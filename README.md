@@ -7,14 +7,32 @@ There are two caching levels:
 1. Each aggregation controls how often it should be refreshed (`cacheTime` in `src/aggregators.js`)
 2. PA endpoints are currently all cached for 30 seconds (`CACHE_TIME` in `src/pa.js`)
 
+### Aggregators
+
 Aggregators define which PA endpoints they need to consume and a transformation function to process the data.
 
-<b>To install:</b>
+```
+{
+    'id': 'example',
+    paDeps': [
+        'olympics/2012-summer-olympics/medal-table',
+        'olympics/2012-summer-olympics/schedule'
+    ],
+    'transform': (medals, schedule) => {
+        return {medals, schedule};
+    },
+    'cacheTime': moment.duration(2, 'hours')
+}
+```
+
+### Install
 
 - `npm install`
 - Copy `config.example.js` to `config.js` and fill in the values
 
-<b>To run:</b> `babel-node index.js`
+### Run 
+
+`babel-node index.js`
 
 ### Files
 - `index.js`: Entry point, processes the aggregators
