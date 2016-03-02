@@ -1,29 +1,7 @@
-import moment from 'moment'
+import aggregators from './src/aggregators'
+import queue from './src/queue'
 import pa from './src/pa'
 import s3 from './src/s3'
-import transformers from './src/transformers'
-import queue from './src/queue'
-
-const aggregators = [
-    {
-        'id': 'medal-table',
-        'paDeps': [
-            'olympics/2012-summer-olympics/medal-table'
-        ],
-        'transform': transformers.medalTable,
-        'cacheTime': moment.duration(2, 'hours')
-    },
-    {
-        'id': 'test',
-        'paDeps': [
-            'olympics/2012-summer-olympics/schedule',
-            'olympics/2012-summer-olympics/medal-table'
-
-        ],
-        'transform': transformers.test,
-        'cacheTime': moment.duration(2, 'seconds')
-    }
-];
 
 aggregators.forEach(aggregator => {
     function process() {
