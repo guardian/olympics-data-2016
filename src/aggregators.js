@@ -46,7 +46,9 @@ export default [
                 .map((dates, discipline) => { return {dates, 'name': discipline}; })
                 .value();
 
-            return {disciplines};
+            var dates = schedule.olympics.schedule.map(s => s.date);
+
+            return {dates, disciplines};
         },
         'cacheTime': moment.duration(2, 'hours')
     }
