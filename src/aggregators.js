@@ -8,7 +8,7 @@ export default [
             'olympics/2012-summer-olympics/medal-table'
         ],
         'transform': medals => {
-            return medals.olympics.games.medalTable.tableEntry.map(tableEntry => {
+            var table = medals.olympics.games.medalTable.tableEntry.map(tableEntry => {
                 return {
                     'position': parseInt(tableEntry.position),
                     'gold': parseInt(tableEntry.gold.value),
@@ -17,6 +17,8 @@ export default [
                     'country': tableEntry.country.identifier
                 };
             });
+
+            return {table};
         },
         'cacheTime': moment.duration(2, 'hours')
     },
@@ -31,15 +33,20 @@ export default [
             });
         },
         'transform': (schedule, daySchedules) => {
-            var days = daySchedules.map((day, dayI) => {
-                var date = schedule.olympics.schedule[dayI].date;
-                var events = day.olympics.scheduledEvent.map(se => se.discipline.identifier);
+            var disciplines = _(daySchedules)
+                .flatMap((day, dayI) => {
+                    var date = schedule.olympics.schedule[dayI].date;
 
-                return {date, 'events': _.uniq(events)};
-            });
-            var disciplines = _(days).flatMap(day => day.events).uniq().value();
+                    return day.olympics.scheduledEvent.map(se => {
+                        return {date, 'discipline': se.discipline.identifier};
+                    });
+                })
+                .groupBy('discipline')
+                .mapValues(dateEvents => _(dateEvents).map(e => e.date).sort().uniq().value())
+                .map((dates, discipline) => { return {dates, 'name': discipline}; })
+                .value();
 
-            return {days, disciplines};
+            return {disciplines};
         },
         'cacheTime': moment.duration(2, 'hours')
     }
