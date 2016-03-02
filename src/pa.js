@@ -4,6 +4,7 @@ import mkdirp from 'mkdirp'
 import moment from 'moment'
 import denodeify from 'denodeify'
 import reqwest from 'reqwest'
+import Bottleneck from 'bottleneck'
 import config from '../config'
 
 const BASE_URL = 'http://olympics.api.press.net/v2';
@@ -15,6 +16,8 @@ var fsStat = denodeify(fs.stat);
 var fsReadFile = denodeify(fs.readFile);
 var fsWriteFile = denodeify(fs.writeFile);
 var mkdirpP = denodeify(mkdirp);
+
+var limiter = new Bottleneck(1, 100); // 10 requests per second limit
 
 function cacheFile(endpoint) {
     return path.join(CACHE_DIR, endpoint) + '.json';
@@ -31,15 +34,17 @@ function requestCache(endpoint) {
 }
 
 function requestUrl(endpoint) {
-    console.log('Requesting URL', endpoint);
+    return limiter.schedule(() => {
+        console.log('Requesting URL', endpoint);
 
-    return reqwest({
-        'url': `${BASE_URL}/${endpoint}`,
-        'type': 'json',
-        'headers': {
-            'Accept': 'application/json',
-            'Apikey': config.pa.apiKey
-        }
+        return reqwest({
+            'url': `${BASE_URL}/${endpoint}`,
+            'type': 'json',
+            'headers': {
+                'Accept': 'application/json',
+                'Apikey': config.pa.apiKey
+            }
+        });
     }).then(resp => {
         return writeCache(endpoint, resp).then(() => resp);
     });
