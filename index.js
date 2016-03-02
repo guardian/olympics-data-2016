@@ -1,10 +1,10 @@
 import moment from 'moment'
-import AWS from 'aws-sdk'
-import config from './config'
 import pa from './src/pa'
+import s3 from './src/s3'
 import transformers from './src/transformers'
+import queue from './src/queue'
 
-const processors = [
+const aggregators = [
     {
         'id': 'medal-table',
         'urlDeps': [
@@ -25,42 +25,23 @@ const processors = [
     }
 ];
 
-var queue = (function () {
-    var items = [], interval;
-
+aggregators.forEach(aggregator => {
     function process() {
-        if (items.length > 0) {
-            let item = items.pop();
-            item().then(process);
-        } else {
-            interval = undefined;
-        }
-    }
+        console.log(`Processing ${aggregator.id}`);
 
-    function add(item) {
-        items.push(item);
-        if (!interval) interval = setTimeout(process, 0);
-    }
-
-    return {add};
-})();
-
-processors.forEach(processor => {
-    function process() {
-        console.log(`Processing ${processor.id}`);
-
-        return Promise.all(processor.urlDeps.map(pa.request))
-            .then(contents => {
-                var out = processor.transform.apply(null, contents);
-            }).catch(err => {
-                console.error(`Error processing ${processor.id}`, err);
-            });
+        return Promise.all(aggregator.urlDeps.map(pa.request)).then(contents => {
+            var out = aggregator.transform.apply(null, contents);
+            return s3.put(aggregator.id, out, aggregator.cacheTime);
+        }).then(() => {
+            setTimeout(tick, aggregator.cacheTime.asMilliseconds())
+        }).catch(err => {
+            console.error(`Error processing ${aggregator.id}`, err);
+        });
     }
 
     function tick() {
         queue.add(process);
     }
 
-    setInterval(tick, processor.cacheTime.asMilliseconds())
     tick();
 });

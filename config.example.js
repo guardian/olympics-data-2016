@@ -1,7 +1,16 @@
 export default {
-    'pa': {'apiKey': ''},
+    'pa': {
+        'apiKey': ''
+    },
     'aws': {
-        'accessKeyId': '',
-        'secretAccessKey': ''
+        's3': {
+            'bucket': '',
+            'dir': ''
+        },
+        'auth': {
+            'accessKeyId': '',
+            'secretAccessKey': '',
+            'region': ''
+        }
     }
 }

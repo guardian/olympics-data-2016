@@ -8,4 +8,4 @@ export default {
     test(schedule, medals) {
         return {'schedule': schedule.olympics.schedule, 'medals': medals.olympics.games.medalTable}
     }
-}
+};
