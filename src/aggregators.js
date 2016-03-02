@@ -6,19 +6,17 @@ export default [
         'paDeps': [
             'olympics/2012-summer-olympics/medal-table'
         ],
-        'transform': medalTable => medalTable,
-        'cacheTime': moment.duration(2, 'hours')
-    },
-    {
-        'id': 'test',
-        'paDeps': [
-            'olympics/2012-summer-olympics/schedule',
-            'olympics/2012-summer-olympics/medal-table'
-
-        ],
-        'transform': (schedule, medals) => {
-            return {'schedule': schedule.olympics.schedule, 'medals': medals.olympics.games.medalTable}
+        'transform': medals => {
+            return medals.olympics.games.medalTable.tableEntry.map(tableEntry => {
+                return {
+                    'position': parseInt(tableEntry.position),
+                    'gold': parseInt(tableEntry.gold.value),
+                    'silver': parseInt(tableEntry.silver.value),
+                    'bronze': parseInt(tableEntry.bronze.value),
+                    'country': tableEntry.country.identifier
+                };
+            });
         },
-        'cacheTime': moment.duration(2, 'seconds')
+        'cacheTime': moment.duration(2, 'hours')
     }
 ];
