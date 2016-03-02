@@ -30,13 +30,16 @@ export default [
                 return 'olympics/2012-summer-olympics/schedule/' + day.date;
             });
         },
-        'transform': (schedule, days) => {
-            return days.map((day, dayI) => {
+        'transform': (schedule, daySchedules) => {
+            var days = daySchedules.map((day, dayI) => {
                 var date = schedule.olympics.schedule[dayI].date;
                 var events = day.olympics.scheduledEvent.map(se => se.discipline.identifier);
 
                 return {date, 'events': _.uniq(events)};
             });
+            var disciplines = _(days).flatMap(day => day.events).uniq().value();
+
+            return {days, disciplines};
         },
         'cacheTime': moment.duration(2, 'hours')
     }
