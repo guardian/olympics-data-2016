@@ -7,7 +7,7 @@ import queue from './src/queue'
 const aggregators = [
     {
         'id': 'medal-table',
-        'urlDeps': [
+        'paDeps': [
             'olympics/2012-summer-olympics/medal-table'
         ],
         'transform': transformers.medalTable,
@@ -15,7 +15,7 @@ const aggregators = [
     },
     {
         'id': 'test',
-        'urlDeps': [
+        'paDeps': [
             'olympics/2012-summer-olympics/schedule',
             'olympics/2012-summer-olympics/medal-table'
 
@@ -29,13 +29,14 @@ aggregators.forEach(aggregator => {
     function process() {
         console.log(`Processing ${aggregator.id}`);
 
-        return Promise.all(aggregator.urlDeps.map(pa.request)).then(contents => {
+        return Promise.all(aggregator.paDeps.map(pa.request)).then(contents => {
             var out = aggregator.transform.apply(null, contents);
             return s3.put(aggregator.id, out, aggregator.cacheTime);
         }).then(() => {
             setTimeout(tick, aggregator.cacheTime.asMilliseconds())
         }).catch(err => {
             console.error(`Error processing ${aggregator.id}`, err);
+            setTimeout(tick, aggregator.cacheTime.asMilliseconds())
         });
     }
 
