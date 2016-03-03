@@ -8,7 +8,7 @@ AWS.config.update(config.aws.auth);
 var s3 = new AWS.S3();
 var s3PutObject = denodeify(s3.putObject.bind(s3));
 
-function put(id, content, cacheTime) {
+function put(id, content) {
     var key = path.join(config.aws.s3.dir, id) + '.json';
     console.log('Putting', key);
 
@@ -17,7 +17,7 @@ function put(id, content, cacheTime) {
         'Key': key,
         'Body': JSON.stringify(content),
         'ACL': 'public-read',
-        'CacheControl': 'max-age=' + cacheTime.asSeconds(),
+        'CacheControl': 'max-age=60',
         'ContentType': 'application/json'
     });
 }

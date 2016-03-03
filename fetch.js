@@ -1,4 +1,5 @@
 import parseArgs from 'minimist'
+import moment from 'moment'
 import aggregators from './src/aggregators'
 import queue from './src/queue'
 import pa from './src/pa'
@@ -28,7 +29,7 @@ aggregators
             }).then(contents => {
                 var out = aggregator.transform.apply(null, contents);
                 if (argv.s3) {
-                    return s3.put(aggregator.id, out, aggregator.cacheTime);
+                    return s3.put(aggregator.id, out);
                 }
             }).catch(err => {
                 console.error(`Error processing ${aggregator.id}`, err);
@@ -47,3 +48,13 @@ aggregators
 
         tick();
     });
+
+if (argv.s3) {
+    let meta = aggregators.map(aggregator => {
+        return {
+            'id': aggregator.id,
+            'cacheTime': aggregator.cacheTime.asMilliseconds()
+        };
+    });
+    s3.put('_aggregators', meta);
+}
