@@ -11,7 +11,7 @@ module.exports = function(grunt) {
         watch: {
             js: {
                 files: ['src/js/**/*'],
-                tasks: ['shell:interactive', 'shell:embed'],
+                tasks: ['shell:embed'],
             },
             css: {
                 files: ['src/css/**/*'],
@@ -35,11 +35,6 @@ module.exports = function(grunt) {
             options: {
                 sourceMap: true
             },
-            interactive: {
-                files: {
-                    'build/main.css': 'src/css/main.scss'
-                }
-            },
             embed: {
                 files: {
                     'build/embed.css': 'src/css/embed.scss'
@@ -48,14 +43,6 @@ module.exports = function(grunt) {
         },
 
         shell: {
-            interactive: {
-                command: './node_modules/.bin/jspm bundle-sfx <%= visuals.jspmFlags %> src/js/main build/main.js --format amd',
-                options: {
-                    execOptions: {
-                        cwd: '.'
-                    }
-                }
-            },
             embed: {
                 command: './node_modules/.bin/jspm bundle-sfx <%= visuals.jspmFlags %> src/js/embed build/embed.js',
                 options: {
@@ -104,9 +91,7 @@ module.exports = function(grunt) {
                     },
                     { // ASSETS
                         expand: true, cwd: 'build/',
-                        src: ['main.js', 'main.css', 'main.js.map', 'main.css.map',
-                            'embed.js', 'embed.css', 'embed.js.map', 'embed.css.map',
-                            'assets/**/*'],
+                        src: ['embed.js', 'embed.css', 'embed.js.map', 'embed.css.map', 'assets/**/*'],
                         dest: 'deploy/<%= visuals.timestamp %>/<%= visuals.timestamp %>'
                     }
                 ]
@@ -226,8 +211,7 @@ module.exports = function(grunt) {
     })
 
     grunt.registerTask('embed', ['shell:embed', 'template:embed', 'sass:embed']);
-    grunt.registerTask('interactive', ['shell:interactive', 'template:bootjs', 'sass:interactive']);
-    grunt.registerTask('all', ['interactive', 'embed', 'copy:assets'])
+    grunt.registerTask('all', ['embed', 'copy:assets'])
     grunt.registerTask('default', ['clean', 'copy:harness', 'all', 'connect', 'watch']);
     grunt.registerTask('build', ['clean', 'all']);
     grunt.registerTask('deploy', ['loadDeployConfig', 'prompt:visuals', 'build', 'copy:deploy', 'aws_s3', 'boot_url']);
