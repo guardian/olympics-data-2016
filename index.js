@@ -4,9 +4,9 @@ import queue from './src/queue'
 import pa from './src/pa'
 import s3 from './src/s3'
 
-var argv = parseArgs(process.argv.slice(2), {'default': {'s3': true, 'pa': true}});
+var argv = parseArgs(process.argv.slice(2), {'default': {'s3': true, 'pa': true, 'loop': true}});
 if (argv.test) {
-    argv.s3 = argv.pa = false;
+    argv.s3 = argv.pa = argv.loop = false;
 }
 
 var aggregatorWhitelist = argv._;
@@ -30,13 +30,15 @@ aggregators
                 if (argv.s3) {
                     return s3.put(aggregator.id, out, aggregator.cacheTime);
                 }
-            }).then(() => {
-                setTimeout(tick, aggregator.cacheTime.asMilliseconds())
             }).catch(err => {
                 console.error(`Error processing ${aggregator.id}`, err);
                 console.error(err.stack);
-                setTimeout(tick, aggregator.cacheTime.asMilliseconds())
-            });
+            })
+            .then(() => {
+                if (argv.loop) {
+                    setTimeout(tick, aggregator.cacheTime.asMilliseconds())
+                }
+            })
         }
 
         function tick() {
