@@ -8,5 +8,13 @@ body {
     padding: 0;
 }
 
-.interactive-embed {
+.olym-aggregator {
+    &[data-error='http'] {
+        background-color: #d61d00;
+        color: white;
+    }
+    &[data-error='stale'] {
+        background-color: #d61d00;
+        color: white;
+    }
 }
