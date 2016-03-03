@@ -50,10 +50,10 @@ function requestUrl(endpoint) {
     });
 }
 
-function request(endpoint) {
+function request(endpoint, forceCache=false) {
     return fsStat(cacheFile(endpoint)).then(stat => {
         var expiryTime = moment(stat.mtime).add(CACHE_TIME);
-        return moment().isAfter(expiryTime) ? requestUrl(endpoint) : requestCache(endpoint);
+        return forceCache || moment().isBefore(expiryTime) ? requestCache(endpoint) : requestUrl(endpoint);
     }).catch(err => {
         if (err.code && err.code === 'ENOENT') {
             return requestUrl(endpoint);

@@ -5,6 +5,7 @@ function process() {
         let item = items.shift();
         item().then(process);
     } else {
+        console.log('Finished processing queue');
         interval = undefined;
     }
 }
