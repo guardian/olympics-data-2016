@@ -9,7 +9,6 @@ import config from '../config'
 
 const BASE_URL = 'http://olympics.api.press.net/v2';
 
-const CACHE_DIR = 'data/';
 const CACHE_TIME = moment.duration(30, 'seconds');
 
 var fsStat = denodeify(fs.stat);
@@ -20,7 +19,7 @@ var mkdirpP = denodeify(mkdirp);
 var limiter = new Bottleneck(1, 100); // 10 requests per second limit
 
 function cacheFile(endpoint) {
-    return path.join(CACHE_DIR, endpoint) + '.json';
+    return path.join(config.pa.cacheDir, endpoint) + '.json';
 }
 
 function writeCache(endpoint, content) {

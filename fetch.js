@@ -53,13 +53,3 @@ function aggregatorFn(aggregator) {
 aggregators
     .filter(aggregator => aggregatorWhitelist.length === 0 || aggregatorWhitelist.indexOf(aggregator.id) > -1)
     .forEach(aggregatorFn);
-
-if (argv.s3) {
-    let meta = aggregators.map(aggregator => {
-        return {
-            'id': aggregator.id,
-            'cacheTime': aggregator.cacheTime.asMilliseconds()
-        };
-    });
-    s3.put('_aggregators', meta);
-}
