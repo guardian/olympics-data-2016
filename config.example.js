@@ -1,8 +1,12 @@
 export default {
     'pa': {
-        'apiKey': ''
+        'apiKey': '',
+        'cacheDir': ''
     },
     'aws': {
+        'sns': {
+            'topic': ''
+        },
         's3': {
             'bucket': '',
             'dir': ''

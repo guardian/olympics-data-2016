@@ -4,6 +4,9 @@ import aggregators from './src/aggregators'
 import queue from './src/queue'
 import pa from './src/pa'
 import s3 from './src/s3'
+import notify from './src/notify'
+
+import www from './www'
 
 var argv = parseArgs(process.argv.slice(2), {'default': {'s3': true, 'pa': true, 'loop': true}});
 if (argv.test) {
@@ -35,6 +38,7 @@ function aggregatorFn(aggregator) {
         }).catch(err => {
             console.error(`Error processing ${aggregator.id}`, err);
             console.error(err.stack);
+            return notify.send(`Error processing ${aggregator.id}`, `${err}\n\n${err.stack}`);
         })
         .then(() => {
             if (argv.loop) {
