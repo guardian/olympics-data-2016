@@ -21,6 +21,7 @@
   "dependencies": {
     "aws-sdk": "^2.2.39",
     "bottleneck": "^1.10.2",
+    "cors": "^2.7.1",
     "denodeify": "^1.2.1",
     "express": "^4.13.4",
     "glob-fs": "^0.1.6",

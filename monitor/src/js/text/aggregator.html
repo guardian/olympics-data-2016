@@ -1,4 +1,18 @@
 <div class="olym-aggregator" {{?it.stats.error}}data-error="{{=it.stats.error.type}}"{{?}}>
-    <h2>{{=it.aggregator.id}}</h2>
-    <p>Last modified: {{=it.stats.lastModified}}</p>
+    <h3>{{=it.id}}</h3>
+    {{?it.stats.error && it.stats.error.message}}
+        <p>{{=it.stats.error.message}}</p>
+    {{?}}
+    <dl class="olym-aggregator__stats">
+        {{?it.cacheTime}}
+            <dt>Cache time</dt>
+            <dd>{{=it.cacheTime.humanize()}}</dd>
+        {{?}}
+        <dt>Last updated</dt>
+        <dd>{{=it.stats.lastModified.fromNow()}} ({{=it.stats.lastModified.format()}})</dd>
+    </dl>
+    <a class="olym-aggregator__link" href="{{=it.contentsUrl}}" target="_blank">See contents</a>
+    <form class="olym-aggregator__refresh" method="POST" action="http://localhost:3000/refresh?type={{=it.type}}&id={{=it.id}}">
+        <button class="olym-aggregator__link">Refresh</button>
+    </form>
 </div>

@@ -1,12 +1,23 @@
 import reqwest from 'reqwest'
 
-const baseUrl = 'https://interactive.guim.co.uk/olympics-2016';
+const baseDataUrl = 'https://interactive.guim.co.uk/olympics-2016';
+const baseStatsUrl = 'http://localhost:3000';
 
-export default function req(url, method='GET') {
-    return reqwest({
-        url: `${baseUrl}/${url}.json`,
-        method,
-        type: 'json',
-        crossOrigin: true
-    });
-}
+export default {
+    data (url, noBody=true) {
+        return reqwest({
+            'url': `${baseDataUrl}/${url}.json`,
+            'method': noBody ? 'HEAD' : 'GET',
+            'type': 'json',
+            'crossOrigin': true
+        });
+    },
+
+    stats(url) {
+        return reqwest({
+            url: `${baseStatsUrl}/${url}.json`,
+            type: 'json',
+            crossOrigin: true
+        });
+    }
+};

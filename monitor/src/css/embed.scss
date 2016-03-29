@@ -8,7 +8,29 @@ body {
     padding: 0;
 }
 
+h1, h2, h3 {
+    margin: 0 0 8px;
+}
+
+h1 {
+    @include fs-headline(6);
+}
+
+h2 {
+    @include fs-header(5);
+}
+
+h3 {
+    @include fs-header(2);
+}
+
 .olym-aggregator {
+    box-sizing: border-box;
+    background-color: #dcdcdc;
+    border: 10px solid white;
+    width: 50%;
+    padding: 5px;
+    float: left;
     &[data-error='http'] {
         background-color: #d61d00;
         color: white;
@@ -17,4 +39,34 @@ body {
         background-color: #d61d00;
         color: white;
     }
+}
+
+.olym-aggregator__stats {
+    @include fs-textSans(3);
+    margin: 0 0 8px;
+
+    dt {
+        font-weight: bold;
+    }
+}
+
+.olym-aggregator__link {
+    @include fs-textSans(2);
+    display: inline-block;
+    padding: 5px 10px;
+    color: white;
+    background-color: #005689;
+    border-radius: 100px;
+    border: 0;
+    margin: 0;
+    cursor: pointer;
+
+    &,
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+.olym-aggregator__refresh {
+    display: inline-block;
 }

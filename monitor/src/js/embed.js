@@ -7,41 +7,47 @@ import embedHTML from './text/embed.html!text'
 import aggregatorHTML from './text/aggregator.html!text'
 
 const lastModifiedFormat =  'ddd, DD, MMM YYYY HH:mm:ss';
-
-console.log(filesize);
+const cacheGracePeriod = 2 * 60 * 1000;
 
 var templateFn = doT.template(embedHTML);
 var aggregatorTemplateFn = doT.template(aggregatorHTML);
 
-function app(el, aggregators) {
-    el.innerHTML = templateFn({aggregators});
+function app(el, aggregators, pa) {
+    el.innerHTML = templateFn({aggregators, pa});
 
     var aggregatorsEl = el.querySelector('.js-aggregators');
+    var paEl = el.querySelector('.js-pa');
 
     aggregators.forEach(aggregator => {
-        var r = req(aggregator.id, 'HEAD').then(resp => {
-            var xhr = r.request;
-            var lastModified = moment(xhr.getResponseHeader('Last-Modified'), lastModifiedFormat);
-
-            var stats = {
-                'lastModified': lastModified.fromNow() + ' (' + lastModified.format() + ')'
-            };
-
-            if (moment().diff(lastModified) > aggregator.cacheTime || true) {
-                stats.error = {'type': 'stale'};
-            }
-            return stats;
-
+        var r = req.data(aggregator.id).then(resp => {
+            var lastModified = moment.utc(r.request.getResponseHeader('Last-Modified'), lastModifiedFormat);
+            var error = moment().diff(lastModified) > aggregator.cacheTime ? {'type': 'stale'} : {};
+            return {lastModified, error};
         }).catch(xhr => {
             return {
-                'lastModified': 'unknown',
+                'lastUpdated': 'unknown',
                 'error': {
                     'type': 'http',
-                    'status': xhr.statusCode
+                    'message': `Fetch error, status ${xhr.statusCode}`
                 }
             };
         }).then(stats => {
-            aggregatorsEl.innerHTML += aggregatorTemplateFn({aggregator, stats});
+            aggregatorsEl.innerHTML += aggregatorTemplateFn({
+                'type': 'aggregator',
+                'id': aggregator.id,
+                'contentsUrl': 'https://interactive.guim.co.uk/olympics-2016/' + aggregator.id + '.json',
+                'cacheTime': moment.duration(aggregator.cacheTime),
+                stats
+            });
+        });
+    });
+
+    pa.forEach(paUrl => {
+        paEl.innerHTML += aggregatorTemplateFn({
+            'type': 'pa',
+            'id': paUrl.file,
+            'contentsUrl': 'http://localhost:3000/cache/' + paUrl.file,
+            'stats': {'lastModified': moment.utc(paUrl.modified)}
         });
     });
 
@@ -50,5 +56,8 @@ function app(el, aggregators) {
 
 window.init = function init(el, config) {
     iframeMessenger.enableAutoResize();
-    req('_aggregators').then(resp => app(el, resp));
+
+    Promise.all([req.stats('aggregators'), req.stats('pa')]).then(([aggregators, pa]) => {
+        app(el, aggregators, pa);
+    });
 };

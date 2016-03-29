@@ -48,12 +48,16 @@ function aggregatorFn(aggregator) {
     }
 
     function tick() {
-        queue.add(process);
+        return queue.add(process);
     }
 
     tick();
+    return tick;
 }
 
+var aggregatorTickers = {};
 aggregators
     .filter(aggregator => aggregatorWhitelist.length === 0 || aggregatorWhitelist.indexOf(aggregator.id) > -1)
-    .forEach(aggregatorFn);
+    .forEach(aggregator => aggregatorTickers[aggregator.id] = aggregatorFn(aggregator));
+
+www.run(aggregatorTickers);
