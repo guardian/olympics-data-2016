@@ -38,7 +38,7 @@ function aggregatorFn(aggregator) {
         }).catch(err => {
             console.error(`Error processing ${aggregator.id}`, err);
             console.error(err.stack);
-            return notify.send(`Error processing ${aggregator.id}`, `${err}\n\n${err.stack}`);
+            notify.send(`Error processing ${aggregator.id}`, `${err}\n\n${err.stack}`);
         })
         .then(() => {
             if (argv.loop) {
