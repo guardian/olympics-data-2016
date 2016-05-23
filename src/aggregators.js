@@ -5,7 +5,7 @@ export default [
     {
         'id': 'medal-table',
         'paDeps': [
-            'olympics/2012-summer-olympics/medal-table'
+            'olympics/2016-summer-olympics/medal-table'
         ],
         'transform': medals => {
             var table = medals.olympics.games.medalTable.tableEntry.map(tableEntry => {
@@ -25,11 +25,11 @@ export default [
     {
         'id': 'schedule',
         'paDeps': [
-            'olympics/2012-summer-olympics/schedule'
+            'olympics/2016-summer-olympics/schedule'
         ],
         'paMoreDeps': schedule => {
             return schedule.olympics.schedule.map(day => {
-                return 'olympics/2012-summer-olympics/schedule/' + day.date;
+                return 'olympics/2016-summer-olympics/schedule/' + day.date;
             });
         },
         'transform': (schedule, daySchedules) => {

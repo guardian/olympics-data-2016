@@ -7,8 +7,6 @@ import reqwest from 'reqwest'
 import Bottleneck from 'bottleneck'
 import config from '../config'
 
-const BASE_URL = 'http://olympics.api.press.net/v2';
-
 const CACHE_TIME = moment.duration(30, 'seconds');
 
 var fsStat = denodeify(fs.stat);
@@ -16,7 +14,7 @@ var fsReadFile = denodeify(fs.readFile);
 var fsWriteFile = denodeify(fs.writeFile);
 var mkdirpP = denodeify(mkdirp);
 
-var limiter = new Bottleneck(1, 100); // 10 requests per second limit
+var limiter = new Bottleneck(1, 1000 / config.pa.rateLimit);
 
 function cacheFile(endpoint) {
     return path.join(config.pa.cacheDir, endpoint) + '.json';
@@ -37,7 +35,7 @@ function requestUrl(endpoint) {
         console.log('Requesting URL', endpoint);
 
         return reqwest({
-            'url': `${BASE_URL}/${endpoint}`,
+            'url': `${config.pa.baseUrl}/${endpoint}`,
             'type': 'json',
             'headers': {
                 'Accept': 'application/json',

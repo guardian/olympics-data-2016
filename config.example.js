@@ -1,7 +1,9 @@
 export default {
     'pa': {
         'apiKey': '',
-        'cacheDir': ''
+        'cacheDir': '',
+        'baseUrl': '',
+        'rateLimit': 10
     },
     'aws': {
         'sns': {
