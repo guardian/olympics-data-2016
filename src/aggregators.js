@@ -81,30 +81,20 @@ export default [
             'olympics/2016-summer-olympics/discipline'
         ],
         'paMoreDeps': discipline => {
-            return discipline.olympics.discipline.map(discipline => {
-                if(discipline.identifier !== "cycling-mountain-bike"){
-                    return 'olympics/2016-summer-olympics/discipline/' + discipline.identifier + '/medal-table/';
-                }
+            return discipline.olympics.discipline.filter(discipline => {
+                return discipline.identifier !== "cycling-mountain-bike"
+            }).map(discipline => {
+                return 'olympics/2016-summer-olympics/discipline/' + discipline.identifier + '/medal-table/';
             });
         },
         'transform': (disciplines,medals) => {
-            console.log(medals)
-            // var disciplines = _(daySchedules)
-            //     .flatMap((day, dayI) => {
-            //         var date = schedule.olympics.schedule[dayI].date;
-
-            //         return day.olympics.scheduledEvent.map(se => {
-            //             return {date, 'discipline': se.discipline.identifier};
-            //         });
-            //     })
-            //     .groupBy('discipline')
-            //     .mapValues(dateEvents => _(dateEvents).map(e => e.date).sort().uniq().value())
-            //     .map((dates, discipline) => { return {dates, 'name': discipline}; })
-            //     .value();
-
-            // var dates = schedule.olympics.schedule.map(s => s.date);
-
-            return {};
+            var disciplines = medals.map(discipline => {
+                return {
+                    "discipline": discipline.olympics.discipline.description,
+                    "medal-table": discipline.olympics.discipline.medalTable.tableEntry
+                }
+            })
+            return {disciplines};
         },
         'cacheTime': moment.duration(2, 'hours')
     }
