@@ -8,22 +8,23 @@ import denodeify from 'denodeify'
 import aggregators from './src/aggregators'
 import config from './config'
 
+const fsStat = denodeify(fs.stat);
+const fsUnlink = denodeify(fs.unlink);
+
+function readdir(d) {
+    var g = glob();
+    return denodeify(g.readdir.bind(g))(d);
+}
+
+function paCacheStats(file) {
+    return fsStat(file).then(stat => {
+        return {'file': file.replace(config.pa.cacheDir, ''), 'modified': stat.mtime};
+    });
+}
+
+
 function run(aggregatorTickers) {
     var app = express();
-
-    function readdir(d) {
-        var g = glob();
-        return denodeify(g.readdir.bind(g))(d);
-    }
-
-    var fsStat = denodeify(fs.stat);
-    var fsUnlink = denodeify(fs.unlink);
-
-    function paCacheStats(file) {
-        return fsStat(file).then(stat => {
-            return {'file': file.replace(config.pa.cacheDir, ''), 'modified': stat.mtime};
-        });
-    }
 
     app.get('/aggregators.json', cors(), (req, res) => {
         var out = aggregators.map(aggregator => {
