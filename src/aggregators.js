@@ -14,7 +14,8 @@ export default [
                     'gold': parseInt(tableEntry.gold.value),
                     'silver': parseInt(tableEntry.silver.value),
                     'bronze': parseInt(tableEntry.bronze.value),
-                    'country': tableEntry.country.identifier
+                    'countryCode': tableEntry.country.identifier,
+                    'country': tableEntry.country.name
                 };
             });
 
