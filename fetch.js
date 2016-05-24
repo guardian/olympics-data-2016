@@ -8,9 +8,9 @@ import notify from './src/notify'
 
 import www from './www'
 
-var argv = parseArgs(process.argv.slice(2), {'default': {'s3': true, 'pa': true, 'loop': true}});
+var argv = parseArgs(process.argv.slice(2), {'default': {'s3': true, 'pa': true, 'loop': true, 'notify': true}});
 if (argv.test) {
-    argv.s3 = argv.pa = argv.loop = false;
+    argv.s3 = argv.pa = argv.loop = argv.notify = false;
 }
 
 var aggregatorWhitelist = argv._;
@@ -38,7 +38,9 @@ function aggregatorFn(aggregator) {
         }).catch(err => {
             console.error(`Error processing ${aggregator.id}`, err);
             console.error(err.stack);
-            notify.send(`Error processing ${aggregator.id}`, `${err}\n\n${err.stack}`);
+            if (argv.notify) {
+                notify.send(`Error processing ${aggregator.id}`, `${err}\n\n${err.stack}`);
+            }
         })
         .then(() => {
             if (argv.loop) {
