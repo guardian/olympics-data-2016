@@ -7,12 +7,20 @@ import reqwest from 'reqwest'
 import Bottleneck from 'bottleneck'
 import config from '../config'
 
-const CACHE_TIME = moment.duration(30, 'seconds');
+const re = (strings, ...values) => new RegExp(String.raw(strings, ...values), 'i');
 
-var fsStat = denodeify(fs.stat);
-var fsReadFile = denodeify(fs.readFile);
-var fsWriteFile = denodeify(fs.writeFile);
-var mkdirpP = denodeify(mkdirp);
+const cacheTimes = [
+    {'endpoint': re`^olympics/[^/]+/discipline$`, 'duration': moment.duration(6, 'hours')},
+    {'endpoint': re`^olympics/[^/]+/schedule$`, 'duration': moment.duration(6, 'hours')},
+
+    // default case
+    {'endpoint': re`^.*$`, 'duration': moment.duration(30, 'seconds')}
+];
+
+const fsStat = denodeify(fs.stat);
+const fsReadFile = denodeify(fs.readFile);
+const fsWriteFile = denodeify(fs.writeFile);
+const mkdirpP = denodeify(mkdirp);
 
 var limiter = new Bottleneck(1, 1000 / config.pa.rateLimit);
 
@@ -49,7 +57,8 @@ function requestUrl(endpoint) {
 
 function request(endpoint, forceCache=false) {
     return fsStat(cacheFile(endpoint)).then(stat => {
-        var expiryTime = moment(stat.mtime).add(CACHE_TIME);
+        var cacheTime = cacheTimes.find(ct => ct.endpoint.test(endpoint)).duration;
+        var expiryTime = moment(stat.mtime).add(cacheTime);
         return forceCache || moment().isBefore(expiryTime) ? requestCache(endpoint) : requestUrl(endpoint);
     }).catch(err => {
         if (err.code && err.code === 'ENOENT') {
