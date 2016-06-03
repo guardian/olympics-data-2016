@@ -1,3 +1,4 @@
+import util from 'util'
 import parseArgs from 'minimist'
 import moment from 'moment'
 import aggregators from './src/aggregators'
@@ -39,7 +40,7 @@ function aggregatorFn(aggregator) {
             console.error(`Error processing ${aggregator.id}`, err);
             console.error(err.stack);
             if (argv.notify) {
-                notify.send(`Error processing ${aggregator.id}`, `${err}\n\n${err.stack}`);
+                notify.send(`Error processing ${aggregator.id}`, `${util.inspect(err)}`);
             }
         })
         .then(() => {
