@@ -24,6 +24,7 @@ function paCacheStats(file) {
 
 
 function run(aggregatorTickers) {
+
     var app = express();
 
     app.get('/aggregators.json', cors(), (req, res) => {

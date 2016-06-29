@@ -51,7 +51,13 @@ function requestUrl(endpoint) {
             }
         });
     }).then(resp => {
-        return writeCache(endpoint, resp).then(() => resp);
+
+        if(resp.olympics){
+            return writeCache(endpoint, resp).then(() => resp);
+        }
+        else {
+            return {}
+        }
     });
 }
 
