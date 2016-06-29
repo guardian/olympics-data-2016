@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import moment from 'moment'
+import fs from 'fs'
 
 export default [
     {
@@ -28,11 +29,13 @@ export default [
         'paDeps': [
             'olympics/2016-summer-olympics/schedule'
         ],
-        'paMoreDeps': schedule => {
-            return schedule.olympics.schedule.map(day => {
-                return 'olympics/2016-summer-olympics/schedule/' + day.date;
-            });
-        },
+        'paMoreDeps': [
+            schedule => {
+                return schedule.olympics.schedule.map(day => {
+                    return 'olympics/2016-summer-olympics/schedule/' + day.date;
+                });
+            }
+        ],
         'transform': (schedule, daySchedules) => {
             var disciplines = _(daySchedules)
                 .flatMap((day, dayI) => {
@@ -81,13 +84,15 @@ export default [
         'paDeps': [
             'olympics/2016-summer-olympics/discipline'
         ],
-        'paMoreDeps': discipline => {
-            return discipline.olympics.discipline.filter(discipline => {
-                return discipline.identifier !== "cycling-mountain-bike"
-            }).map(discipline => {
-                return 'olympics/2016-summer-olympics/discipline/' + discipline.identifier + '/medal-table/';
-            });
-        },
+        'paMoreDeps': [
+            discipline => {
+                return discipline.olympics.discipline.filter(discipline => {
+                    return discipline.identifier !== "cycling-mountain-bike"
+                }).map(discipline => {
+                    return 'olympics/2016-summer-olympics/discipline/' + discipline.identifier + '/medal-table/';
+                });
+            }
+        ],
         'transform': (disciplines,medals) => {
             var disciplines = medals.map(discipline => {
                 return {
@@ -98,5 +103,97 @@ export default [
             return {disciplines};
         },
         'cacheTime': moment.duration(2, 'hours')
+    },{
+        'id' : 'competitors',
+        'paDeps' : [
+            'olympics/2016-summer-olympics/schedule'
+        ],
+        'paMoreDeps' : [
+            schedule => {
+                return schedule.olympics.schedule.map(day => {
+                    return 'olympics/2016-summer-olympics/schedule/' + day.date
+                });
+            },
+            (schedule, daySchedules) => {
+
+                console.log(daySchedules.length)
+
+                return _(daySchedules).slice(0,5).flatMap(ds => ds.olympics.scheduledEvent.slice(0,3).filter(e => e.startListAvailable === 'Yes').map(e => {
+                    return 'olympics/2016-summer-olympics/event-unit/' + e.discipline.event.eventUnit.identifier + '/start-list'
+                })).valueOf()
+
+            } 
+        ],
+        'transform' : (schedule, daySchedules, startLists) => {
+
+            let competitors = _(startLists)
+                .flatMap(sl => sl.olympics.eventUnit.startList.entrant
+                    .map(e => e.participant.competitor ? e.participant.competitor.fullName : 'no name')
+                ).valueOf()
+
+            console.log(competitors)
+
+            return {competitors}
+
+        },
+        'cacheTime' : moment.duration(2, 'hours')
+    },{
+        'id' : 'event-results',
+        'paDeps' : [
+            'olympics/2016-summer-olympics/schedule'
+        ],
+        'paMoreDeps' : [
+            schedule => {
+                return schedule.olympics.schedule.slice(0,20).map(day => {
+                    return 'olympics/2016-summer-olympics/schedule/' + day.date
+                })
+            },
+            (schedule, daySchedules) => {
+
+                return _(daySchedules).flatMap(ds => {
+                    return _(ds.olympics.scheduledEvent).slice(0,20)
+                    .filter(e => e.medalEvent === 'Yes' && e.resultAvailable === 'Yes')
+                    .map(e => {
+                        return 'olympics/2016-summer-olympics/event/' + e.discipline.event.identifier
+                    })
+                    .valueOf()
+                })
+                .uniq()
+                .valueOf()
+
+            },
+            (schedule, daySchedules, events) => {
+
+                return _(events)
+                    .filter(e => e.olympics.event.cumulativeResultAvailable === 'Yes')
+                    .map(e => 'olympics/2016-summer-olympics/event/' + e.olympics.event.identifier + '/cumulative-result')
+            }
+        ],
+
+        'transform' : (schedule, daySchedules, events, cumulativeResults) => {
+
+            let results = _(cumulativeResults).map(r => {
+                return {
+
+                    'eventId' : r.olympics.event.identifier,
+                    'eventDescription' : r.olympics.event.description,
+                    'ranking' : r.olympics.event.result.entrant.map(l => {
+                        return {
+                            'competitor' : l.participant.competitor ? l.participant.competitor.fullName : l.country.longName,
+                            'position' : l.rank ? parseInt(l.rank) : -1
+                    
+                        }
+                    })
+
+                }
+            })
+            .valueOf()
+
+            console.log(results)
+
+            return {results}
+        },
+        cacheTime : moment.duration(2, 'hours')
+
     }
 ];

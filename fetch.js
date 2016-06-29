@@ -6,6 +6,8 @@ import queue from './src/queue'
 import pa from './src/pa'
 import s3 from './src/s3'
 import notify from './src/notify'
+import fs from 'fs'
+import mkdirp from 'mkdirp'
 
 import www from './www'
 
@@ -25,14 +27,25 @@ function aggregatorFn(aggregator) {
         console.log(`Processing ${aggregator.id}`);
 
         return getDeps(aggregator.paDeps).then(contents => {
-            if (aggregator.paMoreDeps) {
-                let moreDeps = aggregator.paMoreDeps.apply(null, contents);
-                return getDeps(moreDeps).then(moreContents => contents.concat([moreContents]));
-            } else {
-                return Promise.resolve(contents);
+
+            if(aggregator.paMoreDeps) {
+                let p = Promise.resolve()
+                for(let i=0; i<aggregator.paMoreDeps.length; i++){
+                    p = p.then(() => {
+                        let moreDeps = aggregator.paMoreDeps[i].apply(null, contents)
+                        return getDeps(moreDeps).then(moreContents => {
+                            contents = contents.concat([moreContents])
+                            return contents
+                        })
+                    })
+                }
+                return p
+            }
+            else {
+                return Promise.resolve(contents)
             }
         }).then(contents => {
-            var out = aggregator.transform.apply(null, contents);
+            var out = aggregator.transform.apply(null, contents)
             if (argv.s3) {
                 return s3.put(aggregator.id, out);
             }
@@ -57,6 +70,8 @@ function aggregatorFn(aggregator) {
     tick();
     return tick;
 }
+
+mkdirp.sync('out')
 
 var aggregatorTickers = {};
 aggregators
