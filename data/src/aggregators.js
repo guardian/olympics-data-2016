@@ -50,7 +50,7 @@ class Aggregator {
 
 export default [
     {
-        'id': 'medal-table',
+        'id': 'medalTable',
         'paDeps': [
             `${path}/medal-table`
         ],
@@ -103,7 +103,7 @@ export default [
         'cacheTime': moment.duration(2, 'hours')
     },
     {
-        'id': 'recent-medals',
+        'id': 'recentMedals',
         'paDeps': [
             `${path}/medal-cast`
         ],
@@ -129,7 +129,7 @@ export default [
         },
         'cacheTime': moment.duration(1, 'hours')
     },{
-        'id': 'medal-table-disciplines',
+        'id': 'medalTableDisciplines',
         'paDeps': [
             `${path}/discipline`
         ],
@@ -153,7 +153,7 @@ export default [
         },
         'cacheTime': moment.duration(2, 'hours')
     },{
-        'id' : 'schedule-details',
+        'id' : 'scheduleDetails',
         'paDeps' : [
             `${path}/schedule`
         ],
@@ -219,7 +219,7 @@ export default [
         },
         'cacheTime' : moment.duration(2, 'hours')
     },{
-        'id' : 'event-results',
+        'id' : 'eventResults',
         'paDeps' : [
             `${path}/schedule`
         ],
@@ -274,7 +274,7 @@ export default [
         cacheTime : moment.duration(2, 'hours')
 
     },{
-        'id' : 'recent-results',
+        'id' : 'recentResults',
         'paDeps': [
             `${path}/medal-cast`
         ],
@@ -361,7 +361,7 @@ export default [
         },
         'cacheTime': moment.duration(1, 'hours')
     },{
-        'id' : 'country-medals',
+        'id' : 'countryMedals',
         'paDeps' : [
             `${path}/country`
         ],
