@@ -1,11 +1,23 @@
 # Olympics 2016 data
 
+## Monitor
+
+--
+
+
+## Interactive
+
+--
+
+
+## Data
+
 Ingests the Press Association Olympics API v2 and outputs aggregations to S3 for interactives to consume.
 
 There are two caching levels:
 
 1. Each aggregation controls how often it should be refreshed (`cacheTime` in `src/aggregators.js`)
-2. PA endpoints are currently all cached for 30 seconds (`CACHE_TIME` in `src/pa.js`)
+2. PA endpoints are configured in `src/pa.js`
 
 ### Aggregators
 
@@ -30,7 +42,7 @@ Aggregators define which PA endpoints they need to consume and a transformation 
 - `npm install`
 - Copy `config.example.js` to `config.js` and fill in the values
 
-### Run 
+### Run
 
 `babel-node index.js`
 
