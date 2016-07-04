@@ -32,7 +32,7 @@ async function renderAll() {
     (await readdir('./src/renderer/templates/*.html')).forEach(template => {
         let name = path.basename(template, '.html');
         let css = fs.readFileSync(`build/${name}.css`).toString();
-        let html = swig.renderFile(template, Object.assign({css}, data));
+        let html = swig.renderFile(template, {...data, css});
         fs.writeFileSync('build/' + path.basename(template), html, 'utf8');
     });
 
