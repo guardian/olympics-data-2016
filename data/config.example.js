@@ -18,8 +18,5 @@ export default {
             'secretAccessKey': '',
             'region': ''
         }
-    },
-    'local': {
-        'aggregatorDir': ''
     }
 }

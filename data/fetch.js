@@ -45,7 +45,7 @@ function aggregatorFn(aggregator) {
             let contents = await getMoreDeps(aggregator.paMoreDeps || [], initialContents);
 
             let data = aggregator.transform(...contents);
-            let localPath = path.join(config.local.aggregatorDir, aggregator.id + '.json');
+            let localPath = path.join('data-out/', aggregator.id + '.json');
             await fsWrite(localPath, JSON.stringify(data));
             if (argv.s3) await s3.put(aggregator.id, data);
         } catch (err) {
@@ -69,7 +69,7 @@ function aggregatorFn(aggregator) {
     return tick;
 }
 
-mkdirp.sync(config.local.aggregatorDir);
+mkdirp.sync('data-out');
 
 var aggregatorTickers = {};
 aggregators
