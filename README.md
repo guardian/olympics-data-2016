@@ -48,17 +48,20 @@ npm run fetch -- [opts] [aggregator, ...]
 ```
 
 Options:
-- `--no-pa`: always use PA cache,
+- `--no-pa`: always use PA cache
 - `--no-s3`: don't upload to S3
 - `--no-loop`: run each aggregator only once
 - `--no-notify`: don't notify on error
 - `--test`: set all of the above
-- `[aggregator, ...]`: run specific aggregators (not all)
+
+`[aggregator, ...]`: run specific aggregators (not all)
 
 ### Files
-- `index.js`: Entry point, processes the aggregators
+- `fetch.js`: Entry point, processes the aggregators
+- `www.js`: Web API for querying state of aggregators
 - `config.js`: Configuration settings, you must set these
 - `src/aggregators.js`: List of aggregators
 - `src/queue.js`: Queue which runs all aggregations on given event loop.
 - `src/pa.js`: PA data (and handles caching PA endpoints)
 - `src/s3.js`: Push data to S3
+- `src/notify.js`: Send notifications via SNS
