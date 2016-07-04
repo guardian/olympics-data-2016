@@ -22,30 +22,21 @@ function getDeps(deps) {
     return Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
 }
 
+function getMoreDeps(deps, contents) {
+    if (deps.length === 0) return Promise.resolve(contents);
+
+    var moreDeps = deps[0](...contents);
+    return getDeps(moreDeps).then(moreContents => getMoreDeps(deps.slice(1), [...contents, moreContents]));
+}
+
 function aggregatorFn(aggregator) {
     function process() {
         console.log(`Processing ${aggregator.id}`);
 
         return getDeps(aggregator.paDeps).then(contents => {
-
-            if(aggregator.paMoreDeps) {
-                let p = Promise.resolve()
-                for(let i=0; i<aggregator.paMoreDeps.length; i++){
-                    p = p.then(() => {
-                        let moreDeps = aggregator.paMoreDeps[i].apply(null, contents)
-                        return getDeps(moreDeps).then(moreContents => {
-                            contents = contents.concat([moreContents])
-                            return contents
-                        })
-                    })
-                }
-                return p
-            }
-            else {
-                return Promise.resolve(contents)
-            }
+            return aggregator.paMoreDeps ? getMoreDeps(aggregator.paMoreDeps, contents) : Promise.resolve(contents);
         }).then(contents => {
-            var out = aggregator.transform.apply(null, contents)
+            var out = aggregator.transform(...contents);
             if (argv.s3) {
                 return s3.put(aggregator.id, out);
             }
