@@ -37,27 +37,28 @@ function getMoreDeps([depFn, ...restDepFns], contents) {
 }
 
 function aggregatorFn(aggregator) {
-    function process() {
+    async function process() {
         console.log(`Processing ${aggregator.id}`);
 
-        return getDeps(aggregator.paDeps).then(contents => {
-            return getMoreDeps(aggregator.paMoreDeps || [], contents);
-        }).then(contents => {
-            var out = aggregator.transform(...contents);
-            var p = fsWrite(path.join(config.local.aggregatorDir, aggregator.id + '.json'), JSON.stringify(out));
-            return argv.s3 ? p.then(() => s3.put(aggregator.id, out)) : p;
-        }).catch(err => {
+        try {
+            let initialContents = await getDeps(aggregator.paDeps);
+            let contents = await getMoreDeps(aggregator.paMoreDeps || [], initialContents);
+
+            let data = aggregator.transform(...contents);
+            let localPath = path.join(config.local.aggregatorDir, aggregator.id + '.json');
+            await fsWrite(localPath, JSON.stringify(data));
+            if (argv.s3) await s3.put(aggregator.id, data);
+        } catch (err) {
             console.error(`Error processing ${aggregator.id}`, err);
             console.error(err.stack);
             if (argv.notify) {
                 notify.send(`Error processing ${aggregator.id}`, `${util.inspect(err)}`);
             }
-        })
-        .then(() => {
-            if (argv.loop) {
-                setTimeout(tick, aggregator.cacheTime.asMilliseconds())
-            }
-        });
+        }
+
+        if (argv.loop) {
+            setTimeout(tick, aggregator.cacheTime.asMilliseconds());
+        }
     }
 
     function tick() {
