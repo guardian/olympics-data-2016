@@ -19,6 +19,15 @@ function parseEntrant(e){
     return null
 }
 
+function parseCompetitor(e) {
+
+    return {
+        'countryCode' : e.country.identifier,
+        'country' : e.country.name,
+        'athlete' : e.type === 'Individual' ? e.participant.competitor.fullName : null
+    }
+}
+
 export default [
     {
         'id': 'medal-table',
@@ -79,7 +88,7 @@ export default [
             `${path}/medal-cast`
         ],
         'transform': medals => {
-            console.log(medals.olympics.games.medalCast)
+
             var list = medals.olympics.games.medalCast.map(tableEntry => {
                 return {
                     "medal": tableEntry.type,
@@ -93,6 +102,8 @@ export default [
                     "eventId":tableEntry.event.identifier
                 }
             });
+
+            console.log(list.length)
 
             return {list};
         },
@@ -122,36 +133,68 @@ export default [
         },
         'cacheTime': moment.duration(2, 'hours')
     },{
-        'id' : 'competitors',
+        'id' : 'schedule-details',
         'paDeps' : [
             `${path}/schedule`
         ],
         'paMoreDeps' : [
             schedule => {
                 return schedule.olympics.schedule.map(day => {
-                    return `{$path}/schedule/` + day.date
-                });
+                    return `${path}/schedule/` + day.date
+                })
             },
             (schedule, daySchedules) => {
 
-                console.log(daySchedules.length)
-
-                return _(daySchedules).flatMap(ds => ds.olympics.scheduledEvent.filter(e => e.startListAvailable === 'Yes').map(e => {
-                    return `${path}/event-unit/` + e.discipline.event.eventUnit.identifier + '/start-list'
-                })).valueOf()
+                return _(daySchedules)
+                    .flatMap(ds => ds.olympics.scheduledEvent
+                        .filter(e => e.startListAvailable === 'Yes')
+                        .map(e => {
+                            return `${path}/event-unit/` + e.discipline.event.eventUnit.identifier + '/start-list'
+                        })
+                    ).valueOf()
 
             } 
         ],
         'transform' : (schedule, daySchedules, startLists) => {
 
             let competitors = _(startLists)
-                .flatMap(sl => sl.olympics.eventUnit.startList.entrant
-                    .map(e => e.participant.competitor ? e.participant.competitor.fullName : 'no name')
-                ).valueOf()
+                .map(sl => {
+                    let eu = sl.olympics.eventUnit
+                    let entrant = eu.startList.entrant
+                    if(!entrant.length) entrant = [entrant]
+                    return [eu.identifier, entrant.map(e => {
+                        return parseCompetitor(e)
+                    })]
+                })
+                .fromPairs()
+                .valueOf()
 
-            console.log(competitors)
+            let scheduleDetails = _.zip(
+                schedule.olympics.schedule.map(day => day.date),
+                daySchedules.map(ds => { 
+                    return ds.olympics.scheduledEvent.map(e => {
 
-            return {competitors}
+                        let eu = e.discipline.event.eventUnit
+
+                        console.log(e.start)
+
+                        return {
+                            'eventUnitId' : eu.identifier,
+                            'eventUnitName' : `${eu.description} (${e.discipline.description})`,
+                            'location' : e.venue.name,
+                            'startTime' : e.start.time, // replace with start.utc ? not available in old API though
+                            'competitors' : competitors[eu.identifier]
+                        }
+                    })
+                })
+            ).map(([date, eventUnits]) => {
+                return {
+                    'date' : date,
+                    'eventUnits' : eventUnits
+                }
+            })
+
+            return { 'scheduleDetails' : scheduleDetails }
 
         },
         'cacheTime' : moment.duration(2, 'hours')
@@ -225,10 +268,21 @@ export default [
                     .uniq()
                     .map(id => `${path}/event-unit/${id}/result`)
                     .valueOf()
+            },
+            (medalCast, eventUnitResults) => {
+
+                return _(eventUnitResults)
+                .map(r => r.olympics.eventUnit)
+                .map(eu => `${path}/event-unit/${eu.identifier}/start-list`)
+                .valueOf()
             }
         ],
 
-        'transform': (medalCast, eventUnitResults) => {
+        'transform': (medalCast, eventUnitResults, startLists) => {
+
+            let starts = startLists.map(sl => sl.olympics.eventUnit.startList.entrant)
+
+            console.log(starts)
 
             let rankings = _(eventUnitResults)
                 .map(r => r.olympics.eventUnit)
@@ -256,10 +310,10 @@ export default [
 
                                 console.log(e.property[0])
                                 let r = e.property[0].value === 'Gold' ? 1 : 2
-                                return { 'rank' : r, 'name' : parseEntrant(e) }
+                                return { 'rank' : r, 'competitor' : parseCompetitor(e) }
                             }
                             else {
-                                return { 'rank' : parseInt(e.rank), 'name' : parseEntrant(e) }
+                                return { 'rank' : parseInt(e.rank), 'competitor' : parseCompetitor(e) }
                             }
                         })
                     }
@@ -269,6 +323,21 @@ export default [
             return {rankings};
         },
         'cacheTime': moment.duration(1, 'hours')
+    },{
+        'id' : 'country-medals',
+        'paDeps' : [
+            `${path}/country`
+        ],
+        'paMoreDeps' : [
+
+            (countries) => {
+                return countries.olympics.country.map(c => `${path}/country/${c.identifier}/medal-cast`)
+            }
+
+        ],
+        transform : (countries, countryRecentMedals) => {
+            console.log(countryRecentMedals)
+        }
     }
 ];
 
