@@ -34,7 +34,7 @@ function aggregatorFn(aggregator) {
         console.log(`Processing ${aggregator.id}`);
 
         return getDeps(aggregator.paDeps).then(contents => {
-            return aggregator.paMoreDeps ? getMoreDeps(aggregator.paMoreDeps, contents) : Promise.resolve(contents);
+            return getMoreDeps(aggregator.paMoreDeps || [], contents);
         }).then(contents => {
             var out = aggregator.transform(...contents);
             if (argv.s3) {
