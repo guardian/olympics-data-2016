@@ -118,7 +118,7 @@ export default [
                 return discipline.olympics.discipline.filter(discipline => {
                     return discipline.identifier !== "cycling-mountain-bike"
                 }).map(discipline => {
-                    return `${path}/discipline/` + discipline.identifier + '/medal-table/';
+                    return `${path}/discipline/${discipline.identifier}/medal-table/`;
                 });
             }
         ],
@@ -140,18 +140,18 @@ export default [
         'paMoreDeps' : [
             schedule => {
                 return schedule.olympics.schedule.map(day => {
-                    return `${path}/schedule/` + day.date
+                    return `${path}/schedule/${day.date}`;
                 })
             },
             (schedule, daySchedules) => {
 
-                return _(daySchedules)
-                    .flatMap(ds => ds.olympics.scheduledEvent
+                return _.flatMap(daySchedules, ds => {
+                    return ds.olympics.scheduledEvent
                         .filter(e => e.startListAvailable === 'Yes')
                         .map(e => {
-                            return `${path}/event-unit/` + e.discipline.event.eventUnit.identifier + '/start-list'
+                            return `${path}/event-unit/${e.discipline.event.eventUnit.identifier}/start-list`;
                         })
-                    ).valueOf()
+                });
 
             } 
         ],
