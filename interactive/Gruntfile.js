@@ -22,7 +22,7 @@ module.exports = function(grunt) {
             },
             js: {
                 files: ['src/js/**/*'],
-                tasks: ['shell:interactive'],
+                tasks: ['jspm'],
             },
             css: {
                 files: ['src/css/**/*.scss'],
@@ -55,14 +55,6 @@ module.exports = function(grunt) {
         },
 
         shell: {
-            interactive: {
-                command: './node_modules/.bin/jspm bundle-sfx <%= visuals.jspmFlags %> src/js/main build/main.js',
-                options: {
-                    execOptions: {
-                        cwd: '.'
-                    }
-                }
-            },
             render: {
                 command: './node_modules/.bin/babel-node src/renderer/render.js',
                 options: {
@@ -70,6 +62,19 @@ module.exports = function(grunt) {
                         cwd: '.'
                     }
                 }
+            }
+        },
+
+        jspm: {
+            options: {
+                sfx: true,
+                minify: true,
+                mangle: true
+            },
+            interactive: {
+                files: [
+                    {expand: true, cwd: 'src/js', 'src': ['*.js', '!config.js'], 'dest': 'build'}
+                ]
             }
         },
 
@@ -163,7 +168,7 @@ module.exports = function(grunt) {
         });
     })
 
-    grunt.registerTask('build', ['sass', 'shell:interactive', 'shell:render', 'copy:assets']);
+    grunt.registerTask('build', ['sass', 'jspm', 'shell:render', 'copy:assets']);
     grunt.registerTask('deploy', ['loadDeployConfig', 'copy', 'build', 'aws_s3', 'boot_url']);
 
     grunt.registerTask('default', ['clean', 'build', 'copy:data', 'connect', 'watch']);
