@@ -75,7 +75,7 @@ var aggregatorTickers = {};
 
 aggregators
     //.filter(aggregator => aggregatorWhitelist.length === 0 || aggregatorWhitelist.indexOf(aggregator.id) > -1)
-    .filter(agg => regexps.length === 0 || regExps.some(r => r.test(agg.id)))
+    .filter(agg => regExps.length === 0 || regExps.some(r => r.test(agg.id)))
     .forEach(aggregator => aggregatorTickers[aggregator.id] = aggregatorFn(aggregator));
 
 www.run(aggregatorTickers);
