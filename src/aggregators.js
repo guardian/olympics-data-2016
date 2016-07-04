@@ -19,6 +19,16 @@ function parseEntrant(e){
     return null
 }
 
+function parseId(e){
+    if(e.type === 'Individual'){
+        return e.participant.competitor.identifier
+    }
+    else if(e.type === 'Team'){
+        return e.code
+    }
+    return null
+}
+
 function parseCompetitor(e) {
 
     return {
@@ -280,7 +290,16 @@ export default [
 
         'transform': (medalCast, eventUnitResults, startLists) => {
 
-            let starts = startLists.map(sl => sl.olympics.eventUnit.startList.entrant)
+            let starts = _(startLists)
+                .map(sl => [sl.olympics.eventUnit.identifier,_(sl.olympics.eventUnit.startList.entrant)
+                    .map(e => {
+                        console.log(e)
+                        return [parseId(e), parseInt(e.order)]
+                    })
+                    .fromPairs()
+                    .valueOf()])
+                .fromPairs()
+                .valueOf()
 
             console.log(starts)
 
@@ -294,26 +313,34 @@ export default [
                         .event
 
                     return {
-                        id: ev.identifier,
+                        evId: ev.identifier,
                         event: `${ev.description} ${ev.disciplineDescription.value}`,
+                        evUnitId: eu.identifier,
                         ut : eu.unitType,
                         eList : eu.result.entrant
                     }
                 })
-                .map(({id, event, ut, eList}) => {
+                .map(({evId, event, evUnitId, ut, eList}) => {
 
                     return {
-                        'eventId' : id,
+                        'eventId' : evId,
                         'eventName' : event,
                         'results' : eList.map(e => {
                             if(/Head to Head/.test(ut)){
 
-                                console.log(e.property[0])
                                 let r = e.property[0].value === 'Gold' ? 1 : 2
-                                return { 'rank' : r, 'competitor' : parseCompetitor(e) }
+                                return {
+                                    'rank' : r,
+                                    'competitor' : parseCompetitor(e),
+                                    'originalPosition' : starts[evUnitId][parseId(e)]
+                                }
                             }
                             else {
-                                return { 'rank' : parseInt(e.rank), 'competitor' : parseCompetitor(e) }
+                                return {
+                                    'rank' : parseInt(e.rank),
+                                    'competitor' : parseCompetitor(e),
+                                    'originalPosition' : starts[evUnitId][parseId(e)]
+                                }
                             }
                         })
                     }
