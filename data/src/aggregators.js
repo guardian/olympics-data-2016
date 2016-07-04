@@ -262,7 +262,6 @@ export default [
                         return {
                             'competitor' : l.participant.competitor ? l.participant.competitor.fullName : l.country.longName,
                             'position' : l.rank ? parseInt(l.rank) : -1
-                    
                         }
                     })
 
@@ -271,7 +270,7 @@ export default [
             .valueOf()
             return {results}
         },
-        cacheTime : moment.duration(2, 'hours')
+        'cacheTime': moment.duration(2, 'hours')
 
     },{
         'id' : 'recentResults',
@@ -372,9 +371,10 @@ export default [
             }
 
         ],
-        transform : (countries, countryRecentMedals) => {
-            console.log(countryRecentMedals)
-        }
+        'transform': (countries, countryRecentMedals) => {
+            return countryRecentMedals;
+        },
+        'cacheTime': moment.duration(1, 'hours');
     }
 ];
 
