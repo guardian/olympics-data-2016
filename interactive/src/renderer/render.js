@@ -30,7 +30,9 @@ async function renderAll() {
     mkdirp.sync('build/embed');
 
     (await readdir('./src/renderer/templates/*.html')).forEach(template => {
-        let html = swig.renderFile(template, data);
+        let name = path.basename(template, '.html');
+        let css = fs.readFileSync(`build/${name}.css`).toString();
+        let html = swig.renderFile(template, Object.assign({css}, data));
         fs.writeFileSync('build/' + path.basename(template), html, 'utf8');
     });
 
