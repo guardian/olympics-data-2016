@@ -21,7 +21,7 @@ if (argv.test) {
     argv.s3 = argv.pa = argv.loop = argv.notify = false;
 }
 
-var aggregatorWhitelist = argv._;
+var regExps = argv._.map(r => new RegExp(r))
 
 function getDeps(deps) {
     return Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
@@ -72,9 +72,10 @@ function aggregatorFn(aggregator) {
 mkdirp.sync('data-out');
 
 var aggregatorTickers = {};
+
 aggregators
-    .filter(aggregator => aggregatorWhitelist.length === 0 || aggregatorWhitelist.indexOf(aggregator.id) > -1)
-    .map(a => new Aggregator(a.id,a.paDeps, a.paMoreDeps, a.transform))
+    //.filter(aggregator => aggregatorWhitelist.length === 0 || aggregatorWhitelist.indexOf(aggregator.id) > -1)
+    .filter(agg => regexps.length === 0 || regExps.some(r => r.test(agg.id)))
     .forEach(aggregator => aggregatorTickers[aggregator.id] = aggregatorFn(aggregator));
 
 www.run(aggregatorTickers);

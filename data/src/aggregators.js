@@ -40,15 +40,16 @@ function parseCompetitor(e) {
 
 
 export class Aggregator {
-    constructor(id, deps, moreDeps, transform){
+    constructor(id, deps, moreDeps, transform, cacheTime){
         this.id = id
         this.paDeps = deps
         this.paMoreDeps = moreDeps
         this.transform = transform
+        this.cacheTime = cacheTime
     }
 }
 
-export var aggregators = [
+var aggregatorSpecs = [
     {
         'id': 'medalTable',
         'paDeps': [
@@ -152,72 +153,72 @@ export var aggregators = [
             return {disciplines};
         },
         'cacheTime': moment.duration(2, 'hours')
-    },{
-        'id' : 'scheduleDetails',
-        'paDeps' : [
-            `${path}/schedule`
-        ],
-        'paMoreDeps' : [
-            schedule => {
-                return schedule.olympics.schedule.map(day => {
-                    return `${path}/schedule/${day.date}`;
-                })
-            },
-            (schedule, daySchedules) => {
+    // },{
+    //     'id' : 'scheduleDetails',
+    //     'paDeps' : [
+    //         `${path}/schedule`
+    //     ],
+    //     'paMoreDeps' : [
+    //         schedule => {
+    //             return schedule.olympics.schedule.map(day => {
+    //                 return `${path}/schedule/${day.date}`;
+    //             })
+    //         },
+    //         (schedule, daySchedules) => {
 
-                return _.flatMap(daySchedules, ds => {
-                    return ds.olympics.scheduledEvent
-                        .filter(e => e.startListAvailable === 'Yes')
-                        .map(e => {
-                            return `${path}/event-unit/${e.discipline.event.eventUnit.identifier}/start-list`;
-                        })
-                });
+    //             return _.flatMap(daySchedules, ds => {
+    //                 return ds.olympics.scheduledEvent
+    //                     .filter(e => e.startListAvailable === 'Yes')
+    //                     .map(e => {
+    //                         return `${path}/event-unit/${e.discipline.event.eventUnit.identifier}/start-list`;
+    //                     })
+    //             });
 
-            } 
-        ],
-        'transform' : (schedule, daySchedules, startLists) => {
+    //         } 
+    //     ],
+    //     'transform' : (schedule, daySchedules, startLists) => {
 
-            let competitors = _(startLists)
-                .map(sl => {
-                    let eu = sl.olympics.eventUnit
-                    let entrant = eu.startList.entrant
-                    if(!entrant.length) entrant = [entrant]
-                    return [eu.identifier, entrant.map(e => {
-                        return parseCompetitor(e)
-                    })]
-                })
-                .fromPairs()
-                .valueOf()
+    //         let competitors = _(startLists)
+    //             .map(sl => {
+    //                 let eu = sl.olympics.eventUnit
+    //                 let entrant = eu.startList.entrant
+    //                 if(!entrant.length) entrant = [entrant]
+    //                 return [eu.identifier, entrant.map(e => {
+    //                     return parseCompetitor(e)
+    //                 })]
+    //             })
+    //             .fromPairs()
+    //             .valueOf()
 
-            let scheduleDetails = _.zip(
-                schedule.olympics.schedule.map(day => day.date),
-                daySchedules.map(ds => { 
-                    return ds.olympics.scheduledEvent.map(e => {
+    //         let scheduleDetails = _.zip(
+    //             schedule.olympics.schedule.map(day => day.date),
+    //             daySchedules.map(ds => { 
+    //                 return ds.olympics.scheduledEvent.map(e => {
 
-                        let eu = e.discipline.event.eventUnit
+    //                     let eu = e.discipline.event.eventUnit
 
-                        console.log(e.start)
+    //                     console.log(e.start)
 
-                        return {
-                            'eventUnitId' : eu.identifier,
-                            'eventUnitName' : `${eu.description} (${e.discipline.description})`,
-                            'location' : e.venue.name,
-                            'startTime' : e.start.time, // replace with start.utc ? not available in old API though
-                            'competitors' : competitors[eu.identifier]
-                        }
-                    })
-                })
-            ).map(([date, eventUnits]) => {
-                return {
-                    'date' : date,
-                    'eventUnits' : eventUnits
-                }
-            })
+    //                     return {
+    //                         'eventUnitId' : eu.identifier,
+    //                         'eventUnitName' : `${eu.description} (${e.discipline.description})`,
+    //                         'location' : e.venue.name,
+    //                         'startTime' : e.start.time, // replace with start.utc ? not available in old API though
+    //                         'competitors' : competitors[eu.identifier]
+    //                     }
+    //                 })
+    //             })
+    //         ).map(([date, eventUnits]) => {
+    //             return {
+    //                 'date' : date,
+    //                 'eventUnits' : eventUnits
+    //             }
+    //         })
 
-            return { 'scheduleDetails' : scheduleDetails }
+    //         return { 'scheduleDetails' : scheduleDetails }
 
-        },
-        'cacheTime' : moment.duration(2, 'hours')
+    //     },
+    //     'cacheTime' : moment.duration(2, 'hours')
     },{
         'id' : 'eventResults',
         'paDeps' : [
@@ -378,3 +379,31 @@ export var aggregators = [
     }
 ];
 
+let days = []
+for(let i=0; i<5; i++){
+
+    let date = moment('2016-08-05').add(i, 'days').format('YYYY-MM-DD')
+    days.push({
+        id: `scheduleDetails${date}`,
+        paDeps: [`${path}/schedule/${date}`],
+        transform : (daySchedule) => {
+
+            let scheduleDetails = daySchedule.olympics.scheduledEvent.map(e => {
+                let eu = e.discipline.event.eventUnit
+                return {
+                    'eventUnitId' : eu.identifier,
+                    'eventUnitName' : `${eu.description} (${e.discipline.description})`,
+                    'location' : e.venue.name,
+                    'startTime' : e.start.utc // replace with start.utc ? not available in old API though
+                }
+            })
+
+            return { 'scheduleDetails' : scheduleDetails }
+
+        },
+        'cacheTime' : moment.duration(2, 'hours')
+    })
+}
+
+export var aggregators = aggregatorSpecs.concat(days)
+    .map(as => new Aggregator(as.id, as.paDeps, as.paMoreDeps, as.transform, as.cacheTime))
