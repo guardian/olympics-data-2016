@@ -74,6 +74,7 @@ mkdirp.sync('data-out');
 var aggregatorTickers = {};
 aggregators
     .filter(aggregator => aggregatorWhitelist.length === 0 || aggregatorWhitelist.indexOf(aggregator.id) > -1)
+    .map(a => new Aggregator(a.id,a.paDeps, a.paMoreDeps, a.transform))
     .forEach(aggregator => aggregatorTickers[aggregator.id] = aggregatorFn(aggregator));
 
 www.run(aggregatorTickers);
