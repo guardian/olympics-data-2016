@@ -22,11 +22,13 @@ function getDeps(deps) {
     return Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
 }
 
-function getMoreDeps(deps, contents) {
-    if (deps.length === 0) return Promise.resolve(contents);
-
-    var moreDeps = deps[0](...contents);
-    return getDeps(moreDeps).then(moreContents => getMoreDeps(deps.slice(1), [...contents, moreContents]));
+function getMoreDeps([depFn, ...restDepFns], contents) {
+    if (depFn) {
+        let moreDeps = depFn(...contents);
+        return getDeps(moreDeps).then(moreContents => getMoreDeps(restDepFns, [...contents, moreContents]));
+    } else {
+        return Promise.resolve(contents);
+    }
 }
 
 function aggregatorFn(aggregator) {
