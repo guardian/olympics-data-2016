@@ -39,7 +39,7 @@ function parseCompetitor(e) {
 }
 
 
-class Aggregator {
+export class Aggregator {
     constructor(id, deps, moreDeps, transform){
         this.id = id
         this.paDeps = deps
@@ -48,7 +48,7 @@ class Aggregator {
     }
 }
 
-export default [
+export var aggregators = [
     {
         'id': 'medalTable',
         'paDeps': [
