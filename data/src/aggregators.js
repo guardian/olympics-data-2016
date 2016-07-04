@@ -374,7 +374,7 @@ export default [
         'transform': (countries, countryRecentMedals) => {
             return countryRecentMedals;
         },
-        'cacheTime': moment.duration(1, 'hours');
+        'cacheTime': moment.duration(1, 'hours')
     }
 ];
 
