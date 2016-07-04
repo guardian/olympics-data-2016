@@ -9,7 +9,6 @@
 
 --
 
-
 ## Data
 
 Ingests the Press Association Olympics API v2 and outputs aggregations to S3 for interactives to consume.
@@ -44,7 +43,17 @@ Aggregators define which PA endpoints they need to consume and a transformation 
 
 ### Run
 
-`babel-node index.js`
+```
+npm run fetch -- [opts] [aggregator, ...]
+```
+
+Options:
+- `--no-pa`: always use PA cache,
+- `--no-s3`: don't upload to S3
+- `--no-loop`: run each aggregator only once
+- `--no-notify`: don't notify on error
+- `--test`: set all of the above
+- `[aggregator, ...]`: run specific aggregators (not all)
 
 ### Files
 - `index.js`: Entry point, processes the aggregators
