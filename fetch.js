@@ -1,15 +1,20 @@
 import util from 'util'
 import parseArgs from 'minimist'
 import moment from 'moment'
+import fs from 'fs'
+import path from 'path'
+import mkdirp from 'mkdirp'
+import denodeify from 'denodeify'
 import aggregators from './src/aggregators'
 import queue from './src/queue'
 import pa from './src/pa'
 import s3 from './src/s3'
 import notify from './src/notify'
-import fs from 'fs'
-import mkdirp from 'mkdirp'
+import config from './config'
 
 import www from './www'
+
+const fsWrite = denodeify(fs.writeFile.bind(fs));
 
 var argv = parseArgs(process.argv.slice(2), {'default': {'s3': true, 'pa': true, 'loop': true, 'notify': true}});
 if (argv.test) {
@@ -39,9 +44,8 @@ function aggregatorFn(aggregator) {
             return getMoreDeps(aggregator.paMoreDeps || [], contents);
         }).then(contents => {
             var out = aggregator.transform(...contents);
-            if (argv.s3) {
-                return s3.put(aggregator.id, out);
-            }
+            var p = fsWrite(path.join(config.local.aggregatorDir, aggregator.id + '.json'), JSON.stringify(out));
+            return argv.s3 ? p.then(() => s3.put(aggregator.id, out)) : p;
         }).catch(err => {
             console.error(`Error processing ${aggregator.id}`, err);
             console.error(err.stack);
@@ -64,7 +68,7 @@ function aggregatorFn(aggregator) {
     return tick;
 }
 
-mkdirp.sync('out')
+mkdirp.sync(config.local.aggregatorDir);
 
 var aggregatorTickers = {};
 aggregators
