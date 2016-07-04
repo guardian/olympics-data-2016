@@ -38,6 +38,16 @@ function parseCompetitor(e) {
     }
 }
 
+
+class Aggregator {
+    constructor(id, deps, moreDeps, transform){
+        this.id = id
+        this.paDeps = deps
+        this.paMoreDeps = moreDeps
+        this.transform = transform
+    }
+}
+
 export default [
     {
         'id': 'medal-table',
