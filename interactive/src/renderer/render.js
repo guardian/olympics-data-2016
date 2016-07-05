@@ -4,8 +4,9 @@ import glob from 'glob-fs'
 import denodeify from 'denodeify'
 import swig from 'swig'
 import mkdirp from 'mkdirp'
+import _ from 'lodash'
 
-const dataDir = '../data/data-html/';
+const dataDir = '../data/data-out/';
 
 async function readdir(d) {
     let g = glob();
@@ -18,6 +19,15 @@ async function getAllData() {
 
     (await readdir(dataDir + '*.json')).map(file => {
         data[path.basename(file, '.json')] = JSON.parse(fs.readFileSync(file));
+    });
+
+    let maxMedalCount = _.max(data.medalTable.table.map(entry => Math.max(entry.bronze, entry.silver, entry.gold)));
+    data.medalTable.table.forEach(row => {
+        row.circleSizes = {
+            "bronze": row.bronze === 0 ? 0 : (row.bronze/maxMedalCount)*7 + 3,
+            "silver": row.silver === 0 ? 0 : (row.silver/maxMedalCount)*7 + 3,
+            "gold": row.gold === 0 ? 0 : (row.gold/maxMedalCount)*7 + 3,
+        }
     });
 
     return data;

@@ -303,15 +303,12 @@ var aggregatorSpecs = [
             let starts = _(startLists)
                 .map(sl => [sl.olympics.eventUnit.identifier,_(sl.olympics.eventUnit.startList.entrant)
                     .map(e => {
-                        console.log(e)
                         return [parseId(e), parseInt(e.order)]
                     })
                     .fromPairs()
                     .valueOf()])
                 .fromPairs()
                 .valueOf()
-
-            console.log(starts)
 
             let rankings = _(eventUnitResults)
                 .map(r => r.olympics.eventUnit)
@@ -331,28 +328,36 @@ var aggregatorSpecs = [
                     }
                 })
                 .map(({evId, event, evUnitId, ut, eList}) => {
+                    let results = eList.map(e => {
+                        if(/Head to Head/.test(ut)){
+
+                            let r = e.property[0].value === 'Gold' ? 1 : 2
+                            return {
+                                'rank' : r,
+                                'competitor' : parseCompetitor(e),
+                                'originalPosition' : starts[evUnitId][parseId(e)]
+                            }
+                        }
+                        else {
+                            return {
+                                'rank' : parseInt(e.rank),
+                                'competitor' : parseCompetitor(e),
+                                'originalPosition' : starts[evUnitId][parseId(e)]
+                            }
+                        }
+                    });
+                    let medals = _.sortBy(results, 'rank')
+                        .filter(r => r.rank <= 3)
+                        .map(r => {
+                            r.medal = ['gold', 'silver', 'bronze'][r.rank - 1]
+                            return r;
+                        });
 
                     return {
                         'eventId' : evId,
                         'eventName' : event,
-                        'results' : eList.map(e => {
-                            if(/Head to Head/.test(ut)){
-
-                                let r = e.property[0].value === 'Gold' ? 1 : 2
-                                return {
-                                    'rank' : r,
-                                    'competitor' : parseCompetitor(e),
-                                    'originalPosition' : starts[evUnitId][parseId(e)]
-                                }
-                            }
-                            else {
-                                return {
-                                    'rank' : parseInt(e.rank),
-                                    'competitor' : parseCompetitor(e),
-                                    'originalPosition' : starts[evUnitId][parseId(e)]
-                                }
-                            }
-                        })
+                        results,
+                        medals
                     }
                 })
                 .valueOf()

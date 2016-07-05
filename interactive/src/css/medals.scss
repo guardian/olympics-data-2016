@@ -1,0 +1,523 @@
+@import "fonts";
+@import "mq";
+@import "share";
+
+$headerPrimaryBlue: rgba(169,215,240,1);
+$headerSecondaryBlue: rgba(169,215,240,0.7);
+$gold:rgba(250,220,2,1);
+$silver:rgba(217,217,217,1);
+$bronze:rgba(243,111,33,1);
+
+body,
+figure.interactive {
+    margin: 0;
+    padding: 0;
+    background-color: #dcdcdc;
+}
+
+// Link styles don't exist on the app
+a {
+    &,
+    &:hover,
+    &:active {
+        color: #005689;
+    }
+
+    text-decoration: none;
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.interactive-container {
+    margin: 0 auto;
+    box-sizing: border-box;
+    background-color: white;
+
+    padding: 0 10px;
+    @include mq(mobileLandscape) {
+        padding: 0 20px;
+    }
+
+    @each $bp in (tablet, desktop, leftCol, wide) {
+        @include mq($bp) {
+            max-width: map-get($mq-breakpoints, $bp);
+        }
+    }
+}
+
+.interactive-container{
+	color:#333;
+	*{
+		box-sizing:border-box;
+	}
+	header{
+		color:#fff;
+		.om-header-primary{
+			background-color: $headerPrimaryBlue;
+			margin:0 -10px;
+			padding:6px 10px 18px;
+		}
+		.om-header-secondary{
+			background-color: $headerSecondaryBlue;
+			margin:0 -10px;
+			padding:6px 10px 18px;
+		}
+		h1{
+			font-weight:400;
+			font-family:$f-serif-headline;
+			margin:0;
+			font-size:28px;
+			line-height:1em;
+		}
+		h2{
+			font-weight:400;
+			font-family:$f-serif-headline;
+			margin:0;
+			font-size:16px;
+			line-height: 18px;
+			span{
+				font-weight:bold;
+				display: block;
+			}
+		}
+		@include mq(mobileLandscape) {
+	        .om-header-primary,.om-header-secondary{
+	        	margin:0 -20px;
+	        	padding-left:20px;
+	        	padding-right:20px;
+	        }
+	        h1{
+	        	font-size:36px;
+	        }
+	    }
+	    @include mq(leftCol){
+	    	h1,h2{
+	    		margin-left:160px;
+	    	}
+	    }
+	    @include mq(wide){
+	    	h1,h2{
+	    		margin-left:240px;
+	    	}
+	    	h1{
+	    		font-size:44px;
+	    	}
+	    }
+	}
+
+	#om-main-content{
+		.om-section{
+			margin-top:30px;
+			position: relative;
+			h3{
+				font-size:18px;
+				font-family:$f-serif-headline;
+				font-weight:500;
+				margin:0;
+			}
+			h4{
+				font-size:13px;
+				color:#ccc;
+				font-family: $f-sans-serif-text;
+				font-weight:100;
+				margin:3px 0 0;
+			}
+			.section-title-container{
+				margin-bottom:12px;
+			}
+			.section-content-container{
+				max-width:620px;
+				position: relative;
+			}
+		}
+		.om-filter{
+			background-color:#f9f9f9;
+			margin:12px -10px;
+			padding:6px 12px;
+
+			p{
+				font-size:18px;
+				font-weight:600;
+				font-family:$f-serif-headline;
+				margin:0;
+			}
+
+			select{
+				font-size:18px;
+				font-weight:600;
+				font-family:$f-serif-headline;
+				margin:0;
+				color:#2a88c5;
+				border:none;
+				border-bottom:1px dotted;
+				border-radius:0;
+				padding-left:0;
+				background:none;
+				padding-right:12px;
+				outline:none;
+				background-image: url(assets/imgs/arrow-down-blue.svg);
+				background-size:18px;
+				background-repeat:no-repeat;
+				background-position: right 0 center;
+			}
+			@include mq(mobileLandscape){
+				margin-left:-20px;
+				margin-right:-20px;
+				padding-left:20px;
+				padding-right:20px
+			}
+			@include mq(leftCol){
+				.om-filter-content{
+					margin-left:160px;
+				}
+			}
+			@include mq(wide){
+				.om-filter-content{
+					margin-left:240px;
+				}
+			}
+		}
+		@include mq(mobileLandscape) {
+			.om-section{
+				h3{
+					font-size:21px;
+				}
+				h4{
+					font-size:14px;
+				}
+			}
+		}
+		@include mq(desktop) {
+			.om-section{
+				margin-top:30px;
+			}
+		}
+		@include mq(leftCol){
+			.om-section{
+				h3{
+					font-size:24px;
+				}
+				.section-title-container{
+					position: absolute;
+					top:0;
+					left:0;
+					width:140px;
+				}
+				.section-content-container{
+					margin-left:160px;
+				}
+			}
+		}
+		@include mq(wide){
+			.om-section{
+				h3{
+					font-size:28px;
+				}
+				.section-title-container{
+					position: absolute;
+					top:0;
+					left:0;
+					width:220px;
+				}
+				.section-content-container{
+					margin-left:240px;
+				}
+			}
+		}
+	}
+
+	#section-leaderboard{
+		.section-content-container{
+			// overflow: hidden;
+		}
+		table{
+			width:100%;
+			border-collapse:collapse;
+			tr{
+				position: relative;
+			}
+			.hidden-row{
+				display:none;
+			}
+			&.show-hidden{
+				.hidden-row{
+					display: table-row;
+				}
+			}
+			td{
+				font-family:$f-sans-serif-text;
+				font-size:12px;
+				color:#767676;
+				padding:6px 0;
+			}
+			td.medaltable-row-position, td.medaltable-row-country,td.medaltable-row-total{
+				font-family:$f-serif-headline;
+				font-size:14px;
+				color:#333;
+			}
+			td.medaltable-row-total{
+				font-weight:bold;
+				text-align: right;
+			}
+			td.medaltable-row-position{
+				width:10px;
+			}
+			td.medaltable-row-flag{
+				width:30px;
+			}
+			td.medaltable-row-country{
+				width:15%;
+				// position: relative;
+			}
+			td.medaltable-row-gold,td.medaltable-row-silver,td.medaltable-row-bronze{
+				text-align: center;
+				width:22%;
+				position: relative;
+			}
+
+			.medal-circle-container{
+				position: absolute;
+				top:calc(50% - 3px) !important;
+				left:calc(50% - 3px) !important;
+				.medal-mask{
+					width:6px;
+					height:4px;
+					display: block;
+					background:#fff;
+					position: absolute;
+					top:0;
+					border:1px solid #fff;
+					box-sizing:content-box;
+				}
+				.medal-circle{
+					width:6px;
+					height:6px;
+					border-radius:3px;
+					display: block;
+					position: absolute;
+					top:0;
+				}
+			}
+			.medal-label{
+				position: relative;
+				&[data-count="0"]{
+					background:#fff;
+					padding:0 4px;
+				}
+			}
+
+			td.medaltable-row-gold .medal-circle{
+				background-color:rgba(250,220,2,0.2)
+			}
+
+			td.medaltable-row-silver .medal-circle{
+				background-color:rgba(217,217,217,0.4)
+			}
+
+			td.medaltable-row-bronze .medal-circle{
+				background-color:rgba(243,111,33,0.2)
+			}
+
+			.medaltable-flag{
+				width:20px;
+				height:20px;
+				border-radius:18px;
+				background-size:130% 100%;
+				background-position:center;
+				background-repeat:no-repeat;
+			}
+			.row-line{
+				height:1px;
+				background:#efefef;
+				width:calc(100% - 100px);
+				display: inline-block;
+				position: absolute;
+				margin-top:5px;
+				margin-left:10px;
+				z-index:0;
+			}
+		}
+		#expand-button{
+			background:none;
+			border-radius:30px;
+			height:30px;
+			border:1px solid #ccc;
+			font-family:$f-sans-serif-text;
+			padding-left:30px;
+			padding-right:12px;
+			color:#767676;
+			outline:none;
+			cursor:pointer;
+			transition: 200ms color, 200ms border-color;
+			background-image:url(assets/imgs/plus.svg);
+			background-size:13px;
+			background-repeat:no-repeat;
+			background-position: 9px center;
+			font-size:13px;
+			padding-bottom:0;
+			padding-top:0;
+			margin-top:6px;
+			&.hide-button{
+				background-image:url(assets/imgs/minus.svg);
+			}
+			&:hover{
+				border-color:#767676;
+				color:#333;
+			}
+		}
+	}
+
+	#section-recentmedals{
+		table{
+			width:100%;
+			border-collapse:collapse;
+				
+			td{
+				font-family:$f-sans-serif-text;
+				font-size:12px;
+				vertical-align: top;
+			}
+			.recentmedals-row-discipline-full{
+				border-top:1px dotted #eee;
+				td{
+					padding-top:6px;
+					padding-bottom:3px;
+				}
+			}
+			.recentmedals-row-info{
+				td{
+					padding-bottom:12px;
+					padding-right:3px;
+				}
+			}
+			.recentmedals-row-discipline{
+				display:none;
+			}
+			.medalist-country{
+				display:block;
+			}
+			.medalist-icon{
+				display: inline-block;
+				width:8px;
+				height:8px;
+				border-radius:10px;
+				background:#fff;
+				border:1px solid #fff;
+				&.color-bronze{ border-color:$bronze; }
+				&.color-silver{ border-color:$silver; }
+				&.color-gold{ border-color:$gold; }
+			}
+			.recentmedals-row-medalist{
+				width:33.3333333%
+			}
+			.recentmedals-row-allresults{
+				ul{
+					margin:0;
+					padding:0;
+					display:none;
+					// transition:1s max-height;
+					li{
+						opacity:0;
+						list-style:none;
+					}
+				}
+				&.row-open{
+					ul{
+						display:block;
+					}
+					li{
+						opacity:1;
+					}
+				}
+			}
+			.recentmedals-row-extra-btn button{
+				border:none;
+				background-image: url(assets/imgs/plus.svg);
+				width:13px;
+				height:13px;
+				background-color:transparent;
+				background-size:100% 100%;
+				outline:none;
+				cursor:pointer;
+			}
+		}
+		@include mq(tablet){
+			table{
+				td{
+					font-size:13px;
+				}
+				.recentmedals-row-discipline-full{
+					display:none;
+				}
+				.recentmedals-row-discipline{
+					display:table-cell;
+					width:34%;
+				}
+				.recentmedals-row-info{
+					border-top:1px dotted #eee;
+					td{
+						padding-top:6px;
+					}
+				}
+				.recentmedals-row-medalist{
+					width:22%;
+				}
+			}
+		}
+	}
+	.section-schedule{
+		table{
+			width:100%;
+			border-collapse:collapse;
+			tr{
+				border-top:1px dotted #eee;
+			}
+			td{
+				font-family:$f-sans-serif-text;
+				font-size:12px;
+				vertical-align: top;
+				padding:6px 3px 3px 0;
+
+			}
+			.schedule-row-time{
+				width:15%;
+			}
+			.schedule-row-name{
+				width:55%;
+			}
+			.schedule-row-location{
+				width:30%;
+			}
+			.medalist-icon{
+				display: inline-block;
+				width:8px;
+				height:8px;
+				border-radius:10px;
+				background:#fff;
+				border:1px solid #fff;
+				&.color-bronze{ border-color:$bronze; }
+				&.color-silver{ border-color:$silver; }
+				&.color-gold{ border-color:$gold; }
+			}
+			
+			.recentmedals-row-extra-btn button{
+				border:none;
+				background-image: url(assets/imgs/plus.svg);
+				width:13px;
+				height:13px;
+				background-color:transparent;
+				background-size:100% 100%;
+				outline:none;
+				cursor:pointer;
+			}
+		}
+		@include mq(tablet){
+			table{
+				td{
+					font-size:13px;
+				}
+			}
+		}
+	}
+}
