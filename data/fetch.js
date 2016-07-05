@@ -5,7 +5,7 @@ import fs from 'fs'
 import path from 'path'
 import mkdirp from 'mkdirp'
 import denodeify from 'denodeify'
-import {aggregators, Aggregator} from './src/aggregators'
+import aggregators from './src/aggregators'
 import queue from './src/queue'
 import pa from './src/pa'
 import s3 from './src/s3'
@@ -74,7 +74,6 @@ mkdirp.sync('data-out');
 var aggregatorTickers = {};
 
 aggregators
-    //.filter(aggregator => aggregatorWhitelist.length === 0 || aggregatorWhitelist.indexOf(aggregator.id) > -1)
     .filter(agg => regExps.length === 0 || regExps.some(r => r.test(agg.id)))
     .forEach(aggregator => aggregatorTickers[aggregator.id] = aggregatorFn(aggregator));
 
