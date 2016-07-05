@@ -78,4 +78,6 @@ aggregators
     .filter(agg => regExps.length === 0 || regExps.some(r => r.test(agg.id)))
     .forEach(aggregator => aggregatorTickers[aggregator.id] = aggregatorFn(aggregator));
 
-www.run(aggregatorTickers);
+if (argv.loop) {
+    www.run(aggregatorTickers);
+}
