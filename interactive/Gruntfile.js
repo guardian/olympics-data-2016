@@ -109,7 +109,8 @@ module.exports = function(grunt) {
                         src: [
                             'main.html', 'main.css', 'main.js', 'main.js.map',
                             '*.json', 'embed/*.html',
-                            'data/*.json'
+                            'data/*.json',
+                            'assets/**/*'
                         ],
                         dest: '<%= visuals.s3.path %>/booted',
                         params: { CacheControl: 'max-age=30' }
