@@ -218,7 +218,7 @@ export default [
         },
         'cacheTime': moment.duration(1, 'hours')
     },
-    {
+    /*{
         'id' : 'countryMedals',
         'paDeps' : [
             `${path}/country`
@@ -234,5 +234,5 @@ export default [
             return countryRecentMedals;
         },
         'cacheTime': moment.duration(1, 'hours')
-    }
+    }*/
 ];

@@ -54,8 +54,7 @@ function requestUrl(endpoint) {
 
         if(resp.olympics){
             return writeCache(endpoint, resp).then(() => resp);
-        }
-        else {
+        } else {
             return {}
         }
     });
