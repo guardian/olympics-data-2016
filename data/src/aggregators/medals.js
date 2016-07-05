@@ -86,31 +86,6 @@ export default [
         'cacheTime': moment.duration(1, 'hours')
     },
     {
-        'id': 'medalTableDisciplines',
-        'paDeps': [
-            `${path}/discipline`
-        ],
-        'paMoreDeps': [
-            discipline => {
-                return discipline.olympics.discipline.filter(discipline => {
-                    return discipline.identifier !== "cycling-mountain-bike"
-                }).map(discipline => {
-                    return `${path}/discipline/${discipline.identifier}/medal-table/`;
-                });
-            }
-        ],
-        'transform': (disciplines,medals) => {
-            var disciplines = medals.map(discipline => {
-                return {
-                    "discipline": discipline.olympics.discipline.description,
-                    "medal-table": discipline.olympics.discipline.medalTable.tableEntry
-                }
-            })
-            return {disciplines};
-        },
-        'cacheTime': moment.duration(2, 'hours')
-    },
-    {
         'id' : 'eventResults',
         'paDeps' : [
             `${path}/schedule`
