@@ -28,11 +28,11 @@
                                     <td class="medaltable-row-flag">
                                         <div class="medaltable-flag" style="background-image:url(assets/imgs/flags/{{ entry.countryCode|lower }}.svg)" />
                                     </td>
-                                    <td class="medaltable-row-country">{{ entry.country }} <div class="row-line"></div></td>
+                                    <td class="medaltable-row-country">{{ entry.country }}</td>
                                     <td class="medaltable-row-gold">
                                         <span class="medal-circle-container">
                                             <span class="medal-mask" style="transform:scaleX({{ entry.circleSizes.gold }})"></span>
-                                            <span class="medal-circle" style="transform:scale({{ entry.circleSizes.gold }})"></span>
+                                            <div class="medal-circle" style="transform:scale({{entry.circleSizes.gold}})"></div>
                                         </span>
                                         <span class="medal-label" data-count="{{ entry.gold }}">{{ entry.gold }}</span>
                                     </td>

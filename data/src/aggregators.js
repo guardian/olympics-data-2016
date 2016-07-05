@@ -31,10 +31,24 @@ function parseId(e){
 
 function parseCompetitor(e) {
 
+    let athlete = null
+
+    if(e.type === 'Individual'){
+        athlete = e.participant.competitor.fullName
+    }
+    else if(e.type === 'Team'){
+        if(e.participant.length === 2){
+            athlete = e.participant.map(p => p.competitor.lastName).sort().join('/')
+        }
+        else {
+            athlete = e.country.name
+        }
+    }
+
     return {
         'countryCode' : e.country.identifier,
         'country' : e.country.name,
-        'athlete' : e.type === 'Individual' ? e.participant.competitor.fullName : null
+        'athlete' : athlete
     }
 }
 
