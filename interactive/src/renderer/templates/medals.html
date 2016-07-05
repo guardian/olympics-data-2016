@@ -30,10 +30,9 @@
                                     </td>
                                     <td class="medaltable-row-country">{{ entry.country }}</td>
                                     <td class="medaltable-row-gold">
-                                        <span class="medal-circle-container">
-                                            <span class="medal-mask" style="transform:scaleX({{ entry.circleSizes.gold }})"></span>
+                                        <div class="medal-circle-container">
                                             <div class="medal-circle" style="transform:scale({{entry.circleSizes.gold}})"></div>
-                                        </span>
+                                        </div>
                                         <span class="medal-label" data-count="{{ entry.gold }}">{{ entry.gold }}</span>
                                     </td>
                                     <td class="medaltable-row-silver">
@@ -69,24 +68,19 @@
                     <h4>Tuesday, 16 Aug, Day 5 of 17</h4>
                 </div>
                 <div class="section-content-container">
-                    <table>
+                    <ul class='om-recent'>
                         {% for entry in recentResults.rankings %}
-                            <tbody>
-                                <tr class="recentmedals-row-discipline-full">
-                                    <td colspan="6">{{entry.eventName}}</td>
-                                </tr>
-                                <tr class="recentmedals-row-info">
-                                    <td class="recentmedals-row-discipline">{{entry.eventName}}</td>
-                                    {% for medal in entry.medals %}
-                                        <td class="recentmedals-row-medalist medal-{{medal.medal}}">
-                                            {% if medal.competitor %}
-                                            <span class="medalist-name">{{medal.competitor.athlete}} <span class="medalist-icon color-{{medal.medal}}"></span></span>
-                                            <span class="medalist-country">({{medal.competitor.countryCode}})</span>
+                            <li class="recentmedals-row-discipline-full om-recent-event">
+                                <h4 class='om-recent-eventname'>{{entry.eventName}}</h4>
+                                {% for medal in entry.medals %}
+                                    <div class="recentmedals-row-medalist medal-{{medal.medal}} om-recent-el">
+                                        {% if medal.competitor %}
+                                        <span class="medalist-icon color-{{medal.medal}}"></span><span class="medalist-name">{{medal.competitor.athlete}}</span>
+                                        <span class="medalist-country">({{medal.competitor.countryCode}})</span>
                                             {% endif %}
-                                        </td>
-                                    {% endfor %}
-                                    <td class="recentmedals-row-extra-btn" align="right"><button></button></td>
-                                </tr>
+                                    </div>
+                                {% endfor %}
+                                <!-- <div class="recentmedals-row-extra-btn"><button></button></div>          
                                 <tr class="recentmedals-row-allresults">
                                     <td class="recentmedals-row-discipline"></td>
                                     <td colspan="6" class="recentmedals-row-results-container">
@@ -95,10 +89,10 @@
                                             <li>{{result.competitor.athlete}} ({{result.competitor.countryCode}})</li>
                                             {% endfor %}
                                         </ul>
-                                    </td>
-                                </tr>
-                             </tbody>
+                                    </td> -->
+                            </li>
                         {% endfor %}
+                    </ul>
                     </table>
                 </div>
             </section>

@@ -46,6 +46,44 @@ a {
     }
 }
 
+.om-recent {
+	list-style-type: none;
+	font-size: 0;
+}
+
+.om-recent-event {
+
+	border-top: 1px solid #ccc;
+	padding-top: 4px;
+	margin-bottom: 8px;
+	width: 100%;
+}
+
+.om-recent-el {
+	display: inline-block;
+	vertical-align: top;
+	@include fs-textSans(3)
+	width: 33%;
+}
+
+.om-recent-eventname {
+	margin-top: 4px;
+	margin-bottom: 8px;
+}
+
+.medalist-icon{
+	display: inline-block;
+	width:8px;
+	height:8px;
+	border-radius:10px;
+	background:#fff;
+	border:2px solid #fff;
+	margin-right: 4px;
+	&.color-bronze{ border-color:$bronze; }
+	&.color-silver{ border-color:$silver; }
+	&.color-gold{ border-color:$gold; }
+}
+
 .interactive-container{
 	color:#333;
 	*{
@@ -121,7 +159,7 @@ a {
 				color:#ccc;
 				font-family: $f-sans-serif-text;
 				font-weight:100;
-				margin:3px 0 0;
+				//margin:3px 0 0;
 			}
 			.section-title-container{
 				margin-bottom:12px;
@@ -280,22 +318,13 @@ a {
 
 			.medal-circle-container{
 				position: absolute;
-				top:calc(50% - 3px);
-				left:calc(50% - 3px);
-				.medal-mask{
-					width:7px;
-					height:4px;
-					display: block;
-					background:#fff;
-					position: absolute;
-					top:0;
-					border:1px solid #fff;
-					box-sizing:content-box;
-				}
+				top:calc(50% - 4px);
+				left:calc(50% - 4px);
+
 				.medal-circle{
-					width:7px;
-					height:7px;
-					border-radius:3.5px;
+					width:8px;
+					height:8px;
+					border-radius:500px;
 					display: block;
 					position: absolute;
 					top:0;
@@ -490,17 +519,6 @@ a {
 			}
 			.schedule-row-location{
 				width:30%;
-			}
-			.medalist-icon{
-				display: inline-block;
-				width:8px;
-				height:8px;
-				border-radius:10px;
-				background:#fff;
-				border:1px solid #fff;
-				&.color-bronze{ border-color:$bronze; }
-				&.color-silver{ border-color:$silver; }
-				&.color-gold{ border-color:$gold; }
 			}
 			
 			.recentmedals-row-extra-btn button{
