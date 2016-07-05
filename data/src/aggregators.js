@@ -86,38 +86,6 @@ var aggregatorSpecs = [
         'cacheTime': moment.duration(2, 'hours')
     },
     {
-        'id': 'schedule',
-        'paDeps': [
-            `${path}/schedule`
-        ],
-        'paMoreDeps': [
-            schedule => {
-                return schedule.olympics.schedule.map(day => {
-                    return `${path}/schedule/` + day.date;
-                });
-            }
-        ],
-        'transform': (schedule, daySchedules) => {
-            var disciplines = _(daySchedules)
-                .flatMap((day, dayI) => {
-                    var date = schedule.olympics.schedule[dayI].date;
-
-                    return day.olympics.scheduledEvent.map(se => {
-                        return {date, 'discipline': se.discipline.identifier};
-                    });
-                })
-                .groupBy('discipline')
-                .mapValues(dateEvents => _(dateEvents).map(e => e.date).sort().uniq().value())
-                .map((dates, discipline) => { return {dates, 'name': discipline}; })
-                .value();
-
-            var dates = schedule.olympics.schedule.map(s => s.date);
-
-            return {dates, disciplines};
-        },
-        'cacheTime': moment.duration(2, 'hours')
-    },
-    {
         'id': 'recentMedals',
         'paDeps': [
             `${path}/medal-cast`
