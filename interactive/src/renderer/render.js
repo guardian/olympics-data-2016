@@ -33,6 +33,11 @@ async function getAllData() {
     return data;
 }
 
+function writeFile(file, data) {
+    console.log('Writing', file);
+    fs.writeFileSync(file, data, 'utf8');
+}
+
 async function renderAll() {
     let data = await getAllData();
 
@@ -43,7 +48,7 @@ async function renderAll() {
         let name = path.basename(template, '.html');
         let css = fs.readFileSync(`build/${name}.css`).toString();
         let html = swig.renderFile(template, {...data, css});
-        fs.writeFileSync('build/' + path.basename(template), html, 'utf8');
+        writeFile(`build/${path.basename(template)}`, html);
     });
 
     let embedCSS = fs.readFileSync('build/embed.css');
@@ -59,10 +64,10 @@ async function renderAll() {
             'headline': 'Olympics', // TODO
             'trailText': 'Olympics' // TODO
         };
-        fs.writeFileSync(`build/${name}.json`, JSON.stringify(source), 'utf8');
+        writeFile(`build/${name}.json`, JSON.stringify(source));
 
         let embedHTML = swig.renderFile('./src/renderer/templates/embeds/_base.html', {html, 'css': embedCSS});
-        fs.writeFileSync(`build/embed/${name}.html`, embedHTML, 'utf8');
+        writeFile(`build/embed/${name}.html`, embedHTML);
     });
 }
 
