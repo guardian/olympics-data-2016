@@ -1,0 +1,104 @@
+@import "fonts";
+@import "mq";
+
+$headerPrimaryBlue: rgba(169,215,240,1);
+$headerSecondaryBlue: rgba(169,215,240,0.7);
+
+$gold: rgba(250,220,2,1);
+$silver: rgba(217,217,217,1);
+$bronze: rgba(243,111,33,1);
+
+$goldLight: rgba(250,220,2,0.2);
+$silverLight: rgba(217,217,217,0.4);
+$bronzeLight: rgba(243,111,33,0.2);
+
+body {
+    @include fs-bodyCopy(2);
+    margin: 0;
+    padding: 0;
+    background-color: #dcdcdc;
+    color: #333;
+}
+
+// Link styles don't exist on the app
+a {
+    &,
+    &:hover,
+    &:active {
+        color: #005689;
+    }
+
+    text-decoration: none;
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.om-container {
+    margin: 0 auto;
+    box-sizing: border-box;
+    background-color: white;
+
+    padding: 0 10px;
+    @include mq(mobileLandscape) {
+        padding: 0 20px;
+    }
+
+    @each $bp in (tablet, desktop, leftCol, wide) {
+        @include mq($bp) {
+            max-width: map-get($mq-breakpoints, $bp);
+        }
+    }
+}
+
+.om-header {
+    @include f-headline;
+
+    margin: 0 -10px;
+    padding: 6px 10px 18px;
+    @include mq(mobileLandscape) {
+        margin: 0 -20px;
+        padding: 6px 20px 18px;
+    }
+    @include mq(leftCol) {
+        padding-left: 180px;
+    }
+    @include mq(wide) {
+        padding-left: 260px;
+    }
+
+    &.om-header--primary {
+        @include fs-headline(5, $size-only: true);
+        background-color: $headerPrimaryBlue;
+    }
+
+    &.om-header--secondary {
+        @include fs-headline(2, $size-only: true);
+        background-color: $headerSecondaryBlue;
+        b {
+            display: block;
+        }
+    }
+}
+
+.om-section {
+    position: relative;
+    margin: 10px 0;
+    @include mq(leftCol) {
+        padding-left: 160px;
+    }
+    @include mq(wide) {
+        padding-left: 240px;
+    }
+}
+
+.om-section__title {
+    @include mq(leftCol) {
+        position: absolute;
+        left: 0;
+        width: 140px;
+    }
+    @include mq(wide) {
+        width: 220px;
+    }
+}

@@ -6,8 +6,11 @@ import swig from 'swig'
 import mkdirp from 'mkdirp'
 import _ from 'lodash'
 import * as d3 from 'd3'
+import moment from 'moment'
 
 const dataDir = '../data/data-out/';
+
+swig.setFilter('datefmt', (date, fmt) => moment(date).format(fmt));
 
 async function readdir(d) {
     let g = glob();

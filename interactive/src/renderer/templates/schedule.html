@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+    <style>{{ css|raw }}</style>
+</head>
+<body>
+    <div class="om-container">
+        <h1 class="om-header om-header--primary">Schedule</h1>
+        <h2 class="om-header om-header--secondary">
+            Rio 2016 Olympics day-by-day events to watch
+            <b>Medal count</b>
+        </h2>
+        {% for date in scheduleAll %}
+            <div class="om-section">
+                <div class="om-section__title">
+                    <h3 class="om-schedule-date">{{ date.date|datefmt('dddd, D MMM') }}</h3>
+                    <p class="om-schedule-date-no">Day {{ loop.index }} of {{ scheduleAll.length }}</p>
+                </div>
+                {% for discipline in date.disciplines %}
+                    <h4 class="om-schedule-discipline">{{ discipline.name }}</h4>
+                    <ul class="om-events">
+                        {% for event in discipline.events %}
+                            <li class="om-events__event">
+                                <p class="om-events__event__time">
+                                    {{ event.start|datefmt('HH:mm') }} -
+                                    {{ event.end|datefmt('HH:mm') }}
+                                </p>
+                                <p class="om-events__event__name">{{ event.name }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

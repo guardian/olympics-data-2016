@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import moment from 'moment'
+import 'moment-range'
 import fs from 'fs'
 import config from '../../config'
 import assert from 'assert'
@@ -7,29 +8,15 @@ import assert from 'assert'
 const phaseId = evt => evt.discipline.event.eventUnit.phaseDescription.identifier;
 const unitId = evt => evt.discipline.event.eventUnit.identifier;
 
-// some event units seem to be aggregate units
-// any event units which are part of the same phase which are entirely contained
-// within another event unit will become "child event units"
-function calcParentEvent(evts, evt1) {
-    return evts.find(evt2 => {
-        return phaseId(evt1) === phaseId(evt2) &&
+function canCombine(group, evt1) {
+    if (group) {
+        let evt2 = group[0];
+        return evt1.phaseId === evt2.phaseId &&
             evt1.venue.identifier === evt2.venue.identifier &&
-            evt1.start.utc >= evt2.start.utc && evt1.end.utc <= evt2.end.utc
-    });
-}
-
-function exportEvent(evt) {
-    let out = {
-        'unitId': unitId(evt),
-        'name': evt.description,
-        'start': evt.start.utc,
-        'end': evt.end.utc,
-        'status': evt.status,
-        'venueName': evt.venue.name
-    };
-    if (evt.childEvents && evt.childEvents.length > 0) out.childEvents = evt.childEvents.map(exportEvent);
-
-    return out;
+            (evt1.start >= evt2.start && evt1.start <= evt2.end ||
+             evt1.end >= evt2.start && evt1.end <= evt2.end);
+    }
+    return false;
 }
 
 export default [
@@ -53,21 +40,38 @@ export default [
 
                             let events = _(disciplineEvents)
                                 .map(evt => {
-                                    return {...evt, 'parentEvent': calcParentEvent(disciplineEvents, evt)};
+                                    return {
+                                        'name': evt.description,
+                                        'start': evt.start.utc,
+                                        'end': evt.end.utc,
+                                        'status': evt.status,
+                                        'unitId': unitId(evt),
+                                        'phaseId': phaseId(evt),
+                                        'venue': evt.venue
+                                    };
                                 })
-                                .groupBy(evt => unitId(evt.parentEvent))
-                                .map(eventUnits => {
-                                    let [[parentEvent], childEvents] = _.partition(eventUnits, evt => {
-                                        return unitId(evt) === unitId(evt.parentEvent)
-                                    });
-
-                                    return exportEvent({...parentEvent, childEvents});
+                                .sortBy(evt => `${evt.phaseId}:${evt.start}`)
+                                .reduce((groups, evt) => {
+                                    let [group, ...otherGroups] = groups;
+                                    return canCombine(group, evt) ?
+                                        [[evt, ...group], ...otherGroups] : [[evt], ...groups];
+                                }, [])
+                                .map(group => {
+                                    let name = _.maxBy(group, evt => moment(evt.end).diff(evt.start)).name;
+                                    let start = _.min(group.map(evt => evt.start));
+                                    let end = _.max(group.map(evt => evt.end));
+                                    return {
+                                        name, start, end,
+                                        'group': group.sort((a, b) => a.start < b.start ? -1 : 1),
+                                        'status': group[0].status,
+                                        'venue': group[0].venue
+                                    };
                                 })
-                                .valueOf();
+                                .sort((a, b) => a.start < b.start ? -1 : 1);
 
                             return {
-                                'disciplineName': discipline.description,
-                                'disciplineId': discipline.identifier,
+                                'name': discipline.description,
+                                'id': discipline.identifier,
                                 events
                             };
                         })

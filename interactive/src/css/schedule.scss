@@ -1,0 +1,48 @@
+@import "common";
+
+.om-schedule-date {
+    @include fs-header(2);
+    font-weight: 600;
+    margin: 0;
+}
+
+.om-schedule-date-no {
+    @include fs-textSans(3);
+    color: #bdbdbd;
+    margin: 0 0 6px;
+}
+
+.om-schedule-discipline {
+    @include fs-header(2);
+    font-weight: 500;
+    margin: 0;
+}
+
+.om-events {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+    max-width: 660px;
+}
+
+.om-events__event {
+    @include fs-textSans(3);
+    position: relative;
+    border-top: 1px dotted #dcdcdc;
+    padding: 3px 0 3px 120px;
+
+    &.om-events__event--group {
+        color: #bdbdbd;
+        border-top: 0;
+    }
+}
+
+.om-events__event__time {
+    position: absolute;
+    left: 0;
+    margin: 0;
+}
+
+.om-events__event__name {
+    margin: 0;
+}
