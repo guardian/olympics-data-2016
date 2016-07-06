@@ -57,12 +57,11 @@ export default [
                                 })
                                 .groupBy(evt => unitId(evt.parentEvent))
                                 .map(eventUnits => {
-                                    let [parentEvents, childEvents] = _.partition(eventUnits, evt => {
+                                    let [[parentEvent], childEvents] = _.partition(eventUnits, evt => {
                                         return unitId(evt) === unitId(evt.parentEvent)
                                     });
-                                    assert(parentEvents.length === 1);
 
-                                    return exportEvent({...parentEvents[0], childEvents});
+                                    return exportEvent({...parentEvent, childEvents});
                                 })
                                 .valueOf();
 
