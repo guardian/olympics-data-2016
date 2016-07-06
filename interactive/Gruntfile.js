@@ -12,8 +12,7 @@ module.exports = function(grunt) {
 
 
     grunt.initConfig({
-
-        visuals: { },
+        visuals: {'s3': grunt.file.readJSON('./cfg/s3.json')},
 
         watch: {
             data: {
@@ -112,7 +111,7 @@ module.exports = function(grunt) {
                             'data/*.json',
                             'assets/**/*'
                         ],
-                        dest: '<%= visuals.s3.path %>/booted',
+                        dest: '<%= visuals.s3.path %>',
                         params: { CacheControl: 'max-age=30' }
                     }
                 ]
@@ -139,43 +138,28 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('loadDeployConfig', function() {
-        grunt.config('visuals', {
-            s3: grunt.file.readJSON('./cfg/s3.json'),
-            timestamp: Date.now(),
-            jspmFlags: '-m',
-            assetPath: '<%= visuals.s3.domain %><%= visuals.s3.path %>/<%= visuals.timestamp %>'
-        });
-    })
-
-    grunt.registerTask('boot_url', function() {
+    grunt.registerTask('urls', function() {
         grunt.log.write('\nMAIN URL: '['green'].bold)
-        grunt.log.writeln(grunt.template.process('<%= visuals.s3.domain %><%= visuals.s3.path %>/booted/main.html'))
+        grunt.log.writeln(grunt.template.process('<%= visuals.s3.domain %><%= visuals.s3.path %>/main.html'))
 
         var baseUrl = 'http://gu.com/'; // TODO
 
         embeds.forEach(embed => {
             grunt.log.writeln(`\n${embed}: `['green'].bold);
 
-            var snapUri = grunt.template.process(`<%= visuals.s3.domain %><%= visuals.s3.path %>/booted/${embed}.json`);
+            var snapUri = grunt.template.process(`<%= visuals.s3.domain %><%= visuals.s3.path %>/${embed}.json`);
             var params = [
                 ['gu-snapType', 'json.html'],
                 ['gu-snapUri', snapUri]
             ];
             grunt.log.writeln(baseUrl + '?' + params.map(p => `${p[0]}=${encodeURIComponent(p[1])}`).join('&'));
 
-            var embedUri = grunt.template.process(`<%= visuals.s3.domain %><%= visuals.s3.path %>/booted/embed/${embed}.html`);
+            var embedUri = grunt.template.process(`<%= visuals.s3.domain %><%= visuals.s3.path %>/embed/${embed}.html`);
             grunt.log.writeln(embedUri);
         });
     })
 
-    grunt.registerTask('build', ['sass', 'jspm', 'shell:render', 'copy:assets']);
-    grunt.registerTask('deploy', ['loadDeployConfig', 'copy', 'build', 'aws_s3', 'boot_url']);
-
-    grunt.registerTask('default', ['clean', 'build', 'copy:data', 'connect', 'watch']);
-
-    grunt.registerTask('urls', ['loadDeployConfig', 'boot_url']);
-
-    grunt.loadNpmTasks('grunt-aws');
-
+    grunt.registerTask('build', ['clean', 'sass', 'jspm', 'shell:render', 'copy']);
+    grunt.registerTask('deploy', ['build', 'aws_s3', 'urls']);
+    grunt.registerTask('default', ['build', 'connect', 'watch']);
 }
