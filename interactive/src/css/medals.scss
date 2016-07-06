@@ -8,6 +8,10 @@ $gold:rgba(250,220,2,1);
 $silver:rgba(217,217,217,1);
 $bronze:rgba(243,111,33,1);
 
+$goldLight: rgba(250,220,2,0.2);
+$silverLight: rgba(217,217,217,0.4);
+$bronzeLight: rgba(243,111,33,0.2);
+
 body,
 figure.interactive {
     margin: 0;
@@ -69,6 +73,102 @@ a {
 .om-recent-eventname {
 	margin-top: 4px;
 	margin-bottom: 8px;
+}
+
+.om-table {
+	@include fs-textSans(4)
+}
+
+.om-table-row {
+	margin: 16px 0;
+	position: relative;
+
+	&:before {
+		border-top: 1px solid #ccc;
+		content: '';
+		margin: 0 auto;
+		position: absolute;
+		top: 50%;
+		width: 100%;
+		z-index: 0;
+	}
+}
+
+.om-table-el {
+	display: inline-block;
+	position: relative;
+}
+
+.om-table-el--flag {
+	width: 20px;
+	height: 20px;
+	margin-bottom: -6px;
+}
+
+.om-table-el--country {
+	width: 25%;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.om-table-el--medal {
+	width: 20%;
+	position: relative;
+	text-align: center;
+}
+
+.om-table-el--total {
+	font-weight: bold;
+	text-align: right;
+	padding: 0 4px;
+	background-color: white;
+}
+
+.om-table-country-label {
+	background-color: white;
+	padding: 0 4px;
+}
+
+.om-medal-circle{
+	width:8px;
+	height:8px;
+	border-radius:500px;
+	display: block;
+	position: absolute;
+	left: calc(50% - 4px);
+	top: calc(50% - 4px);
+	z-index: 2;
+}
+
+.om-medal-circle--gold {
+	background-color: $goldLight;
+
+}
+
+.om-medal-white {
+	width:8px;
+	height:8px;
+	background-color: white;
+	z-index: 0;
+	display: block;
+	position: absolute;
+	left: calc(50% - 4px);
+	top: calc(50% - 4px);
+}
+
+.om-medal-circle--silver {
+	background-color: $silverLight;
+}
+
+.om-medal-circle--bronze {
+	background-color: $bronzeLight;
+}
+
+.om-medal-label{
+	display: inline-block;
+	margin: auto;
+	position: relative;
+
 }
 
 .medalist-icon{
@@ -336,18 +436,6 @@ a {
 					background:#fff;
 					padding:0 4px;
 				}
-			}
-
-			td.medaltable-row-gold .medal-circle{
-				background-color:rgba(250,220,2,0.2)
-			}
-
-			td.medaltable-row-silver .medal-circle{
-				background-color:rgba(217,217,217,0.4)
-			}
-
-			td.medaltable-row-bronze .medal-circle{
-				background-color:rgba(243,111,33,0.2)
 			}
 
 			.medaltable-flag{

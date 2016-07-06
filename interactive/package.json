@@ -31,6 +31,7 @@
     "jspm": "^0.16.39"
   },
   "dependencies": {
+    "d3": "^4.1.0",
     "denodeify": "^1.2.1",
     "globfs": "^0.1.2",
     "lodash": "^4.13.1",

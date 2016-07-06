@@ -5,6 +5,7 @@ import denodeify from 'denodeify'
 import swig from 'swig'
 import mkdirp from 'mkdirp'
 import _ from 'lodash'
+import * as d3 from 'd3'
 
 const dataDir = '../data/data-out/';
 
@@ -22,11 +23,17 @@ async function getAllData() {
     });
 
     let maxMedalCount = _.max(data.medalTable.table.map(entry => Math.max(entry.bronze, entry.silver, entry.gold)));
+
+    let scale = d3.scaleSqrt()
+        .domain([0, maxMedalCount])
+        .range([0,8])
+
     data.medalTable.table.forEach(row => {
+
         row.circleSizes = {
-            "bronze": row.bronze === 0 ? 0 : (row.bronze/maxMedalCount)*7 + 3,
-            "silver": row.silver === 0 ? 0 : (row.silver/maxMedalCount)*7 + 3,
-            "gold": row.gold === 0 ? 0 : (row.gold/maxMedalCount)*7 + 3,
+            "bronze": row.bronze === 0 ? 0 : scale(row.bronze),
+            "silver": row.silver === 0 ? 0 : scale(row.silver),
+            "gold": row.gold === 0 ? 0 : scale(row.gold)
         }
     });
 
