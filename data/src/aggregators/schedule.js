@@ -68,10 +68,12 @@ export default [
                                 })
                                 .sort((a, b) => a.start < b.start ? -1 : 1);
 
+                            let venues = _.uniqBy(events.map(evt => evt.venue), venue => venue.identifier);
+
                             return {
                                 //'id': disciplineEvents[0].discipline.identifier,
                                 'description': disciplineEvents[0].discipline.description,
-                                events
+                                events, venues
                             };
                         })
                         .valueOf();

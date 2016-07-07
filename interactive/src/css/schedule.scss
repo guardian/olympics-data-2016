@@ -18,11 +18,22 @@
     margin: 0;
 }
 
+.om-venue {
+    @include fs-textSans(3);
+    margin: 0 0 2px;
+    color: #bdbdbd;
+    & > svg {
+        display: inline-block;
+        vertical-align: top;
+        margin-right: 2px;
+        width: 9px;
+    }
+}
+
 .om-events {
     list-style: none;
     margin: 0 0 12px;
     padding: 0;
-    max-width: 660px;
 }
 
 .om-events__event {
@@ -46,14 +57,4 @@
 .om-events__event__time {
     position: absolute;
     left: 0;
-}
-
-.om-events__event__venue {
-    color: #bdbdbd;
-    & > svg {
-        display: inline-block;
-        vertical-align: top;
-        margin-right: 2px;
-        width: 9px;
-    }
 }
