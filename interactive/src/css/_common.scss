@@ -1,9 +1,6 @@
 @import "fonts";
 @import "mq";
 
-$headerPrimaryBlue: rgba(169,215,240,1);
-$headerSecondaryBlue: rgba(169,215,240,0.7);
-
 $gold: rgba(250,220,2,1);
 $silver: rgba(217,217,217,1);
 $bronze: rgba(243,111,33,1);
@@ -39,11 +36,6 @@ a {
     box-sizing: border-box;
     background-color: white;
 
-    padding: 0 10px;
-    @include mq(mobileLandscape) {
-        padding: 0 20px;
-    }
-
     @each $bp in (tablet, desktop, leftCol, wide) {
         @include mq($bp) {
             max-width: map-get($mq-breakpoints, $bp);
@@ -53,11 +45,21 @@ a {
 
 .om-header {
     @include f-headline;
+    margin: 0;
+    color: white;
 
-    margin: 0 -10px;
+    &.om-header--primary {
+        background-color: #387e3c;
+    }
+    &.om-header--secondary {
+        background-color: #5ea45e;
+    }
+}
+
+.om-header__inner {
     padding: 6px 10px 18px;
+    margin: 0;
     @include mq(mobileLandscape) {
-        margin: 0 -20px;
         padding: 6px 20px 18px;
     }
     @include mq(leftCol) {
@@ -67,14 +69,20 @@ a {
         padding-left: 260px;
     }
 
-    &.om-header--primary {
-        @include fs-headline(5, $size-only: true);
-        background-color: $headerPrimaryBlue;
+    margin: 0 auto;
+    box-sizing: border-box;
+    @each $bp in (tablet, desktop, leftCol, wide) {
+        @include mq($bp) {
+            max-width: map-get($mq-breakpoints, $bp);
+        }
     }
 
-    &.om-header--secondary {
+    .om-header--primary > & {
+        @include fs-headline(7, $size-only: true);
+        background-color: #3f8840;
+    }
+    .om-header--secondary > & {
         @include fs-headline(2, $size-only: true);
-        background-color: $headerSecondaryBlue;
         b {
             display: block;
         }
@@ -83,14 +91,24 @@ a {
 
 .om-section {
     position: relative;
-    margin: 10px 0;
     max-width: 660px;
 
+    padding: 10px;
+    @include mq(mobileLandscape) {
+        padding: 12px 20px;
+    }
     @include mq(leftCol) {
-        padding-left: 160px;
+        padding-left: 180px;
     }
     @include mq(wide) {
-        padding-left: 240px;
+        padding-left: 260px;
+    }
+
+    &.om-section--divider {
+        border-top: 1px solid #eaeaea;
+        &:first-child {
+            border-top: 0;
+        }
     }
 }
 
@@ -100,7 +118,7 @@ a {
     margin: 0 0 6px;
     @include mq(leftCol) {
         position: absolute;
-        left: 0;
+        left: 20px;
         width: 140px;
     }
     @include mq(wide) {

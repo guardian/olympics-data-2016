@@ -5,14 +5,18 @@
     <style>{{ css|raw }}</style>
 </head>
 <body>
-    <div class="om-container">
-        <h1 class="om-header om-header--primary">Schedule</h1>
-        <h2 class="om-header om-header--secondary">
+    <h1 class="om-header om-header--primary">
+        <div class="om-header__inner">Schedule</div>
+    </h1>
+    <h2 class="om-header om-header--secondary">
+        <div class="om-header__inner">
             Rio 2016 Olympics day-by-day events to watch
-            <b>Medal count</b>
-        </h2>
+            <b>Schedule of events</b>
+        </div>
+    </h2>
+    <div class="om-container">
         {% for date in scheduleAll %}
-            <div class="om-section">
+            <div class="om-section om-section--divider">
                 <div class="om-section__title">
                     <h3 class="om-schedule-date">{{ date.date|datefmt('dddd, D MMM') }}</h3>
                     <p class="om-schedule-date-no">Day {{ loop.index }} of {{ scheduleAll.length }}</p>
