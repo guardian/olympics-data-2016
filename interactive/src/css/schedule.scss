@@ -18,16 +18,9 @@
     margin: 0;
 }
 
-.om-venue {
+.om-schedule-venue {
     @include fs-textSans(3);
     margin: 0 0 2px;
-    color: #bdbdbd;
-    & > svg {
-        display: inline-block;
-        vertical-align: top;
-        margin-right: 2px;
-        width: 9px;
-    }
 }
 
 .om-events {

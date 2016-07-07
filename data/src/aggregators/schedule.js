@@ -31,7 +31,7 @@ export default [
             }
         ],
         'transform': (dates, dateSchedules) => {
-            return _.zip(dates.olympics.schedule, dateSchedules)
+            let days = _.zip(dates.olympics.schedule, dateSchedules)
                 .map(([schedule, dateSchedule]) => {
                     let disciplines = _(dateSchedule.olympics.scheduledEvent)
                         // TODO: remove filter when PA updates
@@ -71,7 +71,7 @@ export default [
                             let venues = _.uniqBy(events.map(evt => evt.venue), venue => venue.identifier);
 
                             return {
-                                //'id': disciplineEvents[0].discipline.identifier,
+                                'identifier': disciplineEvents[0].discipline.identifier,
                                 'description': disciplineEvents[0].discipline.description,
                                 events, venues
                             };
@@ -80,6 +80,13 @@ export default [
 
                     return {'date': schedule.date, disciplines};
                 });
+            let disciplines = _(days)
+                .flatMap(date => date.disciplines)
+                .uniqBy('identifier')
+                .pick(['identifier', 'description'])
+                .valueOf();
+
+            return {days, disciplines}
         },
         'cacheTime': moment.duration(2, 'hours')
     }

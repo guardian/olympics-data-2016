@@ -14,28 +14,38 @@
             <b>Schedule of events</b>
         </div>
     </h2>
+    <div class="om-filter">
+        <div class="om-filter__inner">
+            Upcoming events in
+            <select class="om-filter__choice">
+                {% for discipline in scheduleAll.disciplines %}
+                    <option value="{{ discipline.identifier }}">{{ discipline.description }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
     <div class="om-container">
-        {% for date in scheduleAll %}
+        {% for date in scheduleAll.days %}
             <div class="om-section om-section--divider">
                 <div class="om-section__title">
                     <h3 class="om-schedule-date">{{ date.date|datefmt('dddd, D MMM') }}</h3>
-                    <p class="om-schedule-date-no">Day {{ loop.index }} of {{ scheduleAll.length }}</p>
+                    <p class="om-schedule-date-no">Day {{ loop.index }} of {{ scheduleAll.days.length }}</p>
                 </div>
                 {% for discipline in date.disciplines %}
                     <h4 class="om-schedule-discipline">{{ discipline.description }}</h4>
                     {% if discipline.venues.length === 1 %}
-                        <p class="om-venue">{{ discipline.venues[0].name }}</p>
+                        <p class="om-schedule-venue">{{ discipline.venues[0].name }}</p>
                     {% endif %}
                     <ul class="om-events">
                         {% for event in discipline.events %}
                             <li class="om-events__event">
-                                <p class="om-events__event__time">
+                                <div class="om-events__event__time">
                                     {{ event.start|datefmt('HH:mm') }} -
                                     {{ event.end|datefmt('HH:mm') }}
-                                </p>
-                                <p class="om-events__event__name">{{ event.description }}</p>
+                                </div>
+                                <span class="om-events__event__name">{{ event.description }}</span>
                                 {% if discipline.venues.length > 1 %}
-                                    <p class="om-events__event__venue om-venue">{{ event.venue.name }}</p>
+                                    <span class="om-events__event__venue">{{ event.venue.name }}</span>
                                 {% endif %}
                             </li>
                         {% endfor %}

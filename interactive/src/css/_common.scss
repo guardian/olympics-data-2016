@@ -31,16 +31,21 @@ a {
     }
 }
 
-.om-container {
+.om-container,
+.om-header__inner,
+.om-filter__inner {
     margin: 0 auto;
     box-sizing: border-box;
-    background-color: white;
 
     @each $bp in (tablet, desktop, leftCol, wide) {
         @include mq($bp) {
             max-width: map-get($mq-breakpoints, $bp);
         }
     }
+}
+
+.om-container {
+    background-color: white;
 }
 
 .om-header {
@@ -56,11 +61,11 @@ a {
     }
 }
 
-.om-header__inner {
-    padding: 6px 10px 18px;
-    margin: 0;
+.om-header__inner,
+.om-filter__inner {
+    padding: 0 10px;
     @include mq(mobileLandscape) {
-        padding: 6px 20px 18px;
+        padding: 0 20px;
     }
     @include mq(leftCol) {
         padding-left: 180px;
@@ -68,25 +73,46 @@ a {
     @include mq(wide) {
         padding-left: 260px;
     }
+}
 
-    margin: 0 auto;
-    box-sizing: border-box;
-    @each $bp in (tablet, desktop, leftCol, wide) {
-        @include mq($bp) {
-            max-width: map-get($mq-breakpoints, $bp);
-        }
-    }
-
+.om-header__inner {
     .om-header--primary > & {
         @include fs-headline(7, $size-only: true);
+        padding-top: 15px;
+        padding-bottom: 15px;
         background-color: #3f8840;
     }
     .om-header--secondary > & {
         @include fs-headline(2, $size-only: true);
+        padding-top: 8px;
+        padding-bottom: 8px;
+        background-color: inherit;
         b {
             display: block;
         }
     }
+}
+
+.om-filter {
+    background-color: #f7e87a;
+    border-top: 1px solid white;
+    line-height: 35px;
+}
+
+.om-filter__inner {
+    @include fs-bodyCopy(1);
+    background-color: #fded80;
+}
+
+.om-filter__choice {
+    @include fs-header(1);
+    background-color: #f7d603;
+    border: 0;
+    height: 35px;
+    outline: 0;
+    margin: -1px 0 0 5px;
+    padding-left: 5px;
+    width: 160px;
 }
 
 .om-section {
