@@ -20,7 +20,7 @@ function parseCompetitor(e) {
     let athlete = null
 
     if(e.type === 'Individual'){
-        athlete = e.participant.competitor.lastName
+        athlete = e.participant.competitor.firstName[0] + '. ' + e.participant.competitor.lastName
     }
     // else if(e.type === 'Team'){
     //     if(e.participant.length === 2){

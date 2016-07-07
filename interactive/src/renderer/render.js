@@ -45,13 +45,17 @@ async function getAllData() {
     });
 
     data.recentMedalsAll = _(data.recentMedals)
+
+        .filter(m => moment(m.time).isAfter(moment().subtract(2, 'months')))
         .groupBy(m => m.discipline)
         .toPairs()
         .sortBy(([discipline, medals]) => {
             return _(medals)
-                .maxBy(m => m.time)
+                .maxBy(m => new Date(m.time))
                 .valueOf()
+                .time
         })
+        .reverse()
         .map(([discipline, medals]) => {
 
             let medalsGrouped = _(medals)
@@ -60,7 +64,7 @@ async function getAllData() {
                 .valueOf()
             return [discipline, medalsGrouped]
         })
-        .slice(0,3)
+        .slice(0,4)
         .valueOf()
 
     console.log(data.recentMedalsAll)
