@@ -5,16 +5,16 @@ import fs from 'fs'
 import config from '../../config'
 import assert from 'assert'
 
-const phaseId = evt => evt.discipline.event.eventUnit.phaseDescription.identifier;
-const unitId = evt => evt.discipline.event.eventUnit.identifier;
+const combineBlacklist = ['football', 'water-polo', 'hockey', 'volleyball', 'basketball'];
 
 function canCombine(group, evt1) {
-    if (group) {
+    if (group && combineBlacklist.indexOf(evt1.discipline.identifier) === -1) {
         let evt2 = group[0];
-        return evt1.phaseId === evt2.phaseId &&
+
+        return evt1.phase.identifier === evt2.phase.identifier &&
             evt1.venue.identifier === evt2.venue.identifier &&
-            (evt1.start >= evt2.start && evt1.start <= evt2.end ||
-             evt1.end >= evt2.start && evt1.end <= evt2.end);
+            evt1.start >= evt2.start &&
+            moment(evt1.start).subtract(10, 'minutes').isSameOrBefore(evt2.end)
     }
     return false;
 }
@@ -34,44 +34,43 @@ export default [
             return _.zip(dates.olympics.schedule, dateSchedules)
                 .map(([schedule, dateSchedule]) => {
                     let disciplines = _(dateSchedule.olympics.scheduledEvent)
+                        // TODO: remove filter when PA updates
+                        .filter(evt => !evt.discipline.event.eventUnit.identifier.endsWith('00'))
+                        .map(evt => {
+                            return {
+                                'description': evt.description,
+                                'start': evt.start.utc,
+                                'end': evt.end.utc,
+                                'venue': evt.venue,
+                                'phase': evt.discipline.event.eventUnit.phaseDescription,
+                                'event': _.pick(evt.discipline.event, ['description']),
+                                'discipline': _.pick(evt.discipline, ['identifier', 'description'])
+                            };
+                        })
                         .groupBy('discipline.identifier')
                         .map(disciplineEvents => {
-                            let discipline = disciplineEvents[0].discipline;
-
-                            let events = _(disciplineEvents)
-                                .map(evt => {
-                                    return {
-                                        'name': evt.description,
-                                        'start': evt.start.utc,
-                                        'end': evt.end.utc,
-                                        'status': evt.status,
-                                        'unitId': unitId(evt),
-                                        'phaseId': phaseId(evt),
-                                        'venue': evt.venue
-                                    };
-                                })
-                                .sortBy(evt => `${evt.phaseId}:${evt.start}`)
+                            let events = _.sortBy(disciplineEvents, evt => `${evt.phase.identifier}:${evt.start}`)
                                 .reduce((groups, evt) => {
                                     let [group, ...otherGroups] = groups;
                                     return canCombine(group, evt) ?
                                         [[evt, ...group], ...otherGroups] : [[evt], ...groups];
                                 }, [])
                                 .map(group => {
-                                    let name = _.maxBy(group, evt => moment(evt.end).diff(evt.start)).name;
-                                    let start = _.min(group.map(evt => evt.start));
-                                    let end = _.max(group.map(evt => evt.end));
-                                    return {
-                                        name, start, end,
-                                        'group': group.sort((a, b) => a.start < b.start ? -1 : 1),
-                                        'status': group[0].status,
-                                        'venue': group[0].venue
-                                    };
+                                    let first = group[0];
+                                    if (group.length === 1) {
+                                        return first;
+                                    } else {
+                                        let description = `${first.event.description} ${first.phase.value}`;
+                                        let start = _.min(group.map(evt => evt.start));
+                                        let end = _.max(group.map(evt => evt.end));
+                                        return {...first, description, start, end, group};
+                                    }
                                 })
                                 .sort((a, b) => a.start < b.start ? -1 : 1);
 
                             return {
-                                'name': discipline.description,
-                                'id': discipline.identifier,
+                                //'id': disciplineEvents[0].discipline.identifier,
+                                'description': disciplineEvents[0].discipline.description,
                                 events
                             };
                         })

@@ -37,12 +37,23 @@
     }
 }
 
-.om-events__event__time {
-    position: absolute;
-    left: 0;
+.om-events__event__time,
+.om-events__event__name,
+.om-events__event__venue {
     margin: 0;
 }
 
-.om-events__event__name {
-    margin: 0;
+.om-events__event__time {
+    position: absolute;
+    left: 0;
+}
+
+.om-events__event__venue {
+    color: #bdbdbd;
+    & > svg {
+        display: inline-block;
+        vertical-align: top;
+        margin-right: 2px;
+        width: 9px;
+    }
 }

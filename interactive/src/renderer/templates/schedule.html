@@ -18,7 +18,7 @@
                     <p class="om-schedule-date-no">Day {{ loop.index }} of {{ scheduleAll.length }}</p>
                 </div>
                 {% for discipline in date.disciplines %}
-                    <h4 class="om-schedule-discipline">{{ discipline.name }}</h4>
+                    <h4 class="om-schedule-discipline">{{ discipline.description }}</h4>
                     <ul class="om-events">
                         {% for event in discipline.events %}
                             <li class="om-events__event">
@@ -26,7 +26,13 @@
                                     {{ event.start|datefmt('HH:mm') }} -
                                     {{ event.end|datefmt('HH:mm') }}
                                 </p>
-                                <p class="om-events__event__name">{{ event.name }}</p>
+                                <p class="om-events__event__name">{{ event.description }}</p>
+                                <p class="om-events__event__venue">
+                                    <svg viewBox="0 0 55.76 102.2">
+                                      <path fill="currentColor" d="M 27.9,0 C 12.5,0 0,12.5 0,27.8 0,31.9 1.1,36.3 2.5,40 l 23,62.2 4.7,0 23.4,-62 C 55,35.7 55.8,31.8 55.8,27.9 55.8,12.5 43.3,0 27.9,0 m 0,47.7 C 17,47.7 8.1,38.9 8.1,27.9 8.1,17 16.9,8.1 27.9,8.1 c 10.9,0 19.8,8.8 19.8,19.8 -0.1,10.9 -8.9,19.8 -19.8,19.8" />
+                                    </svg>
+                                    {{ event.venue.name }}
+                                </p>
                             </li>
                         {% endfor %}
                     </ul>
