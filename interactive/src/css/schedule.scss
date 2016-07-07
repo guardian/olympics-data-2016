@@ -1,15 +1,15 @@
 @import "common";
 
 .om-schedule-date {
-    @include fs-header(2);
-    font-weight: 600;
     margin: 0;
+    font-size: inherit;
 }
 
 .om-schedule-date-no {
     @include fs-textSans(3);
+    font-weight: normal;
     color: #bdbdbd;
-    margin: 0 0 6px;
+    margin: 0;
 }
 
 .om-schedule-discipline {

@@ -84,6 +84,8 @@ a {
 .om-section {
     position: relative;
     margin: 10px 0;
+    max-width: 660px;
+
     @include mq(leftCol) {
         padding-left: 160px;
     }
@@ -93,6 +95,9 @@ a {
 }
 
 .om-section__title {
+    @include fs-header(2);
+    font-weight: 600;
+    margin: 0 0 6px;
     @include mq(leftCol) {
         position: absolute;
         left: 0;
