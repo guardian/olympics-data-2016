@@ -20,17 +20,16 @@ function parseCompetitor(e) {
     let athlete = null
 
     if(e.type === 'Individual'){
-        athlete = e.participant.competitor.fullName
+        athlete = e.participant.competitor.lastName
     }
-    else if(e.type === 'Team'){
-        if(e.participant.length === 2){
-            athlete = e.participant.map(p => p.competitor.lastName).sort().join('/')
-        }
-        else {
-            athlete = e.country.name
-        }
-    }
-
+    // else if(e.type === 'Team'){
+    //     if(e.participant.length === 2){
+    //         athlete = e.participant.map(p => p.competitor.lastName).sort().join('/')
+    //     }
+    //     else {
+    //         athlete = e.country.name
+    //     }
+    // }
     return {
         'countryCode' : e.country.identifier,
         'country' : e.country.name,
@@ -61,84 +60,34 @@ export default [
         'cacheTime': moment.duration(2, 'hours')
     },
     {
-        'id': 'recentMedals',
-        'paDeps': [
-            `${path}/medal-cast`
-        ],
-        'transform': medals => {
-
-            var list = medals.olympics.games.medalCast.map(tableEntry => {
-                return {
-                    "medal": tableEntry.type,
-                    "date":tableEntry.date,
-                    "time":tableEntry.time,
-                    "countryCode":tableEntry.entrant.country.identifier,
-                    "country": tableEntry.entrant.country.name,
-                    "athlete":tableEntry.entrant.participant ? tableEntry.entrant.participant.competitor.fullName : null,
-                    "discipline":tableEntry.event.disciplineDescription.value,
-                    "disciplineDescription":tableEntry.event.description,
-                    "eventId":tableEntry.event.identifier
-                }
-            });
-
-            return {list};
-        },
-        'cacheTime': moment.duration(1, 'hours')
-    },
-    {
-        'id' : 'eventResults',
+        'id' : 'recentMedals',
         'paDeps' : [
-            `${path}/schedule`
+            `${path}/discipline/`
         ],
         'paMoreDeps' : [
-            schedule => {
-                return schedule.olympics.schedule.slice(0,20).map(day => {
-                    return `${path}/schedule/` + day.date
-                })
-            },
-            (schedule, daySchedules) => {
-
-                return _(daySchedules).flatMap(ds => {
-                    return _(ds.olympics.scheduledEvent).slice(0,20)
-                    .filter(e => e.medalEvent === 'Yes' && e.resultAvailable === 'Yes')
-                    .map(e => {
-                        return `${path}/event/` + e.discipline.event.identifier
-                    })
-                    .valueOf()
-                })
-                .uniq()
-                .valueOf()
-
-            },
-            (schedule, daySchedules, events) => {
-
-                return _(events)
-                    .filter(e => e.olympics.event.cumulativeResultAvailable === 'Yes')
-                    .map(e => `${path}/event/` + e.olympics.event.identifier + '/cumulative-result')
+            (disciplines) => {
+                return disciplines.olympics.discipline
+                    .map(d => `${path}/discipline/${d.identifier}/medal-cast?limit=500`)
             }
         ],
-
-        'transform' : (schedule, daySchedules, events, cumulativeResults) => {
-
-            let results = _(cumulativeResults).map(r => {
-                return {
-
-                    'eventId' : r.olympics.event.identifier,
-                    'eventDescription' : r.olympics.event.description,
-                    'ranking' : r.olympics.event.result.entrant.map(l => {
+        'transform' : (disciplines, medalCasts) => {
+            return _(medalCasts)
+                .filter(mc => mc.olympics)
+                .map(mc => mc.olympics.discipline.medalCast
+                    .map(m => {
                         return {
-                            'competitor' : l.participant.competitor ? l.participant.competitor.fullName : l.country.longName,
-                            'position' : l.rank ? parseInt(l.rank) : -1
+                            type: m.type,
+                            discipline: m.event.disciplineDescription.value,
+                            time: m.utc,
+                            competitor: parseCompetitor(m.entrant),
+                            eventName: m.event.description,
+                            eventId: m.event.identifier,
+                            eventUnitId : m.event.eventUnit.identifier
                         }
-                    })
-
-                }
-            })
-            .valueOf()
-            return {results}
+                    }))
+                .flatten()
         },
-        'cacheTime': moment.duration(2, 'hours')
-
+        'cacheTime' : moment.duration(2, 'hours')
     },
     {
         'id' : 'recentResults',
@@ -185,13 +134,14 @@ export default [
 
                     return {
                         evId: ev.identifier,
-                        event: `${ev.description} ${ev.disciplineDescription.value}`,
+                        discipline: ev.disciplineDescription.value,
+                        event: ev.description,
                         evUnitId: eventUnit.identifier,
                         unitType : eventUnit.unitType,
                         eList : eventUnit.result.entrant
                     }
                 })
-                .map(({evId, event, evUnitId, unitType, eList}) => {
+                .map(({evId, discipline, event, evUnitId, unitType, eList}) => {
                     let results = eList.map(e => {
                         let rank = /Head to Head/.test(unitType) ?
                             (e.property[0].value === 'Gold' ? 1 : 2) :
@@ -199,21 +149,29 @@ export default [
                         return {rank, 'competitor': parseCompetitor(e)};
                     });
 
-                    let medals = _.sortBy(results, 'rank')
-                        .filter(r => r.rank <= 3)
-                        .map(r => {
-                            r.medal = ['gold', 'silver', 'bronze'][r.rank - 1]
-                            return r;
-                        });
-
                     return {
                         'eventId' : evId,
                         'eventName' : event,
-                        results,
-                        medals
+                        'discipline' : discipline,
+                        results
                     }
+
+                    // let medals = _.sortBy(results, 'rank')
+                    //     .filter(r => r.rank <= 3)
+                    //     .map(r => {
+                    //         r.medal = ['gold', 'silver', 'bronze'][r.rank - 1]
+                    //         return r;
+                    //     });
+
+                    // return {
+                    //     'eventId' : evId,
+                    //     'eventName' : event,
+                    //     results,
+                    //     medals
+                    // }
                 });
 
+            console.log(rankings)
             return {rankings};
         },
         'cacheTime': moment.duration(1, 'hours')

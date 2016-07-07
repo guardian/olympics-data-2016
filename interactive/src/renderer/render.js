@@ -32,13 +32,38 @@ async function getAllData() {
         .range([0,8])
 
     data.medalTable.table.forEach(row => {
-
         row.circleSizes = {
             "bronze": row.bronze === 0 ? 0 : scale(row.bronze),
             "silver": row.silver === 0 ? 0 : scale(row.silver),
             "gold": row.gold === 0 ? 0 : scale(row.gold)
         }
+        row.maskSizes = {
+            "bronze" : row.bronze === 0 ? scale(1) : scale(row.bronze),
+            "silver" : row.silver === 0 ? scale(1) : scale(row.silver),
+            "gold" : row.gold === 0 ? scale(1) : scale(row.gold),
+        }
     });
+
+    data.recentMedalsAll = _(data.recentMedals)
+        .groupBy(m => m.discipline)
+        .toPairs()
+        .sortBy(([discipline, medals]) => {
+            return _(medals)
+                .maxBy(m => m.time)
+                .valueOf()
+        })
+        .map(([discipline, medals]) => {
+
+            let medalsGrouped = _(medals)
+                .groupBy(m => m.eventName)
+                .toPairs()
+                .valueOf()
+            return [discipline, medalsGrouped]
+        })
+        .slice(0,3)
+        .valueOf()
+
+    console.log(data.recentMedalsAll)
 
     return data;
 }

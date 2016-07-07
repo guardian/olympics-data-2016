@@ -25,6 +25,9 @@
                     <ol class='om-table'>
                     {% for entry in medalTable.table %}
                             <li class='om-table-row'>
+                                <div class='om-table-el om-table-el--position'>
+                                    {{ entry.position }}.
+                                </div>
                                 <div class='om-table-el om-table-el--flag' style='background-image:url(assets/imgs/flags/{{ entry.countryCode|lower }}.svg)'>
                                 </div>
                                 <div class='om-table-el om-table-el--country'>
@@ -33,7 +36,7 @@
                                 <div class='om-table-el om-table-el--medal'>
 
                                 <div class="om-medal-white"
-                                style="transform:scale({{entry.circleSizes.gold + 1}})">
+                                style="transform:scale({{entry.maskSizes.gold + 1}})">
                                 </div>
                                     <div class="om-medal-circle om-medal-circle--gold" style="transform:scale({{entry.circleSizes.gold}})">
                                     </div>
@@ -43,7 +46,7 @@
                                 </div>
                                 <div class='om-table-el om-table-el--medal'>
                                     <div class="om-medal-white"
-                                    style="transform:scale({{entry.circleSizes.silver + 1}})">
+                                    style="transform:scale({{entry.maskSizes.silver + 1}})">
                                     </div>
                                     <div class="om-medal-circle om-medal-circle--silver" style="transform:scale({{entry.circleSizes.silver}})">
                                     </div>
@@ -53,7 +56,7 @@
                                 </div>
                                 <div class='om-table-el om-table-el--medal'>
                                     <div class="om-medal-white"
-                                    style="transform:scale({{entry.circleSizes.bronze + 1}})">
+                                    style="transform:scale({{entry.maskSizes.bronze + 1}})">
                                     </div>
                                     <div class="om-medal-circle om-medal-circle--bronze" style="transform:scale({{entry.circleSizes.bronze}})">
                                     </div>
@@ -67,42 +70,6 @@
                             </li>
                     {% endfor %}
                     </ol>
-
-
-                    <table>
-                        <tbody>
-                            {% for entry in medalTable.table %}
-                                <tr {% if loop.index0 >= 10 %}class="hidden-row"{% endif %} class='om-medaltable-row'>
-                                    <td class="medaltable-row-position">{{ entry.position }}.</td>
-                                    <td class="medaltable-row-flag">
-                                        <div class="medaltable-flag" style="background-image:url(assets/imgs/flags/{{ entry.countryCode|lower }}.svg)" />
-                                    </td>
-                                    <td class="medaltable-row-country">{{ entry.country }}</td>
-                                    <td class="medaltable-row-gold om-medaltable-cell">
-                                        <div class="medal-circle-container">
-                                            <div class="medal-circle" style="transform:scale({{entry.circleSizes.gold}})"></div>
-                                        </div>
-                                        <span class="medal-label" data-count="{{ entry.gold }}">{{ entry.gold }}</span>
-                                    </td>
-                                    <td class="medaltable-row-silver">
-                                        <span class="medal-circle-container">
-                                            <span class="medal-mask" style="transform:scaleX({{ entry.circleSizes.silver }})"></span>
-                                            <span class="medal-circle" style="transform:scale({{ entry.circleSizes.silver }})"></span>
-                                        </span>
-                                        <span class="medal-label" data-count="{{ entry.silver }}">{{ entry.silver }}</span>
-                                    </td>
-                                    <td class="medaltable-row-bronze">
-                                        <span class="medal-circle-container">
-                                            <span class="medal-mask" style="transform:scaleX({{ entry.circleSizes.bronze }})"></span>
-                                            <span class="medal-circle" style="transform:scale({{ entry.circleSizes.bronze }})"></span>
-                                        </span>
-                                        <span class="medal-label" data-count="{{ entry.bronze }}">{{ entry.bronze }}</span>
-                                    </td>
-                                    <td class="medaltable-row-total">{{ entry.gold + entry.silver + entry.bronze }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
                     <button id="expand-button">More countries</button>
                 </div>
             </section>
@@ -113,32 +80,37 @@
             </section>
             <section class="om-section" id="section-recentmedals">
                 <div class="section-title-container">
-                    <h3 class='om-medaltable-row'>Latest medals</h3>
+                    <h3 class='om-medaltable-row'>Latest results</h3>
                     <h4>Tuesday, 16 Aug, Day 5 of 17</h4>
                 </div>
                 <div class="section-content-container">
-                    <ul class='om-recent'>
-                        {% for entry in recentResults.rankings %}
-                            <li class="recentmedals-row-discipline-full om-recent-event">
-                                <h4 class='om-recent-eventname'>{{entry.eventName}}</h4>
-                                {% for medal in entry.medals %}
-                                    <div class="recentmedals-row-medalist medal-{{medal.medal}} om-recent-el">
-                                        {% if medal.competitor %}
-                                        <span class="medalist-icon color-{{medal.medal}}"></span><span class="medalist-name">{{medal.competitor.athlete}}</span>
-                                        <span class="medalist-country">({{medal.competitor.countryCode}})</span>
-                                            {% endif %}
-                                    </div>
-                                {% endfor %}
-                                <!-- <div class="recentmedals-row-extra-btn"><button></button></div>          
-                                <tr class="recentmedals-row-allresults">
-                                    <td class="recentmedals-row-discipline"></td>
-                                    <td colspan="6" class="recentmedals-row-results-container">
-                                        <ul>
-                                            {% for result in entry.results %}
-                                            <li>{{result.competitor.athlete}} ({{result.competitor.countryCode}})</li>
-                                            {% endfor %}
-                                        </ul>
-                                    </td> -->
+                    <ul class='om-recent-disciplines'>
+                        {% for discipline in recentMedalsAll %}
+                            <li class='om-recent-discipline'>
+                                <h3 class='om-recent-discipline'>
+                                    {{ discipline[0] }}
+                                </h3>
+                                <ul class='om-recent-events'>
+                                    {% for event in discipline['1'] %}
+                                        <li class='om-recent-event'>
+                                            <h4 class='om-recent-eventname'> {{ event[0] }} </h4>
+                                            <div class='om-recent-medalists'>
+                                                {% for medal in event['1'] %}
+                                                    <div class="om-recent-medalist medal-{{medal.medal}} om-recent-el">
+                                                        <span class="medalist-icon color-{{medal.type.toLowerCase()}}"></span>
+
+                                                        {% if medal.competitor.athlete %}
+                                                            <span class="medalist-name">{{medal.competitor.athlete}}</span>
+                                                            <span class="medalist-country">({{medal.competitor.countryCode}})</span>
+                                                        {% else %}
+                                                            <span class="medalist-name">{{medal.competitor.country}}</span>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
                             </li>
                         {% endfor %}
                     </ul>
