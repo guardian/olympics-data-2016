@@ -30,7 +30,7 @@ function cacheFile(endpoint) {
 
 function writeCache(endpoint, content) {
     var file = cacheFile(endpoint);
-    return mkdirpP(path.dirname(file)).then(() => fsWriteFile(file, JSON.stringify(content)));
+    return mkdirpP(path.dirname(file)).then(() => fsWriteFile(file, JSON.stringify(content, null, 2)));
 }
 
 function requestCache(endpoint) {

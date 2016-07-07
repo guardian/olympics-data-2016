@@ -46,7 +46,7 @@ function aggregatorFn(aggregator) {
 
             let data = aggregator.transform(...contents);
             let localPath = path.join('data-out/', aggregator.id + '.json');
-            await fsWrite(localPath, JSON.stringify(data));
+            await fsWrite(localPath, JSON.stringify(data, null, 2));
             if (argv.s3) await s3.put(aggregator.id, data);
         } catch (err) {
             console.error(`Error processing ${aggregator.id}`, err);
