@@ -69,7 +69,16 @@
         </section>
         <section class="om-filter">
             <div class="om-filter-content">
-                <p>Who's winning? I'd like to see medals in <select><option>all sports</option><option>Football</option></select><select><option>All countries</option></select></p>
+                <p>Who's winning? I'd like to see medals in
+                    <select>
+                        <option value='all' selected>all sports</option>
+                        {% for d in disciplines %}
+                            <option value='{{ d.identifier }}'>{{ d.description }}</option>
+                        {% endfor %}
+                    </select>
+                    <select>
+                        <option>All countries</option>
+                    </select></p>
             </div>
         </section>
         <section class="om-section">
