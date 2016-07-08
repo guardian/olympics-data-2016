@@ -85,11 +85,5 @@ export default [
                 });
         },
         'cacheTime': moment.duration(2, 'hours')
-    },
-    {
-        'id': 'disciplines',
-        'paDeps': ['olympics/2016-summer-olympics/discipline'],
-        'transform': disciplines => disciplines.olympics.discipline,
-        'cacheTime': moment.duration(14, 'days')
     }
 ];
