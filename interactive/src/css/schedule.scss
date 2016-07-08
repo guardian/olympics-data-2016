@@ -27,8 +27,12 @@
 }
 
 .om-discipline__venue {
-    @include fs-textSans(3);
+    @include fs-textSans(2);
     margin: 0 0 2px;
+
+    @include mq(mobileLandscape) {
+        @include fs-textSans(3, $size-only: true);
+    }
 }
 
 .om-events {
@@ -38,14 +42,14 @@
 }
 
 .om-event {
-    @include fs-textSans(3);
+    @include fs-textSans(2);
     position: relative;
     border-top: 1px dotted #dcdcdc;
-    padding: 3px 0 3px 80px;
+    padding: 3px 20px 3px 65px;
 
-    &.om-event--group {
-        color: #bdbdbd;
-        border-top: 0;
+    @include mq(mobileLandscape) {
+        @include fs-textSans(3, $size-only: true);
+        padding-left: 80px;
     }
 }
 
@@ -56,13 +60,15 @@
 
 .om-event__name {
     font-weight: 500;
+    margin-right: 20px;
 }
 
 .om-event__venue {
-    margin-left: 20px;
+    white-space: nowrap;
 }
 
 .om-event__scheduled {
-    float: right;
-    margin-top: 2px;
+    position: absolute;
+    top: 2px;
+    right: 0;
 }
