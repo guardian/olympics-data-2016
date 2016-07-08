@@ -12,13 +12,17 @@
     margin: 0;
 }
 
-.om-schedule-discipline {
+.om-discipline.is-hidden {
+    display: none;
+}
+
+.om-discipline__name {
     @include fs-header(2);
     font-weight: 500;
     margin: 0;
 }
 
-.om-schedule-venue {
+.om-discipline__venue {
     @include fs-textSans(3);
     margin: 0 0 2px;
 }

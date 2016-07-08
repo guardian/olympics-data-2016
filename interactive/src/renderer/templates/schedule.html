@@ -17,7 +17,8 @@
     <div class="om-filter">
         <div class="om-filter__inner">
             Upcoming events in
-            <select class="om-filter__choice">
+            <select class="om-filter__choice js-discipline-choice" disabled>
+                <option value="">All sports</option>
                 {% for discipline in disciplines %}
                     <option value="{{ discipline.identifier }}">{{ discipline.description }}</option>
                 {% endfor %}
@@ -32,27 +33,30 @@
                     <p class="om-schedule-date-no">Day {{ loop.index }} of {{ scheduleAll.length }}</p>
                 </div>
                 {% for discipline in date.disciplines %}
-                    <h4 class="om-schedule-discipline">{{ discipline.description }}</h4>
-                    {% if discipline.venues.length === 1 %}
-                        <p class="om-schedule-venue">{{ discipline.venues[0].name }}</p>
-                    {% endif %}
-                    <ul class="om-events">
-                        {% for event in discipline.events %}
-                            <li class="om-events__event">
-                                <div class="om-events__event__time">
-                                    {{ event.start|datefmt('HH:mm') }} -
-                                    {{ event.end|datefmt('HH:mm') }}
-                                </div>
-                                <span class="om-events__event__name">{{ event.description }}</span>
-                                {% if discipline.venues.length > 1 %}
-                                    <span class="om-events__event__venue">{{ event.venue.name }}</span>
-                                {% endif %}
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    <div class="om-discipline js-discipline" data-discipline="{{ discipline.identifier }}" >
+                        <h4 class="om-discipline__name">{{ discipline.description }}</h4>
+                        {% if discipline.venues.length === 1 %}
+                            <p class="om-discipline__venue">{{ discipline.venues[0].name }}</p>
+                        {% endif %}
+                        <ul class="om-events">
+                            {% for event in discipline.events %}
+                                <li class="om-events__event">
+                                    <div class="om-events__event__time">
+                                        {{ event.start|datefmt('HH:mm') }} -
+                                        {{ event.end|datefmt('HH:mm') }}
+                                    </div>
+                                    <span class="om-events__event__name">{{ event.description }}</span>
+                                    {% if discipline.venues.length > 1 %}
+                                        <span class="om-events__event__venue">{{ event.venue.name }}</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 {% endfor %}
             </div>
         {% endfor %}
     </div>
+    <script src="./schedule.js"></script>
 </body>
 </html>
