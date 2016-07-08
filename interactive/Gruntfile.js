@@ -96,7 +96,9 @@ module.exports = function(grunt) {
                 debug: grunt.option('dry'),
                 bucket: '<%= visuals.s3.bucket %>',
                 uploadConcurrency: 10,
-                downloadConcurrency: 10
+                downloadConcurrency: 10,
+                differential: true,
+                displayChangesOnly: true
             },
             production: {
                 options: {
@@ -106,7 +108,7 @@ module.exports = function(grunt) {
                         expand: true,
                         cwd: 'build',
                         src: [
-                            'main.html', 'main.css', 'main.js', 'main.js.map',
+                            '*.html', '*.css', '*.js', '*.js.map',
                             '*.json', 'embed/*.html',
                             'data/*.json',
                             'assets/**/*'
