@@ -126,6 +126,7 @@ a {
 .om-section {
     position: relative;
     max-width: 660px;
+    min-height: 60px;
 
     padding: 10px;
     @include mq(mobileLandscape) {

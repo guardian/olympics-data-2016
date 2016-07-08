@@ -29,7 +29,10 @@
         {% for date in scheduleAll %}
             <div class="om-section om-section--divider">
                 <div class="om-section__title">
-                    <h3 class="om-schedule-date">{{ date.date|datefmt('dddd, D MMM') }}</h3>
+                    <h3 class="om-schedule-date">
+                        {{ date.date|datefmt('dddd') }},
+                        <span>{{ date.date|datefmt('D MMM') }}</span>
+                    </h3>
                     <p class="om-schedule-date-no">Day {{ loop.index }} of {{ scheduleAll.length }}</p>
                 </div>
                 {% for discipline in date.disciplines %}

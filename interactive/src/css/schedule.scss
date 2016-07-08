@@ -3,6 +3,10 @@
 .om-schedule-date {
     margin: 0;
     font-size: inherit;
+
+    & > span {
+        white-space: nowrap;
+    }
 }
 
 .om-schedule-date-no {
