@@ -1,0 +1,31 @@
+<div class="om-section om-section--divider">
+    <div class="om-section__title">
+        <h3 class="om-schedule-date">
+            <time datetime="{{ schedule.date }}">
+                {{ schedule.date|datefmt('dddd') }},
+                <span>{{ schedule.date|datefmt('D MMM') }}</span>
+            </time>
+        </h3>
+        <p class="om-schedule-date-no">Day {{ loop.index }} of {{ scheduleAll.length }}</p>
+    </div>
+    {% for discipline in schedule.disciplines %}
+        <div class="om-discipline js-discipline" data-discipline="{{ discipline.identifier }}" >
+            <h4 class="om-discipline__name">{{ discipline.description }}</h4>
+            {% if discipline.venues.length === 1 %}
+                <p class="om-discipline__venue">{{ discipline.venues[0].name }}</p>
+            {% endif %}
+            <ul class="om-events">
+                {% for event in discipline.events %}
+                    <li class="om-event">
+                        <time class="om-event__time" datetime="{{event.start}}">{{ event.start|datefmt('HH:mm') }}</time>
+                        <span class="om-event__name">{{ event.description }}</span>
+                        {% if discipline.venues.length > 1 %}
+                            <span class="om-event__venue">{{ event.venue.name }}</span>
+                        {% endif %}
+                        <img class="om-event__scheduled" src="./assets/imgs/clock.svg" />
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+</div>

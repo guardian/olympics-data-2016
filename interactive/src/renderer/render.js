@@ -80,13 +80,24 @@ async function renderAll() {
     let data = await getAllData();
 
     mkdirp.sync('build');
+    mkdirp.sync('build/days');
     mkdirp.sync('build/embed');
 
     (await readdir('./src/renderer/templates/*.html')).forEach(template => {
         let name = path.basename(template, '.html');
         let css = fs.readFileSync(`build/${name}.css`).toString();
         let html = swig.renderFile(template, {...data, css});
-        writeFile(`build/${path.basename(template)}`, html);
+        writeFile(`build/${name}.html`, html);
+    });
+
+    (await readdir('./src/renderer/templates/days/*.html')).forEach(template => {
+        let name = path.basename(template, '.html');
+        data.scheduleAll.forEach(day => {
+            let html = swig.renderFile(template, {
+                'schedule': day
+            });
+            writeFile(`build/days/${name}-${moment(day.date).format('YYYY-MM-DD')}.html`, html);
+        });
     });
 
     let embedCSS = fs.readFileSync('build/embed.css');

@@ -109,7 +109,7 @@ module.exports = function(grunt) {
                         cwd: 'build',
                         src: [
                             '*.html', '*.css', '*.js', '*.js.map',
-                            '*.json', 'embed/*.html',
+                            '*.json', 'days/*.html', 'embed/*.html',
                             'data/*.json',
                             'assets/**/*'
                         ],
