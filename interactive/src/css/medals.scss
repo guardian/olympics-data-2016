@@ -65,14 +65,14 @@
 }
 
 .om-table {
-	@include fs-textSans(4);
+	@include fs-textSans(3);
 	list-style-type: none;
-    margin: 0;
+    margin: 32px 0 0 0;
     padding: 0;
 }
 
 .om-table-row {
-	margin: 16px 0;
+	margin: 24px 0;
 	position: relative;
 
 	&:before {
@@ -99,7 +99,7 @@
 }
 
 .om-table-el--position {
-	@include fs-headline(3);
+	@include fs-headline(2);
 	text-align: right;
 	padding-right: 8px;
 	width: 40px;
@@ -115,7 +115,7 @@
 }
 
 .om-table-el--country {
-	@include fs-headline(3);
+	@include fs-headline(2);
 	width: 48px;
 	margin-left: 0;
 	margin-right: 0;
@@ -128,7 +128,7 @@
 }
 
 .om-table-el--total {
-	@include fs-headline(3);
+	@include fs-headline(2);
 	font-weight: bold;
 	text-align: right;
 	padding: 0 8px;

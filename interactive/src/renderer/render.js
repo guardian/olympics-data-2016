@@ -64,7 +64,6 @@ async function getAllData() {
                 .valueOf()
             return [discipline, medalsGrouped]
         })
-        .slice(0,4)
         .valueOf()
 
     console.log(data.recentMedalsAll)
