@@ -71,13 +71,13 @@
             <div class="om-filter-content">
                 <p>Who's winning? I'd like to see medals in
                     <select class='om-select-discipline om-filter__choice'>
-                        <option value='all' selected>All sports</option>
+                        <option value='all'>All sports</option>
                         {% for d in disciplines %}
-                            <option value='{{ d.identifier }}'>{{ d.description }}</option>
+                            <option value='{{ d.id }}'>{{ d.description }}</option>
                         {% endfor %}
                     </select>
                     <select class='om-select-country om-filter__choice'>
-                        <option value='all' selected>All countries</option>
+                        <option value='all'>All countries</option>
                         {% for c in countries %}
                             <option value='{{ c.identifier }}'>{{ c.name }}</option>
                         {% endfor %}

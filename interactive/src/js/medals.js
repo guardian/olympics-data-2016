@@ -38,3 +38,13 @@ button.addEventListener('click', e => {
 
 let discipline = $('.om-select-discipline')
 let country = $('.om-select-country')
+
+discipline.addEventListener('change', e => {
+    let id_ = discipline.options[discipline.selectedIndex].value
+    console.log(id_)
+})
+
+country.addEventListener('change', e => {
+    let id_ = country.options[country.selectedIndex].value
+    console.log(id_)
+})
