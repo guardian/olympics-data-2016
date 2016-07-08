@@ -30,8 +30,10 @@
             <div class="om-section om-section--divider">
                 <div class="om-section__title">
                     <h3 class="om-schedule-date">
-                        {{ date.date|datefmt('dddd') }},
-                        <span>{{ date.date|datefmt('D MMM') }}</span>
+                        <time datetime="{{ date.date }}">
+                            {{ date.date|datefmt('dddd') }},
+                            <span>{{ date.date|datefmt('D MMM') }}</span>
+                        </time>
                     </h3>
                     <p class="om-schedule-date-no">Day {{ loop.index }} of {{ scheduleAll.length }}</p>
                 </div>
@@ -43,15 +45,13 @@
                         {% endif %}
                         <ul class="om-events">
                             {% for event in discipline.events %}
-                                <li class="om-events__event">
-                                    <div class="om-events__event__time">
-                                        {{ event.start|datefmt('HH:mm') }} -
-                                        {{ event.end|datefmt('HH:mm') }}
-                                    </div>
-                                    <span class="om-events__event__name">{{ event.description }}</span>
+                                <li class="om-event">
+                                    <time class="om-event__time" datetime="{{event.start}}">{{ event.start|datefmt('HH:mm') }}</time>
+                                    <span class="om-event__name">{{ event.description }}</span>
                                     {% if discipline.venues.length > 1 %}
-                                        <span class="om-events__event__venue">{{ event.venue.name }}</span>
+                                        <span class="om-event__venue">{{ event.venue.name }}</span>
                                     {% endif %}
+                                    <img class="om-event__scheduled" src="./assets/imgs/clock.svg" />
                                 </li>
                             {% endfor %}
                         </ul>

@@ -37,25 +37,32 @@
     padding: 0;
 }
 
-.om-events__event {
+.om-event {
     @include fs-textSans(3);
     position: relative;
     border-top: 1px dotted #dcdcdc;
-    padding: 3px 0 3px 120px;
+    padding: 3px 0 3px 80px;
 
-    &.om-events__event--group {
+    &.om-event--group {
         color: #bdbdbd;
         border-top: 0;
     }
 }
 
-.om-events__event__time,
-.om-events__event__name,
-.om-events__event__venue {
-    margin: 0;
-}
-
-.om-events__event__time {
+.om-event__time {
     position: absolute;
     left: 0;
+}
+
+.om-event__name {
+    font-weight: 500;
+}
+
+.om-event__venue {
+    margin-left: 20px;
+}
+
+.om-event__scheduled {
+    float: right;
+    margin-top: 2px;
 }
