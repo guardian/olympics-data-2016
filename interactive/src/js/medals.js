@@ -25,3 +25,14 @@ for(var i =0; i<extraBtns.length; i++){
         }
     })
 }
+
+let button = document.querySelector('.om-expand-button')
+let countries = document.querySelectorAll('.om-table-row')
+button.addEventListener('click', e => {
+    countries.slice(10).forEach(function(el){
+        el.classList.toggle('om-table-row--hidden')
+    })
+})
+
+let discipline = document.querySelector('.om-select-discipline')
+let country = document.querySelector('.om-select-country')

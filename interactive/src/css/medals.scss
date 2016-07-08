@@ -93,6 +93,10 @@
 	}
 }
 
+.om-table-row--hidden {
+	display: none;
+}
+
 .om-table-el {
 	float: left;
 	position: relative;
@@ -180,6 +184,37 @@
 	margin: auto;
 	position: relative;
 
+}
+
+
+.om-expand-button {
+
+	background:none;
+	border-radius:30px;
+	height:30px;
+	border:1px solid #ccc;
+	font-family:$f-sans-serif-text;
+	padding-left:30px;
+	padding-right:12px;
+	color:#767676;
+	outline:none;
+	cursor:pointer;
+	transition: 200ms color, 200ms border-color;
+	background-image:url(assets/imgs/plus.svg);
+	background-size:13px;
+	background-repeat:no-repeat;
+	background-position: 9px center;
+	font-size:13px;
+	padding-bottom:0;
+	padding-top:0;
+	margin-top:6px;
+	&.hide-button{
+		background-image:url(assets/imgs/minus.svg);
+	}
+	&:hover{
+		border-color:#767676;
+		color:#333;
+	}
 }
 
 .medalist-icon{

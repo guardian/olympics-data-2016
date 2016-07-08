@@ -65,19 +65,22 @@
                     </li>
             {% endfor %}
             </ol>
-            <button id="expand-button">More countries</button>
+            <button class="om-expand-button">All countries</button>
         </section>
         <section class="om-filter">
             <div class="om-filter-content">
                 <p>Who's winning? I'd like to see medals in
-                    <select>
-                        <option value='all' selected>all sports</option>
+                    <select class='om-select-discipline om-filter__choice'>
+                        <option value='all' selected>All sports</option>
                         {% for d in disciplines %}
                             <option value='{{ d.identifier }}'>{{ d.description }}</option>
                         {% endfor %}
                     </select>
-                    <select>
-                        <option>All countries</option>
+                    <select class='om-select-country om-filter__choice'>
+                        <option value='all' selected>All countries</option>
+                        {% for c in countries %}
+                            <option value='{{ c.identifier }}'>{{ c.name }}</option>
+                        {% endfor %}
                     </select></p>
             </div>
         </section>
