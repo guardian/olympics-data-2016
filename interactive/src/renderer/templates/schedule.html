@@ -18,18 +18,18 @@
         <div class="om-filter__inner">
             Upcoming events in
             <select class="om-filter__choice">
-                {% for discipline in scheduleAll.disciplines %}
+                {% for discipline in disciplines %}
                     <option value="{{ discipline.identifier }}">{{ discipline.description }}</option>
                 {% endfor %}
             </select>
         </div>
     </div>
     <div class="om-container">
-        {% for date in scheduleAll.days %}
+        {% for date in scheduleAll %}
             <div class="om-section om-section--divider">
                 <div class="om-section__title">
                     <h3 class="om-schedule-date">{{ date.date|datefmt('dddd, D MMM') }}</h3>
-                    <p class="om-schedule-date-no">Day {{ loop.index }} of {{ scheduleAll.days.length }}</p>
+                    <p class="om-schedule-date-no">Day {{ loop.index }} of {{ scheduleAll.length }}</p>
                 </div>
                 {% for discipline in date.disciplines %}
                     <h4 class="om-schedule-discipline">{{ discipline.description }}</h4>

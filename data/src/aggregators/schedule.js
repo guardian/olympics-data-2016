@@ -31,12 +31,15 @@ export default [
             }
         ],
         'transform': (dates, dateSchedules) => {
-            let days = _.zip(dates.olympics.schedule, dateSchedules)
+            return _.zip(dates.olympics.schedule, dateSchedules)
                 .map(([schedule, dateSchedule]) => {
                     let disciplines = _(dateSchedule.olympics.scheduledEvent)
                         // TODO: remove filter when PA updates
                         .filter(evt => !evt.discipline.event.eventUnit.identifier.endsWith('00'))
                         .map(evt => {
+                            if (!evt.end) {
+                                console.log(JSON.stringify(evt, null, 2));
+                            }
                             return {
                                 'description': evt.description,
                                 'start': evt.start.utc,
@@ -80,14 +83,13 @@ export default [
 
                     return {'date': schedule.date, disciplines};
                 });
-            let disciplines = _(days)
-                .flatMap(date => date.disciplines)
-                .uniqBy('identifier')
-                .pick(['identifier', 'description'])
-                .valueOf();
-
-            return {days, disciplines}
         },
         'cacheTime': moment.duration(2, 'hours')
+    },
+    {
+        'id': 'disciplines',
+        'paDeps': ['olympics/2016-summer-olympics/discipline'],
+        'transform': disciplines => disciplines.olympics.discipline,
+        'cacheTime': moment.duration(14, 'days')
     }
 ];
