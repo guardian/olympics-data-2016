@@ -12,9 +12,9 @@ export default [
         'cacheTime': moment.duration(14, 'days')
     },
     {
-    	'id' : 'countries',
-    	'paDeps' : ['olympics/2016-summer-olympics/country'],
-    	'transform' : countries => countries.olympics.country,
-    	'cacheTime' : moment.duration(14,  'days')
+        'id' : 'countries',
+        'paDeps' : ['olympics/2016-summer-olympics/country'],
+        'transform' : countries => countries.olympics.country,
+        'cacheTime' : moment.duration(14, 'days')
     }
 ];
