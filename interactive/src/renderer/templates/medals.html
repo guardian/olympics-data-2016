@@ -23,7 +23,7 @@
                         <div class='om-table-el om-table-el--position'>
                             {{ entry.position }}.
                         </div>
-                        <div class='om-table-el om-table-el--flag' style='background-image:url(assets/imgs/flags/{{ entry.countryCode|lower }}.svg)'>
+                        <div class='om-table-el om-table-el--flag om-flag om-flag--{{ entry.countryCode }}'>
                         </div>
                         <div class='om-table-el om-table-el--country'>
                             <span class='om-table-country-label'>{{ entry.countryCode }}</span>
