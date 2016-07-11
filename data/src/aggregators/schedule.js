@@ -88,5 +88,51 @@ export default [
                 });
         },
         'cacheTime': moment.duration(2, 'hours')
+    },
+    {
+        'id': 'startLists',
+        'paDeps': ['olympics/2016-summer-olympics/schedule'],
+        'paMoreDeps': [
+            dates => {
+                return dates.olympics.schedule.map(s => `olympics/2016-summer-olympics/schedule/${s.date}`);
+            },
+            (a, dateSchedules) => {
+                return _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent))
+                    .filter(evt => evt.startListAvailable === 'Yes')
+                    .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.discipline.event.eventUnit.identifier}/start-list`)
+                    .slice(0, 100) // TODO: remove
+            }
+        ],
+        'transform': (a, b, startLists) => {
+            return _(startLists)
+                .map(startList => startList.olympics.eventUnit)
+                .map(eventUnit => [eventUnit.identifier, forceArray(eventUnit.startList.entrant)])
+                .fromPairs()
+                .valueOf();
+        },
+        'cacheTime': moment.duration(1, 'hour')
+    },
+    {
+        'id': 'results',
+        'paDeps': ['olympics/2016-summer-olympics/schedule'],
+        'paMoreDeps': [
+            dates => {
+                return dates.olympics.schedule.map(s => `olympics/2016-summer-olympics/schedule/${s.date}`);
+            },
+            (a, dateSchedules) => {
+                return _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent))
+                    .filter(evt => evt.resultAvailable === 'Yes')
+                    .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.discipline.event.eventUnit.identifier}/result`)
+                    .slice(0, 100) // TODO: remove
+            }
+        ],
+        'transform': (a, b, results) => {
+            return _(results)
+                .map(result => result.olympics.eventUnit)
+                .map(eventUnit => [eventUnit.identifier, forceArray(eventUnit.result.entrant)])
+                .fromPairs()
+                .valueOf();
+        },
+        'cacheTime': moment.duration(10, 'minutes')
     }
 ];

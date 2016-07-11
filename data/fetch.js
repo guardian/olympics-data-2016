@@ -24,6 +24,7 @@ if (argv.test) {
 var regExps = argv._.map(r => new RegExp(r))
 
 function getDeps(deps) {
+    console.log(`Requesting ${deps.length} resources`);
     return Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
 }
 
