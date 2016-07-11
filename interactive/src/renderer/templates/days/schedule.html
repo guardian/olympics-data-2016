@@ -27,7 +27,13 @@
                                 <tbody>
                                     {% for result in results[event.unit.identifier] %}
                                         <tr>
-                                            <td>{{ result.order }}</td>
+                                            <td>
+                                                {% if result.medal %}
+                                                    <div class="om-medal om-medal--{{ result.medal|lower }}"></div>
+                                                {% else %}
+                                                    {{ result.order }}
+                                                {% endif %}
+                                            </td>
                                             <td><div class="om-flag om-flag--{{ result.countryCode }}"></div></td>
                                             <td>{{ result.names }}</td>
                                         </tr>
