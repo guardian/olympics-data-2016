@@ -106,6 +106,20 @@ async function getAllData() {
 
         data.getMedalClass = (medal) => medal.na ? 'om-medalist-name om-medalist-na' : 'om-medalist-name'
 
+    _.forEach(data.results, results => {
+        results.forEach(result => {
+            let names;
+            if (result.type === 'Individual') {
+                names = result.competitors[0].fullName;
+            } else if (result.competitors.length > 2) {
+                names = result.countryName;
+            } else {
+                names = result.competitors.map(c => c.lastName).join('/');
+            }
+            result.names = names;
+        });
+    });
+
     return data;
 }
 
@@ -133,7 +147,8 @@ async function renderAll() {
         let name = path.basename(template, '.html');
         data.scheduleAll.forEach(day => {
             let html = swig.renderFile(template, {
-                'schedule': day
+                'schedule': day,
+                'results': data.results
             });
             writeFile(`build/days/${name}-${moment(day.date).format('YYYY-MM-DD')}.html`, html);
         });

@@ -22,6 +22,19 @@
                         {% if discipline.venues.length > 1 %}
                             <span class="om-event__venue">{{ event.venue.name }}</span>
                         {% endif %}
+                        {% if results[event.unit.identifier] %}
+                            <table>
+                                <tbody>
+                                    {% for result in results[event.unit.identifier] %}
+                                        <tr>
+                                            <td>{{ result.order }}</td>
+                                            <td><div class="om-flag om-flag--{{ result.countryCode }}"></div></td>
+                                            <td>{{ result.names }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
                         <img class="om-event__scheduled" src="./assets/imgs/clock.svg" />
                     </li>
                 {% endfor %}

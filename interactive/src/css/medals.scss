@@ -245,16 +245,3 @@
 .is-hidden {
 	display: none;
 }
-
-.medalist-icon{
-	display: inline-block;
-	width:8px;
-	height:8px;
-	border-radius:10px;
-	background:#fff;
-	border:2px solid #fff;
-	margin-right: 4px;
-	&.color-bronze{ border-color:$bronze; }
-	&.color-silver{ border-color:$silver; }
-	&.color-gold{ border-color:$gold; }
-}
