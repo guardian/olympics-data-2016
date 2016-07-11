@@ -19,6 +19,10 @@ function canCombine(group, evt1) {
     return false;
 }
 
+function forceArray(arr) {
+    return _.isArray(arr) ? arr : [arr];
+}
+
 export default [
     {
         'id': 'scheduleAll',
@@ -33,13 +37,12 @@ export default [
         'transform': (dates, dateSchedules) => {
             return _.zip(dates.olympics.schedule, dateSchedules)
                 .map(([schedule, dateSchedule]) => {
-                    let disciplines = _(dateSchedule.olympics.scheduledEvent)
+                    console.log(schedule.date);
+                    let disciplines = _(forceArray(dateSchedule.olympics.scheduledEvent))
                         // TODO: remove filter when PA updates
                         .filter(evt => !evt.discipline.event.eventUnit.identifier.endsWith('00'))
+                        .filter(evt => evt.status !== 'Cancelled')
                         .map(evt => {
-                            if (!evt.end) {
-                                console.log(JSON.stringify(evt, null, 2));
-                            }
                             return {
                                 'description': evt.description,
                                 'start': evt.start.utc,
