@@ -19,7 +19,7 @@
             <h3 class="om-section__title">Leaderboard</h3>
             <ol class='om-table'>
             {% for entry in medalTable.table %}
-                    <li class='om-table-row'>
+                    <li class='om-table-row {%if loop.index > 10 %} om-table-row--hidden {% endif %}'>
                         <div class='om-table-el om-table-el--position'>
                             {{ entry.position }}.
                         </div>
@@ -65,65 +65,31 @@
                     </li>
             {% endfor %}
             </ol>
-            <button class="om-expand-button">All countries</button>
+            <button class="js-leaderboard-button om-expand-button">All countries</button>
         </section>
     </div>
     <section class="om-filter">
         <div class="om-filter__inner">
             Who's winning? I'd like to see medals in
             <select class='om-select-discipline om-filter__choice'>
-                <option value='all' selected>All sports</option>
+                <option value='' selected>All sports</option>
                 {% for d in disciplines %}
                     <option value='{{ d.identifier }}'>{{ d.description }}</option>
                 {% endfor %}
             </select>
             <select class='om-select-country om-filter__choice'>
-                <option value='all' selected>All countries</option>
+                <option value='' selected>All countries</option>
                 {% for c in countries %}
                     <option value='{{ c.identifier }}'>{{ c.name }}</option>
                 {% endfor %}
             </select>
         </div>
     </section>
-    <div class="om-container">
-        <section class="om-section">
-            <div class="om-section__title">
-                <h3 class='om-medaltable-row'>Last 24 hours</h3>
-                <h4>Tuesday, 16 Aug, Day 5 of 17</h4>
-            </div>
-            <ul class='om-recent-disciplines'>
-                {% for discipline in recentMedalsAll %}
-                    <li class='om-recent-discipline'>
-                        <h3 class='om-recent-discipline'>
-                            {{ discipline[0] }}
-                        </h3>
-                        <ul class='om-recent-events'>
-                            {% for event in discipline['1'] %}
-                                <li class='om-recent-event'>
-                                    <h4 class='om-recent-eventname'> {{ event[0] }} </h4>
-                                    <div class='om-recent-medalists'>
-                                        {% for medal in event['1'] %}
-                                            <div class="om-recent-medalist medal-{{medal.medal}} om-recent-el">
-                                                <span class="medalist-icon color-{{medal.type.toLowerCase()}}"></span>
+    <div class="om-container om-recent">
 
-                                                {% if medal.competitor.athlete %}
-                                                    <span class="medalist-name">{{medal.competitor.athlete}}</span>
-                                                    <span class="medalist-country">({{medal.competitor.countryCode}})</span>
-                                                {% else %}
-                                                    <span class="medalist-name">{{medal.competitor.country}}</span>
-                                                {% endif %}
-                                            </div>
-                                        {% endfor %}
-                                        <button class='om-recent-button'></button>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                {% endfor %}
-            </ul>
-        </section>
+    {% include './medals/days/dayMedals.html' { 'dayDisciplines': recentMedalsByDay[0].disciplines } %}
     </div>
+     <button class="js-recent-button om-expand-button">Results from previous days</button>
     <script src="./medals.js"></script>
 </body>
 </html>

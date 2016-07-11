@@ -37,6 +37,11 @@ function parseCompetitor(e) {
     }
 }
 
+function parseDisplayStr(c) {
+    if(c.athlete) return `${c.athlete} (${c.countryCode})`
+    return c.country
+}
+
 export default [
     {
         'id': 'medalTable',
@@ -78,8 +83,10 @@ export default [
                         return {
                             type: m.type,
                             discipline: m.event.disciplineDescription.value,
+                            disciplineId: m.event.disciplineDescription.identifier,
                             time: m.utc,
                             competitor: parseCompetitor(m.entrant),
+                            displayStr : parseDisplayStr(parseCompetitor(m.entrant)),
                             eventName: m.event.description,
                             eventId: m.event.identifier,
                             eventUnitId : m.event.eventUnit.identifier

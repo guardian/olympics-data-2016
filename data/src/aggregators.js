@@ -16,5 +16,13 @@ export default [
         'paDeps' : ['olympics/2016-summer-olympics/country'],
         'transform' : countries => countries.olympics.country,
         'cacheTime' : moment.duration(14, 'days')
+    },
+    {
+        'id' : 'schedule',
+        'paDeps' : ['olympics/2016-summer-olympics/schedule'],
+        'transform' : (schedule) => {
+            return schedule.olympics.schedule.map(s => s.date)
+        },
+        'cacheTime' : moment.duration(14, 'days')
     }
 ];

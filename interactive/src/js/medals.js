@@ -1,50 +1,47 @@
 import { $, $$ } from './lib/selector'
-// var expandBtnEl = document.querySelector('#section-leaderboard #expand-button');
-// expandBtnEl.addEventListener('click',function(e){
-//     var tableEl = document.querySelector('#section-leaderboard table');
-//     if(tableEl.className.indexOf('show-hidden') > -1){
-//         tableEl.className = "";
-//         expandBtnEl.className = "";
-//         expandBtnEl.innerHTML = "More countries"
-//     }else{
-//         tableEl.className = "show-hidden";
-//         expandBtnEl.className = "hide-button";
-//         expandBtnEl.innerHTML = "Less countries"
-//     }
-// })
+import reqwest from 'reqwest'
 
-// var extraBtns = document.querySelectorAll('#section-recentmedals .recentmedals-row-extra-btn button');
-// for(var i =0; i<extraBtns.length; i++){
-//     extraBtns[i].addEventListener('click',function(e){
-//         var tbodyEl = e.target.parentElement.parentElement.parentElement;
-//         var listItemContainer = tbodyEl.querySelector('.recentmedals-row-allresults');
-
-//         if(listItemContainer.className.indexOf('row-open') > -1){
-//             listItemContainer.className = "recentmedals-row-allresults";
-//         }else{
-//             listItemContainer.className += " row-open";
-//         }
-//     })
-// }
-
-let button = $('.om-expand-button')
+let lbButton = $('.js-leaderboard-button')
+let rButton = $('.js-recent-button')
 let countries = $$('.om-table-row')
 
-button.addEventListener('click', e => {
+function hideWhatShallBeHidden() { // no, this is not a permanent name
+
+    let id_ = dSelect.options[dSelect.selectedIndex].value
+    let disciplines = $$('.om-recent-discipline')
+    disciplines.forEach(ev => {
+        if (id_ === '' || id_ === ev.getAttribute('data-discipline')) {
+            ev.classList.remove('is-hidden')
+        } else {
+            ev.classList.add('is-hidden')
+        }
+    })
+} 
+
+lbButton.addEventListener('click', e => {
     countries.slice(10).forEach(function(el){
         el.classList.toggle('om-table-row--hidden')
     })
+    lbButton.innerHTML = (lbButton.innerHTML === 'Hide countries') ? 'All countries' : 'Hide countries'
 })
 
-let discipline = $('.om-select-discipline')
-let country = $('.om-select-country')
+let dSelect = $('.om-select-discipline')
+let cSelect = $('.om-select-country')
+let container = $('.om-recent')
 
-discipline.addEventListener('change', e => {
-    let id_ = discipline.options[discipline.selectedIndex].value
+dSelect.addEventListener('change', () => {
+    hideWhatShallBeHidden()
+})
+
+cSelect.addEventListener('change', () => {
+    let id_ = cSelect.options[cSelect.selectedIndex].value
     console.log(id_)
 })
 
-country.addEventListener('change', e => {
-    let id_ = country.options[country.selectedIndex].value
-    console.log(id_)
+rButton.addEventListener('click', e => {
+    let date = '2016-02-25'
+    reqwest(`./medals/days/dayMedals-${date}.html`).then(resp => {
+        container.innerHTML += resp
+        hideWhatShallBeHidden()
+    })
 })

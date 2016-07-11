@@ -12,10 +12,21 @@ const dataDir = '../data/data-out/';
 
 swig.setFilter('datefmt', (date, fmt) => moment(date).format(fmt));
 
+let log = x => {
+    console.log(x)
+    return x
+}
+
 async function readdir(d) {
     let g = glob();
     let files = await denodeify(g.readdir.bind(g))(d);
     return files.filter(file => /^[^_.]/.test(path.basename(file)));
+}
+
+function getMedals(type, medals){
+
+    let filtered = medals.filter(m => m.type === type)
+    return filtered.length === 0 ? [{ 'displayStr' : '– (not awarded)', 'type' : type, 'na' : true }] : filtered
 }
 
 async function getAllData() {
@@ -44,29 +55,56 @@ async function getAllData() {
         }
     });
 
-    data.recentMedalsAll = _(data.recentMedals)
+    data.recentMedalsByDay = _(data.recentMedals)
 
-        .filter(m => moment(m.time).isAfter(moment().subtract(2, 'months')))
-        .groupBy(m => m.discipline)
+        .groupBy(m => moment(m.time).format('YYYY-MM-DD'))
         .toPairs()
-        .sortBy(([discipline, medals]) => {
-            return _(medals)
-                .maxBy(m => new Date(m.time))
-                .valueOf()
-                .time
-        })
-        .reverse()
-        .map(([discipline, medals]) => {
+        .map(([day, events]) => {
+            return {
+                day,
+                disciplines : _(events)
+                    .groupBy(m => m.disciplineId)
+                    .toPairs()
+                    .map(([disciplineId, medals]) => {
+                        return {
+                            disciplineId,
+                            disciplineName : medals[0].discipline,
+                            medals
+                        }
+                    })
+                    .sortBy( obj => {
+                        return _(obj.medals)
+                            .maxBy(m => new Date(m.time))
+                            .valueOf()
+                            .time
+                    })
+                    .reverse()
+                    .map( obj => {
 
-            let medalsGrouped = _(medals)
-                .groupBy(m => m.eventName)
-                .toPairs()
-                .valueOf()
-            return [discipline, medalsGrouped]
-        })
+                        let medalsGrouped = _(obj.medals)
+                            .groupBy(m => m.eventName)
+                            .toPairs()
+                            .map(([eventName, medals]) => {
+                                return [
+                                    eventName,
+                                    [ getMedals('Gold', medals), getMedals('Silver', medals), getMedals('Bronze', medals) ]
+                                ]
+                            })
+                            .valueOf()
+
+                        return {
+                            disciplineId : obj.disciplineId,
+                            disciplineName : obj.disciplineName,
+                            medals : medalsGrouped
+                        } 
+                    })
+                    .valueOf()
+                        }
+                    })
         .valueOf()
+        
 
-    console.log(data.recentMedalsAll)
+        data.getMedalClass = (medal) => medal.na ? 'om-medalist-name om-medalist-na' : 'om-medalist-name'
 
     return data;
 }
@@ -82,6 +120,7 @@ async function renderAll() {
     mkdirp.sync('build');
     mkdirp.sync('build/days');
     mkdirp.sync('build/embed');
+    mkdirp.sync('build/medals/days');
 
     (await readdir('./src/renderer/templates/*.html')).forEach(template => {
         let name = path.basename(template, '.html');
@@ -99,6 +138,21 @@ async function renderAll() {
             writeFile(`build/days/${name}-${moment(day.date).format('YYYY-MM-DD')}.html`, html);
         });
     });
+
+    (await readdir('./src/renderer/templates/medals/days/*.html')).forEach(template => {
+
+        let name = path.basename(template, '.html')
+
+        data.recentMedalsByDay.forEach(obj => {
+
+            let html = swig.renderFile(template, {
+                'dayDisciplines' : obj.disciplines,
+                'getMedalClass' : data.getMedalClass
+
+            })
+            writeFile(`build/medals/days/${name}-${moment(obj.day).format('YYYY-MM-DD')}.html`, html);
+        })
+    })
 
     let embedCSS = fs.readFileSync('build/embed.css');
     (await readdir('./src/renderer/templates/embeds/*.html')).forEach(template => {

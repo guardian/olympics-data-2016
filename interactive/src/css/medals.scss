@@ -2,13 +2,24 @@
 @import "share";
 @import "flags";
 
+.om-container {
+	&:after {
+		display: block;
+		content: '';
+		clear: both;
+	}
+}
+
 .om-recent-disciplines {
 	list-style-type: none;
-    padding: 0;
 }
 
 .om-recent-discipline {
 	margin-bottom: 24px;
+}
+
+.om-recent-discipline-header {
+	margin-bottom: 12px;
 }
 
 .om-recent-events {
@@ -18,45 +29,57 @@
 
 .om-recent-event {
 
+	position: relative;
 	border-bottom: 1px dotted #ccc;
-	padding-top: 4px;
+	padding-bottom: 2px;
 	margin-bottom: 8px;
+	margin-right: 16px;
 	width: 100%;
-}
-
-.om-recent-el {
-	display: inline-block;
-	vertical-align: top;
-	@include fs-textSans(3);
-	width: 33%;
-}
-
-.om-recent-eventname {
-	margin-top: 4px;
-	margin-bottom: 8px;
-}
-
-.om-recent-medalists {
-
-	vertical-align: bottom;
 
 	&:after {
-		content: '';
 		display: block;
+		content: '';
 		clear: both;
 	}
 }
 
+.om-recent-el {
+	vertical-align: top;
+	@include fs-textSans(3);
+}
+
+.om-recent-eventname {
+
+	@include fs-textSans(3);
+	margin-top: 0;
+	margin-bottom: 4px;
+}
+
+.om-recent-medalists {
+
+	float: left;
+	min-height: 1px;
+	width: 33%;
+	vertical-align: bottom;
+}
+
 .om-recent-medalist{
 	display: block;
-	float: left;
-	width: 30%;
+}
+
+.om-medalist-name {
+	&.om-medalist-na {
+		color: #ccc;
+		font-style: italic;
+	}
 }
 
 .om-recent-button {
+	position: absolute;
+	right: 12px;
+	bottom: 6px;
 	display: block;
-	float: right;
-	border:none;
+	border: none;
 	background-image: url(assets/imgs/plus.svg);
 	width:12px;
 	height:12px;
@@ -158,11 +181,6 @@
 	z-index: 2;
 }
 
-.om-medal-circle--gold {
-	background-color: $goldLight;
-
-}
-
 .om-medal-white {
 	width:8px;
 	height:8px;
@@ -172,6 +190,11 @@
 	position: absolute;
 	left: calc(50% - 4px);
 	top: calc(50% - 4px);
+}
+
+.om-medal-circle--gold {
+	background-color: $goldLight;
+
 }
 
 .om-medal-circle--silver {
@@ -188,9 +211,9 @@
 
 }
 
-
 .om-expand-button {
 
+	float: right;
 	background:none;
 	border-radius:30px;
 	height:30px;
@@ -209,7 +232,7 @@
 	font-size:13px;
 	padding-bottom:0;
 	padding-top:0;
-	margin-top:6px;
+	margin: 12px;
 	&.hide-button{
 		background-image:url(assets/imgs/minus.svg);
 	}
@@ -217,6 +240,10 @@
 		border-color:#767676;
 		color:#333;
 	}
+}
+
+.is-hidden {
+	display: none;
 }
 
 .medalist-icon{
