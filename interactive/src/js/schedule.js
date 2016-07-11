@@ -4,8 +4,6 @@ import { $, $$ } from './lib/selector'
 let disciplineChoiceEl = $('.js-discipline-choice');
 let dayScheduleEl = $('.js-date-schedule');
 
-disciplineChoiceEl.disabled = false;
-
 function filterDisciplines() {
     let value = disciplineChoiceEl.options[disciplineChoiceEl.selectedIndex].value;
 
@@ -20,12 +18,13 @@ function filterDisciplines() {
     });
 }
 
+disciplineChoiceEl.disabled = false;
 disciplineChoiceEl.addEventListener('change', filterDisciplines);
 
 let dateCache = {};
-$$('.js-date').forEach(dayEl => {
-    let date = dayEl.getAttribute('data-date');
-    dayEl.addEventListener('click', () => {
+$$('.js-date').forEach(dateEl => {
+    let date = dateEl.getAttribute('data-date');
+    dateEl.addEventListener('click', () => {
         let promise = dateCache[date] || reqwest(`./days/schedule-${date}.html`);
         promise.then(html => {
             dayScheduleEl.innerHTML = html;
