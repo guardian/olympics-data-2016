@@ -31,7 +31,7 @@
                 <button class="js-date" data-date="{{ day.date }}">{{ day.date }}</button>
             {% endfor %}
         </div>
-        <div class="js-date-schedule">
+        <div class="js-date-schedule" data-startdate="{{ scheduleAll[0].date}}">
             {% include './days/schedule.html' {'schedule': scheduleAll[0]} %}
         </div>
     </div>
