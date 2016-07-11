@@ -56,55 +56,50 @@ async function getAllData() {
     });
 
     data.recentMedalsByDay = _(data.recentMedals)
-
         .groupBy(m => moment(m.time).format('YYYY-MM-DD'))
-        .toPairs()
-        .map(([day, events]) => {
-            return {
-                day,
-                disciplines : _(events)
-                    .groupBy(m => m.disciplineId)
-                    .toPairs()
-                    .map(([disciplineId, medals]) => {
-                        return {
-                            disciplineId,
-                            disciplineName : medals[0].discipline,
-                            medals
-                        }
-                    })
-                    .sortBy( obj => {
-                        return _(obj.medals)
-                            .maxBy(m => new Date(m.time))
-                            .valueOf()
-                            .time
-                    })
-                    .reverse()
-                    .map( obj => {
+        .map((events, day) => {
+            let disciplines = _(events)
+                .groupBy('disciplineId')
+                .map((medals, disciplineId) => {
+                    return {
+                        disciplineId,
+                        disciplineName : medals[0].discipline,
+                        medals
+                    }
+                })
+                .sortBy( obj => {
+                    return _(obj.medals)
+                        .maxBy(m => new Date(m.time))
+                        .valueOf()
+                        .time
+                })
+                .reverse()
+                .map( obj => {
 
-                        let medalsGrouped = _(obj.medals)
-                            .groupBy(m => m.eventName)
-                            .toPairs()
-                            .map(([eventName, medals]) => {
-                                return [
-                                    eventName,
-                                    [ getMedals('Gold', medals), getMedals('Silver', medals), getMedals('Bronze', medals) ]
-                                ]
-                            })
-                            .valueOf()
+                    let medalsGrouped = _(obj.medals)
+                        .groupBy('eventName')
+                        .map((medals, eventName) => {
+                            return {
+                                'name': eventName,
+                                'medals': _(['Gold', 'Silver', 'Bronze'])
+                                    .map(type => [type, getMedals(type, medals)])
+                                    .fromPairs()
+                                    .valueOf()
+                            };
+                        })
+                        .valueOf();
 
-                        return {
-                            disciplineId : obj.disciplineId,
-                            disciplineName : obj.disciplineName,
-                            medals : medalsGrouped
-                        } 
-                    })
-                    .valueOf()
-                        }
-                    })
+                    return {
+                        disciplineId : obj.disciplineId,
+                        disciplineName : obj.disciplineName,
+                        medals : medalsGrouped
+                    } 
+                })
+                .valueOf()
+
+            return {day, disciplines};
+        })
         .valueOf()
-        
-
-        data.getMedalClass = (medal) => medal.na ? 'om-medalist-name om-medalist-na' : 'om-medalist-name'
 
     _.forEach(data.results, results => {
         results.forEach(result => {
@@ -161,8 +156,7 @@ async function renderAll() {
         data.recentMedalsByDay.forEach(obj => {
 
             let html = swig.renderFile(template, {
-                'dayDisciplines' : obj.disciplines,
-                'getMedalClass' : data.getMedalClass
+                'dayDisciplines' : obj.disciplines
 
             })
             writeFile(`build/medals/days/${name}-${moment(obj.day).format('YYYY-MM-DD')}.html`, html);
