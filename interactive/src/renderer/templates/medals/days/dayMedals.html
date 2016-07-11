@@ -1,0 +1,49 @@
+<section class="om-section">
+    <div class="om-section__title">
+        <h3 class='om-medaltable-row'>Last day</h3>
+        <h4>Tuesday, 16 Aug, Day 5 of 17</h4>
+    </div>
+    <div class='om-recent'>
+        <ul class='om-recent-disciplines'>
+            {% for discipline in dayDisciplines %}
+                <li class='om-recent-discipline' data-discipline='{{ discipline.disciplineId }}'>
+                    <h3 class='om-recent-discipline-header'>
+                        {{ discipline.disciplineName }}
+                    </h3>
+                    <ul class='om-recent-events'>
+                        {% for event in discipline.medals %}
+                            <li class='om-recent-event'>
+                                <h4 class='om-recent-eventname'> {{ event[0] }} </h4>
+                                <div class='om-recent-medalists'>
+                                    {% for medal in event['1']['0'] %}
+                                        <div class="om-recent-medalist medal-{{medal.medal}} om-recent-el">
+                                            <span class="medalist-icon color-{{medal.type.toLowerCase()}}"></span>
+                                            <span class='{{ getMedalClass(medal) }}'>{{ medal.displayStr }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class='om-recent-medalists'>
+                                    {% for medal in event['1']['1'] %}
+                                        <div class="om-recent-medalist medal-{{medal.medal}} om-recent-el">
+                                            <span class="medalist-icon color-{{medal.type.toLowerCase()}}"></span>
+                                            <span class='{{ getMedalClass(medal) }}'>{{ medal.displayStr }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class='om-recent-medalists'>
+                                    {% for medal in event['1']['2'] %}
+                                        <div class="om-recent-medalist medal-{{medal.medal}} om-recent-el">
+                                            <span class="medalist-icon color-{{medal.type.toLowerCase()}}"></span>
+                                            <span class='{{ getMedalClass(medal) }}'>{{ medal.displayStr }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <button class='om-recent-button'></button>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
