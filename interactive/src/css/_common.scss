@@ -95,8 +95,11 @@ a {
 
 .om-filter {
     background-color: #f7e87a;
-    border-top: 1px solid white;
     line-height: 35px;
+
+    .om-header + & {
+        border-top: 1px solid white;
+    }
 }
 
 .om-filter__inner {
@@ -159,4 +162,18 @@ a {
     @include mq(wide) {
         width: 220px;
     }
+}
+
+.om-medal {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 10px;
+    background: #fff;
+    border: 2px solid #fff;
+    margin-right: 4px;
+
+    &.om-medal--bronze { border-color: $bronze; }
+    &.om-medal--silver { border-color: $silver; }
+    &.om-medal--gold { border-color: $gold; }
 }
