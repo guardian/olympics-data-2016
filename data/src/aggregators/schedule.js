@@ -23,6 +23,26 @@ function forceArray(arr) {
     return _.isArray(arr) ? arr : [arr];
 }
 
+function parseEntrants(entrants) {
+    return _(entrants)
+        .map(entrant => {
+            let properties = _(forceArray(entrant.property || []))
+                .map(p => [p.type, p.value])
+                .fromPairs()
+                .valueOf();
+            return {
+                'order': parseInt(entrant.order),
+                'type': entrant.type,
+                'competitors': forceArray(entrant.participant).map(p => p.competitor),
+                'countryCode': entrant.country.identifier,
+                'countryName': entrant.country.name,
+                'medal': properties['Medal Awarded']
+            };
+        })
+        .sortBy('order')
+        .valueOf();
+}
+
 export default [
     {
         'id': 'scheduleAll',
@@ -48,6 +68,7 @@ export default [
                                 'start': evt.start.utc,
                                 'end': evt.end.utc,
                                 'venue': evt.venue,
+                                'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
                                 'phase': evt.discipline.event.eventUnit.phaseDescription,
                                 'event': _.pick(evt.discipline.event, ['description']),
                                 'discipline': _.pick(evt.discipline, ['identifier', 'description'])
@@ -123,13 +144,13 @@ export default [
                 return _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent))
                     .filter(evt => evt.resultAvailable === 'Yes')
                     .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.discipline.event.eventUnit.identifier}/result`)
-                    .slice(0, 100) // TODO: remove
+                    .slice(900, 1000) // TODO: remove
             }
         ],
         'transform': (a, b, results) => {
             return _(results)
                 .map(result => result.olympics.eventUnit)
-                .map(eventUnit => [eventUnit.identifier, forceArray(eventUnit.result.entrant)])
+                .map(eventUnit => [eventUnit.identifier, parseEntrants(forceArray(eventUnit.result.entrant))])
                 .fromPairs()
                 .valueOf();
         },
