@@ -33,23 +33,25 @@ function cacheFile(endpoint) {
     return path.join(config.pa.cacheDir, endpoint) + '.json';
 }
 
-function writeCache(endpoint, content) {
+async function writeCache(endpoint, content) {
     var file = cacheFile(endpoint);
 
+    await mkdirpP(path.dirname(file));
+    await fsWriteFile(file, JSON.stringify(content, null, 2));
 
-    return mkdirpP(path.dirname(file))
-        .then(() => fsWriteFile(file, JSON.stringify(content, null, 2)))
-        // TODO: remove after PA tests
-        // store the state of endpoint at current time
-        .then(() => fsWriteFile(`${file}_${moment().format()}`, JSON.stringify(content, null, 2)));
+    // TODO: remove after PA tests
+    // store the state of endpoint at current time
+    await fsWriteFile(`${file}_${moment().format()}`, JSON.stringify(content, null, 2));
 }
 
-function requestCache(endpoint) {
+async function requestCache(endpoint) {
     logger.info('Requesting cache', endpoint);
-    return fsReadFile(cacheFile(endpoint)).then(content => JSON.parse(content));
+    let content = await fsReadFile(cacheFile(endpoint));
+    return JSON.parse(content);
 }
 
 function newRequest(endpoint) {
+    // wrap in a real promise
     return new Promise(resolve => {
         reqwest({
             'url': `${config.pa.baseUrl}/${endpoint}`,
@@ -58,7 +60,7 @@ function newRequest(endpoint) {
                 'Accept': 'application/json',
                 'Apikey': config.pa.apiKey
             },
-            'success': resp => resolve(resp)
+            'success': resolve
         });
     });
 }
@@ -86,18 +88,20 @@ async function requestUrl(endpoint) {
     }
 }
 
-function request(endpoint, forceCache=false) {
-    return fsStat(cacheFile(endpoint)).then(stat => {
+async function request(endpoint, forceCache=false) {
+    try {
+        let stat = await fsStat(cacheFile(endpoint));
         var cacheTime = cacheTimes.find(ct => ct.endpoint.test(endpoint)).duration;
         var expiryTime = moment(stat.mtime).add(cacheTime);
-        return forceCache || moment().isBefore(expiryTime) ? requestCache(endpoint) : requestUrl(endpoint);
-    }).catch(err => {
+
+        return await (forceCache || moment().isBefore(expiryTime) ? requestCache(endpoint) : requestUrl(endpoint));
+    } catch (err) {
         if (err.code && err.code === 'ENOENT') {
-            return requestUrl(endpoint);
+            return await requestUrl(endpoint);
         } else {
             throw err;
         }
-    });
+    }
 }
 
 export default {request};

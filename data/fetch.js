@@ -68,7 +68,6 @@ function aggregatorFn(aggregator) {
         }
     }
 
-    process();
     return process;
 }
 
@@ -78,7 +77,12 @@ var aggregatorTickers = {};
 
 aggregators
     .filter(agg => regExps.length === 0 || regExps.some(r => r.test(agg.id)))
-    .forEach(aggregator => aggregatorTickers[aggregator.id] = aggregatorFn(aggregator));
+    .forEach(aggregator => {
+        let tickFn = aggregatorFn(aggregator);
+        aggregatorTickers[aggregator.id] = tickFn;
+
+        tickFn();
+    });
 
 if (argv.loop) {
     www.run(aggregatorTickers);
