@@ -178,7 +178,6 @@ export default [
                     // }
                 });
 
-            console.log(rankings)
             return {rankings};
         },
         'cacheTime': moment.duration(1, 'hours')

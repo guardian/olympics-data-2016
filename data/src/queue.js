@@ -1,18 +1,19 @@
+import log from './log'
+
+var logger = log('queue');
 var items = [], interval;
 
-function process() {
-    if (items.length > 0) {
-        let [item, resolve] = items.shift();
-        item().then(resolve).then(process);
-    } else {
-        console.log('Finished processing queue');
-        interval = undefined;
-    }
+async function process() {
+    logger.info(`Processing ${items.length} items`);
+    await Promise.all(items.map(item => item.tick().then(item.resolve)));
+    logger.info('Finished processing queue');
+
+    interval = undefined;
 }
 
-function add(item) {
+function add(tick) {
     return new Promise((resolve, reject) => {
-        items.push([item, resolve]);
+        items.push({tick, resolve});
         if (!interval) interval = setTimeout(process, 0);
     });
 }

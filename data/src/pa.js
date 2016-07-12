@@ -5,6 +5,7 @@ import moment from 'moment'
 import denodeify from 'denodeify'
 import reqwest from 'reqwest'
 import Bottleneck from 'bottleneck'
+import log from './log'
 import config from '../config'
 
 const re = (strings, ...values) => new RegExp(String.raw(strings, ...values), 'i');
@@ -22,7 +23,8 @@ const fsReadFile = denodeify(fs.readFile);
 const fsWriteFile = denodeify(fs.writeFile);
 const mkdirpP = denodeify(mkdirp);
 
-var limiter = new Bottleneck(0, 1000 / config.pa.rateLimit);
+const logger = log('pa');
+const limiter = new Bottleneck(0, 1000 / config.pa.rateLimit);
 
 function cacheFile(endpoint) {
     return path.join(config.pa.cacheDir, endpoint) + '.json';
@@ -34,13 +36,13 @@ function writeCache(endpoint, content) {
 }
 
 function requestCache(endpoint) {
-    console.log('Requesting cache', endpoint);
+    logger.info('Requesting cache', endpoint);
     return fsReadFile(cacheFile(endpoint)).then(content => JSON.parse(content));
 }
 
 function requestUrl(endpoint) {
     return limiter.schedule(() => {
-        console.log('Requesting URL', endpoint);
+        logger.info('Requesting URL', endpoint);
 
         return reqwest({
             'url': `${config.pa.baseUrl}/${endpoint}`,

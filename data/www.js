@@ -6,10 +6,13 @@ import moment from 'moment'
 import glob from 'glob-fs'
 import denodeify from 'denodeify'
 import aggregators from './src/aggregators'
+import log from './src/log'
 import config from './config'
 
 const fsStat = denodeify(fs.stat);
 const fsUnlink = denodeify(fs.unlink);
+
+const logger = log('www');
 
 function readdir(d) {
     var g = glob();
@@ -76,7 +79,7 @@ function run(aggregatorTickers) {
 
     app.use('/cache', express.static(config.pa.cacheDir));
 
-    app.listen(3000, () => console.log('Listening on port 3000'));
+    app.listen(3000, () => logger.info('Listening on port 3000'));
 }
 
 export default {run}

@@ -10,11 +10,14 @@ import queue from './src/queue'
 import pa from './src/pa'
 import s3 from './src/s3'
 import notify from './src/notify'
+import log from './src/log'
 import config from './config'
 
 import www from './www'
 
 const fsWrite = denodeify(fs.writeFile.bind(fs));
+
+const mainLogger = log('fetch');
 
 var argv = parseArgs(process.argv.slice(2), {'default': {'s3': true, 'pa': true, 'loop': true, 'notify': true}});
 if (argv.test) {
@@ -24,7 +27,7 @@ if (argv.test) {
 var regExps = argv._.map(r => new RegExp(r))
 
 function getDeps(deps) {
-    console.log(`Requesting ${deps.length} resources`);
+    mainLogger.info(`Requesting ${deps.length} resources`);
     return Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
 }
 
@@ -38,8 +41,10 @@ function getMoreDeps([depFn, ...restDepFns], contents) {
 }
 
 function aggregatorFn(aggregator) {
+    let logger = log(`aggregator:${aggregator.id}`);
+
     async function process() {
-        console.log(`Processing ${aggregator.id}`);
+        logger.info(`Processing`);
 
         try {
             let initialContents = await getDeps(aggregator.paDeps);
@@ -50,8 +55,8 @@ function aggregatorFn(aggregator) {
             await fsWrite(localPath, JSON.stringify(data, null, 2));
             if (argv.s3) await s3.put(aggregator.id, data);
         } catch (err) {
-            console.error(`Error processing ${aggregator.id}`, err);
-            console.error(err.stack);
+            logger.error(`Error processing ${aggregator.id}`, err);
+            logger.error(err.stack);
             if (argv.notify) {
                 notify.send(`Error processing ${aggregator.id}`, `${util.inspect(err)}`);
             }
