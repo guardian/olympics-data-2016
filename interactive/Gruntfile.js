@@ -34,6 +34,10 @@ module.exports = function(grunt) {
             render: {
                 files: ['src/renderer/**/*'],
                 tasks: ['shell:render']
+            },
+            server: {
+                files: ['../data/data-out/**/*'],
+                tasks: ['copy:data', 'deploy'],
             }
         },
 
@@ -161,7 +165,14 @@ module.exports = function(grunt) {
         });
     })
 
+    grunt.registerTask('watch:basic', function () {
+        delete grunt.config.data.watch.server;
+        grunt.task.run('watch');
+    });
+
     grunt.registerTask('build', ['clean', 'sass', 'jspm', 'shell:render', 'copy']);
     grunt.registerTask('deploy', ['build', 'aws_s3', 'urls']);
-    grunt.registerTask('default', ['build', 'connect', 'watch']);
+    grunt.registerTask('default', ['build', 'connect', 'watch:basic']);
+
+    grunt.registerTask('server', ['deploy', 'watch:server']);
 }
