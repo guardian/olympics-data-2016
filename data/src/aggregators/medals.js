@@ -81,8 +81,8 @@ export default [
         'transform' : (disciplines, medalCasts) => {
             return _(medalCasts)
                 .filter(mc => mc.olympics.discipline)
-                .map(mc => {
-                    return _.flatMap(forceArray(mc.olympics.discipline.medalCast), m => {
+                .flatMap(mc => {
+                    return _.map(forceArray(mc.olympics.discipline.medalCast), m => {
                         return {
                             type: m.type,
                             discipline: m.event.disciplineDescription.value,

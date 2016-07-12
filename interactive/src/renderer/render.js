@@ -55,9 +55,12 @@ async function getAllData() {
         }
     });
 
+    console.log(data.recentMedals)
+
     data.recentMedalsByDay = _(data.recentMedals)
         .groupBy(m => moment(m.time).format('YYYY-MM-DD'))
         .map((events, day) => {
+
             let disciplines = _(events)
                 .groupBy('disciplineId')
                 .map((medals, disciplineId) => {
@@ -152,6 +155,7 @@ async function renderAll() {
     (await readdir('./src/renderer/templates/medals/days/*.html')).forEach(template => {
         let name = path.basename(template, '.html')
         data.recentMedalsByDay.forEach(obj => {
+
             console.log('Rendering', template, obj.day);
             let html = swig.renderFile(template, {
                 'dayDisciplines' : obj.disciplines,
