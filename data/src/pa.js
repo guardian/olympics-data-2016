@@ -36,11 +36,12 @@ function cacheFile(endpoint) {
 function writeCache(endpoint, content) {
     var file = cacheFile(endpoint);
 
-    // TODO: remove after PA tests
-    // store the state of endpoint at current time
-    fsWriteFile(`${file}_${moment().format()}`, JSON.stringify(content, null, 2));
 
-    return mkdirpP(path.dirname(file)).then(() => fsWriteFile(file, JSON.stringify(content, null, 2)));
+    return mkdirpP(path.dirname(file))
+        .then(() => fsWriteFile(file, JSON.stringify(content, null, 2)))
+        // TODO: remove after PA tests
+        // store the state of endpoint at current time
+        .then(() => fsWriteFile(`${file}_${moment().format()}`, JSON.stringify(content, null, 2)));
 }
 
 function requestCache(endpoint) {
