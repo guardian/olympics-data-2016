@@ -6,6 +6,7 @@ let rButton = $('.js-recent-button')
 let countries = $$('.om-table-row')
 
 let daysCached = null
+let resultsCached = {}
 
 function yesterday(dayStr){
     let date = new Date(dayStr)
@@ -30,11 +31,25 @@ function addResultHandlers() {
     $$('.js-results-button').forEach( el => {
         el.addEventListener('click', () => {
             let euid = el.getAttribute('data-euid');
-            reqwest(`./eventunits/results-${euid}.html`).then(resp => {
-                el.parentElement.innerHTML += resp;
-            });
 
-            el.classList.toggle('hide-button');
+            if(el.classList.contains('hide-button')) {
+                console.log(el.parentElement)
+                let table = el.parentElement.querySelector('.om-results-table')
+                table.classList.add('is-hidden')
+            }
+
+            else {
+
+                let p = resultsCached[euid] ? Promise.resolve(resultsCached[euid]) : Promise.resolve(reqwest(`./eventunits/results-${euid}.html`))
+
+                p.then(resp => {
+                    el.parentElement.insertAdjacentHTML('beforeEnd', resp);
+                });
+
+                el.classList.toggle('hide-button');
+
+            }
+
         })
     })
 }
@@ -79,7 +94,7 @@ rButton.addEventListener('click', e => {
 
             return Promise.resolve(reqwest(`./medals/days/dayMedals-${nextDate}.html`))
         }).then( resp => {
-            container.innerHTML += resp
+            container.insertAdjacentHTML('beforeEnd', resp)
             filterEls()
             addResultHandlers()
 

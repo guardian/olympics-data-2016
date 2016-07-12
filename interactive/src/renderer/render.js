@@ -103,6 +103,7 @@ async function getAllData() {
         .valueOf()
 
     _.forEach(data.results, results => {
+
         results.forEach(result => {
             let names;
             if (result.type === 'Individual') {
@@ -162,7 +163,7 @@ async function renderAll() {
 
     (await readdir('./src/renderer/templates/eventunits/*.html')).forEach(template => {
         let name = path.basename(template, '.html')
-        data.results.forEach((result, key) => {
+        _(data.results).forEach((result, key) => {
             console.log('Rendering', template, key);
             let html = swig.renderFile(template, {
                 'results' : result.filter(res => res.order <= 10)
