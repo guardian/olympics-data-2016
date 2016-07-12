@@ -6,7 +6,7 @@ function forceArray(arr) {
 }
 
 function getEventUnit(evt) {
-    return evt.discipline.eventUnit;
+    return evt.discipline.event.eventUnit;
 }
 
 function parseScheduledEvent(evt) {
