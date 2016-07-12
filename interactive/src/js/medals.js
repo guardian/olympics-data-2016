@@ -5,6 +5,8 @@ let lbButton = $('.js-leaderboard-button')
 let rButton = $('.js-recent-button')
 let countries = $$('.om-table-row')
 
+let daysCached = null
+
 function yesterday(dayStr){
     let date = new Date(dayStr)
     return (new Date(date - 24*3600*1000)).toISOString().slice(0,10)
@@ -31,6 +33,8 @@ function addResultHandlers() {
             reqwest(`./eventunits/results-${euid}.html`).then(resp => {
                 el.parentElement.innerHTML += resp;
             });
+
+            el.classList.toggle('hide-button');
         })
     })
 }
@@ -41,6 +45,8 @@ lbButton.addEventListener('click', e => {
         el.classList.toggle('om-table-row--hidden')
     })
     lbButton.innerHTML = (lbButton.innerHTML === 'Hide countries') ? 'All countries' : 'Hide countries'
+    console.log(lbButton.classList)
+    lbButton.classList.toggle('hide-button')
 })
 
 let dSelect = $('.om-select-discipline')
@@ -60,13 +66,24 @@ rButton.addEventListener('click', e => {
 
     let dates = $$('.om-section-date')
 
-    let nextDate = yesterday(dates[dates.length-1].getAttribute('data-date'))
+    //let nextDate = yesterday(dates[dates.length-1].getAttribute('data-date'))
 
-    reqwest(`./medals/days/dayMedals-${nextDate}.html`).then(resp => {
-        container.innerHTML += resp
-        filterEls()
-        addResultHandlers()
-    })
+    let p = daysCached ? Promise.resolve(daysCached) : Promise.resolve(reqwest('https://s3.amazonaws.com/gdn-cdn/olympics-2016/schedule.json'))
+        p.then( days => {
+            daysCached = days
+            let ind = days.indexOf(dates[dates.length-1].getAttribute('data-date'))
+            console.log(days)
+            let nextDate = days[ind-1]
+
+            if(ind === 0) rButton.classList.add('is-hidden');
+
+            return Promise.resolve(reqwest(`./medals/days/dayMedals-${nextDate}.html`))
+        }).then( resp => {
+            container.innerHTML += resp
+            filterEls()
+            addResultHandlers()
+
+        }).catch( err => console.log(err))
 })
 
 addResultHandlers()
