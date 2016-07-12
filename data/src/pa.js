@@ -13,9 +13,9 @@ const re = (strings, ...values) => new RegExp(String.raw(strings, ...values), 'i
 const cacheTimes = [
     {'endpoint': re`^olympics/[^/]+/schedule/[^/]+$`, 'duration': moment.duration(5, 'minutes')},
     {'endpoint': re`^olympics/[^/]+/event-unit/[^/]+/start-list$`, 'duration' : moment.duration(30, 'minutes')},
-    {'endpoint': re`^olympics/[^/]+/event-unit/[^/]+/result$`, 'duration' : moment.duration(30, 'minutes')},
+    {'endpoint': re`^olympics/[^/]+/event-unit/[^/]+/result$`, 'duration' : moment.duration(10, 'minutes')},
     {'endpoint': re`^olympics/[^/]+/discipline/[^/]+/medal-cast`, 'duration': moment.duration(10, 'minutes')},
-    {'endpoint': re`^olympics/[^/]+/medal-table$`, 'duration': moment.duration(10, 'minutes')},
+    {'endpoint': re`^olympics/[^/]+/medal-table$`, 'duration': moment.duration(30, 'minutes')},
 
     // default case
     {'endpoint': re`^.*$`, 'duration': moment.duration(6, 'hours')}
@@ -38,7 +38,7 @@ function writeCache(endpoint, content) {
 
     // TODO: remove after PA tests
     // store the state of endpoint at current time
-    fsWriteFile(file + moment().format(), JSON.stringify(content, null, 2));
+    fsWriteFile(`${file}_${moment().format()}`, JSON.stringify(content, null, 2));
 
     return mkdirpP(path.dirname(file)).then(() => fsWriteFile(file, JSON.stringify(content, null, 2)));
 }
