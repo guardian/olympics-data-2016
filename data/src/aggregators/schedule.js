@@ -57,7 +57,6 @@ export default [
         'transform': (dates, dateSchedules) => {
             return _.zip(dates.olympics.schedule, dateSchedules)
                 .map(([schedule, dateSchedule]) => {
-                    console.log(schedule.date);
                     let disciplines = _(forceArray(dateSchedule.olympics.scheduledEvent))
                         // TODO: remove filter when PA updates
                         .filter(evt => !evt.discipline.event.eventUnit.identifier.endsWith('00'))
