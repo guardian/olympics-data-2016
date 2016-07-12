@@ -19,21 +19,28 @@ function canCombine(group, evt1) {
     return false;
 }
 
+function getCompetitors(entrant) {
+    let participants = entrant.participant ? forceArray(entrant.participant) : [];
+    return participants.map(p => p.competitor);
+}
+
 function forceArray(arr) {
     return _.isArray(arr) ? arr : [arr];
 }
 
 function parseEntrants(entrants) {
     return _(entrants)
+        .filter(entrant => entrant.code !== 'NOCOMP')
         .map(entrant => {
             let properties = _(forceArray(entrant.property || []))
                 .map(p => [p.type, p.value])
                 .fromPairs()
                 .valueOf();
+
             return {
                 'order': parseInt(entrant.order),
                 'type': entrant.type,
-                'competitors': forceArray(entrant.participant).map(p => p.competitor),
+                'competitors': getCompetitors(entrant), // forceArray(entrant.participant).map(p => p ? p.competitor : null),
                 'countryCode': entrant.country.identifier,
                 'countryName': entrant.country.name,
                 'medal': properties['Medal Awarded']

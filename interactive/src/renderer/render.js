@@ -131,6 +131,7 @@ async function renderAll() {
     mkdirp.sync('build/days');
     mkdirp.sync('build/embed');
     mkdirp.sync('build/medals/days');
+    mkdirp.sync('build/eventunits');
 
     (await readdir('./src/renderer/templates/*.html')).forEach(template => {
         let name = path.basename(template, '.html');
@@ -154,8 +155,6 @@ async function renderAll() {
 
         let name = path.basename(template, '.html')
 
-        console.log(data.recentMedalsByDay.map(obj => obj.day))
-
         data.recentMedalsByDay.forEach(obj => {
 
             console.log(obj.day)
@@ -167,6 +166,18 @@ async function renderAll() {
             })
             writeFile(`build/medals/days/${name}-${moment(obj.day).format('YYYY-MM-DD')}.html`, html);
         })
+    });
+
+    (await readdir('./src/renderer/templates/eventunits/*.html')).forEach(template => {
+
+        let name = path.basename(template, '.html')
+        for(let key in data.results){
+            let html = swig.renderFile(template, {
+                'results' : data.results[key]
+            })
+            writeFile(`build/eventunits/${name}-${key}.html`, html)
+        }
+
     })
 
     let embedCSS = fs.readFileSync('build/embed.css');
