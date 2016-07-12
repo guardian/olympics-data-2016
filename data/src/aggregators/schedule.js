@@ -1,9 +1,22 @@
 import _ from 'lodash'
 import moment from 'moment'
-import 'moment-range'
-import fs from 'fs'
-import config from '../../config'
-import assert from 'assert'
+
+function forceArray(arr) {
+    return arr === undefined ? [] : _.isArray(arr) ? arr : [arr];
+}
+
+function parseScheduledEvent(evt) {
+    return {
+        'description': evt.description,
+        'start': evt.start.utc,
+        'end': evt.end.utc,
+        'venue': evt.venue,
+        'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
+        'phase': evt.discipline.event.eventUnit.phaseDescription,
+        'event': _.pick(evt.discipline.event, ['description']),
+        'discipline': _.pick(evt.discipline, ['identifier', 'description'])
+    };
+}
 
 const combineBlacklist = ['football', 'water-polo', 'hockey', 'volleyball', 'basketball'];
 
@@ -19,13 +32,31 @@ function canCombine(group, evt1) {
     return false;
 }
 
+function combineEvents(evts) {
+    let events = _(evts)
+        .sortBy(evt => `${evt.phase.identifier}:${evt.start}`)
+        .reduce((groups, evt) => {
+            let [group, ...otherGroups] = groups;
+            return canCombine(group, evt) ?
+                [[evt, ...group], ...otherGroups] : [[evt], ...groups];
+        }, [])
+        .map(group => {
+            let first = group[0];
+            if (group.length === 1) {
+                return first;
+            } else {
+                let description = `${first.event.description} ${first.phase.value}`;
+                let start = _.min(group.map(evt => evt.start));
+                let end = _.max(group.map(evt => evt.end));
+                return {...first, description, start, end, group};
+            }
+        })
+        .sort((a, b) => a.start < b.start ? -1 : 1);
+}
+
 function getCompetitors(entrant) {
     let participants = entrant.participant ? forceArray(entrant.participant) : [];
     return participants.map(p => p.competitor);
-}
-
-function forceArray(arr) {
-    return arr === undefined ? [] : _.isArray(arr) ? arr : [arr];
 }
 
 function parseEntrants(entrants) {
@@ -64,45 +95,16 @@ export default [
         'transform': (dates, dateSchedules) => {
             return _.zip(dates.olympics.schedule, dateSchedules)
                 .map(([schedule, dateSchedule]) => {
-                    let disciplines = _(forceArray(dateSchedule.olympics.scheduledEvent))
-                        // TODO: remove filter when PA updates
+                    let events = forceArray(dateSchedule.olympics.scheduledEvent)
                         .filter(evt => !evt.discipline.event.eventUnit.identifier.endsWith('00'))
                         .filter(evt => evt.status !== 'Cancelled')
-                        .map(evt => {
-                            return {
-                                'description': evt.description,
-                                'start': evt.start.utc,
-                                'end': evt.end.utc,
-                                'venue': evt.venue,
-                                'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
-                                'phase': evt.discipline.event.eventUnit.phaseDescription,
-                                'event': _.pick(evt.discipline.event, ['description']),
-                                'discipline': _.pick(evt.discipline, ['identifier', 'description'])
-                            };
-                        })
+                        .map(parseScheduledEvent);
+
+                    let disciplines = _(events)
                         .groupBy('discipline.identifier')
                         .map(disciplineEvents => {
-                            let events = _.sortBy(disciplineEvents, evt => `${evt.phase.identifier}:${evt.start}`)
-                                .reduce((groups, evt) => {
-                                    let [group, ...otherGroups] = groups;
-                                    return canCombine(group, evt) ?
-                                        [[evt, ...group], ...otherGroups] : [[evt], ...groups];
-                                }, [])
-                                .map(group => {
-                                    let first = group[0];
-                                    if (group.length === 1) {
-                                        return first;
-                                    } else {
-                                        let description = `${first.event.description} ${first.phase.value}`;
-                                        let start = _.min(group.map(evt => evt.start));
-                                        let end = _.max(group.map(evt => evt.end));
-                                        return {...first, description, start, end, group};
-                                    }
-                                })
-                                .sort((a, b) => a.start < b.start ? -1 : 1);
-
-                            let venues = _.uniqBy(events.map(evt => evt.venue), venue => venue.identifier);
-
+                            let events = combineEvents(disciplineEvents);
+                            let venues = _(events).map('venue').uniqBy('identifier').valueOf();
                             return {
                                 'identifier': disciplineEvents[0].discipline.identifier,
                                 'description': disciplineEvents[0].discipline.description,
