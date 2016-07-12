@@ -17,6 +17,10 @@ const cacheTimes = [
     {'endpoint': re`^olympics/[^/]+/discipline/[^/]+/medal-cast`, 'duration': moment.duration(10, 'minutes')},
     {'endpoint': re`^olympics/[^/]+/medal-table$`, 'duration': moment.duration(30, 'minutes')},
 
+    // TODO: remove after PA tests
+    {'endpoint': re`^olympics/[^/]+/schedule$`, 'duration': moment.duration(10, 'minutes')},
+    {'endpoint': re`^olympics/[^/]+/discipline$`, 'duration': moment.duration(10, 'minutes')},
+
     // default case
     {'endpoint': re`^.*$`, 'duration': moment.duration(6, 'hours')}
 ];
