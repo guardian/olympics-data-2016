@@ -1,7 +1,7 @@
 <section class="om-section">
     <div class="om-section__title">
-        <h3 class='om-medaltable-row'>Last day</h3>
-        <h4>Tuesday, 16 Aug, Day 5 of 17</h4>
+        <h3 class='om-medaltable-row'>What goes here?</h3>
+        <h4 class='om-section-date js-section-date' data-date='{{ day }}''>{{ day | date('jS \o\f F') }}</h4>
     </div>
     <div class='om-recent'>
         <ul class='om-recent-disciplines'>
@@ -26,7 +26,7 @@
                                         {% endfor %}
                                     </div>
                                 {% endfor %}
-                                <button class='om-recent-button'></button>
+                                <button data-euid='{{ event.eventUnitId }}' class='om-recent-button js-results-button'></button>
                             </li>
                         {% endfor %}
                     </ul>

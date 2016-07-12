@@ -5,7 +5,12 @@ let lbButton = $('.js-leaderboard-button')
 let rButton = $('.js-recent-button')
 let countries = $$('.om-table-row')
 
-function hideWhatShallBeHidden() { // no, this is not a permanent name
+function yesterday(dayStr){
+    let date = new Date(dayStr)
+    return (new Date(date - 24*3600*1000)).toISOString().slice(0,10)
+}
+
+function filterEls() {
 
     let id_ = dSelect.options[dSelect.selectedIndex].value
     let disciplines = $$('.om-recent-discipline')
@@ -18,6 +23,17 @@ function hideWhatShallBeHidden() { // no, this is not a permanent name
     })
 } 
 
+function addResultHandlers() {
+
+    $$('.js-results-button').forEach( el => {
+        el.addEventListener('click', () => {
+            console.log(el.getAttribute('data-euid'))
+            el.parentElement.innerHTML += 'hihi'
+        })
+    })
+}
+
+
 lbButton.addEventListener('click', e => {
     countries.slice(10).forEach(function(el){
         el.classList.toggle('om-table-row--hidden')
@@ -27,10 +43,10 @@ lbButton.addEventListener('click', e => {
 
 let dSelect = $('.om-select-discipline')
 let cSelect = $('.om-select-country')
-let container = $('.om-recent')
+let container = $('.om-recent-days')
 
 dSelect.addEventListener('change', () => {
-    hideWhatShallBeHidden()
+    filterEls()
 })
 
 cSelect.addEventListener('change', () => {
@@ -39,9 +55,16 @@ cSelect.addEventListener('change', () => {
 })
 
 rButton.addEventListener('click', e => {
-    let date = '2016-02-25'
-    reqwest(`./medals/days/dayMedals-${date}.html`).then(resp => {
+
+    let dates = $$('.om-section-date')
+
+    let nextDate = yesterday(dates[dates.length-1].getAttribute('data-date'))
+
+    reqwest(`./medals/days/dayMedals-${nextDate}.html`).then(resp => {
         container.innerHTML += resp
-        hideWhatShallBeHidden()
+        filterEls()
+        addResultHandlers()
     })
 })
+
+addResultHandlers()

@@ -81,6 +81,7 @@ async function getAllData() {
                         .map((medals, eventName) => {
                             return {
                                 'name': eventName,
+                                'eventUnitId': medals[0].eventUnitId,
                                 'medals': _(['Gold', 'Silver', 'Bronze'])
                                     .map(type => [type, getMedals(type, medals)])
                                     .fromPairs()
@@ -153,10 +154,15 @@ async function renderAll() {
 
         let name = path.basename(template, '.html')
 
+        console.log(data.recentMedalsByDay.map(obj => obj.day))
+
         data.recentMedalsByDay.forEach(obj => {
 
+            console.log(obj.day)
+
             let html = swig.renderFile(template, {
-                'dayDisciplines' : obj.disciplines
+                'dayDisciplines' : obj.disciplines,
+                'day' : obj.day
 
             })
             writeFile(`build/medals/days/${name}-${moment(obj.day).format('YYYY-MM-DD')}.html`, html);

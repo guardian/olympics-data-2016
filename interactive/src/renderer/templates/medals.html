@@ -86,10 +86,11 @@
         </div>
     </section>
     <div class="om-container om-recent">
-
-    {% include './medals/days/dayMedals.html' { 'dayDisciplines': recentMedalsByDay[0].disciplines } %}
+        <div class='om-recent-days'>
+            {% include './medals/days/dayMedals.html' { 'dayDisciplines': recentMedalsByDay[0].disciplines, 'day' : recentMedalsByDay[0].day } %}
+        </div>
+        <button class="js-recent-button om-expand-button">Results from previous days</button>
     </div>
-     <button class="js-recent-button om-expand-button">Results from previous days</button>
     <script src="./medals.js"></script>
 </body>
 </html>
