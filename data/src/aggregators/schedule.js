@@ -38,7 +38,7 @@ function canCombine(group, evt1) {
 }
 
 function combineEvents(evts) {
-    let events = _(evts)
+    let combinedEvents = _(evts)
         .sortBy(evt => `${evt.phase.identifier}:${evt.start}`)
         .reduce((groups, evt) => {
             let [group, ...otherGroups] = groups;
@@ -56,7 +56,9 @@ function combineEvents(evts) {
                 return {...first, description, start, end, group};
             }
         })
-        .sort((a, b) => a.start < b.start ? -1 : 1);
+        .sort((a, b) => a.start < b.start ? -1 : 1)
+        .valueOf();
+    return combinedEvents;
 }
 
 function getCompetitors(entrant) {

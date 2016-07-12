@@ -81,20 +81,19 @@ export default [
         'transform' : (disciplines, medalCasts) => {
             return _(medalCasts)
                 .filter(mc => mc.olympics.discipline)
-                .flatMap(mc => {
-                    return _.map(forceArray(mc.olympics.discipline.medalCast), m => {
-                        return {
-                            type: m.type,
-                            discipline: m.event.disciplineDescription.value,
-                            disciplineId: m.event.disciplineDescription.identifier,
-                            time: m.utc,
-                            competitor: parseCompetitor(m.entrant),
-                            displayStr : parseDisplayStr(parseCompetitor(m.entrant)),
-                            eventName: m.event.description,
-                            eventId: m.event.identifier,
-                            eventUnitId : m.event.eventUnit.identifier
-                        };
-                    });
+                .flatMap(mc => forceArray(mc.olympics.discipline.medalCast))
+                .map(m => {
+                    return {
+                        type: m.type,
+                        discipline: m.event.disciplineDescription.value,
+                        disciplineId: m.event.disciplineDescription.identifier,
+                        time: m.utc,
+                        competitor: parseCompetitor(m.entrant),
+                        displayStr : parseDisplayStr(parseCompetitor(m.entrant)),
+                        eventName: m.event.description,
+                        eventId: m.event.identifier,
+                        eventUnitId : m.event.eventUnit.identifier
+                    };
                 });
         },
         'cacheTime' : moment.duration(10, 'minutes')

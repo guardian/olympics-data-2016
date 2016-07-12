@@ -6,7 +6,6 @@ import path from 'path'
 import mkdirp from 'mkdirp'
 import denodeify from 'denodeify'
 import aggregators from './src/aggregators'
-import queue from './src/queue'
 import pa from './src/pa'
 import s3 from './src/s3'
 import notify from './src/notify'
@@ -31,12 +30,13 @@ function getDeps(deps) {
     return Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
 }
 
-function getMoreDeps([depFn, ...restDepFns], contents) {
+async function getMoreDeps([depFn, ...restDepFns], contents) {
     if (depFn) {
         let moreDeps = depFn(...contents);
-        return getDeps(moreDeps).then(moreContents => getMoreDeps(restDepFns, [...contents, moreContents]));
+        let moreContents = await getDeps(moreDeps);
+        return await getMoreDeps(restDepFns, [...contents, moreContents]);
     } else {
-        return Promise.resolve(contents);
+        return contents;
     }
 }
 
@@ -44,7 +44,7 @@ function aggregatorFn(aggregator) {
     let logger = log(`aggregator:${aggregator.id}`);
 
     async function process() {
-        logger.info(`Processing`);
+        logger.info('Starting');
 
         try {
             let initialContents = await getDeps(aggregator.paDeps);
@@ -64,17 +64,12 @@ function aggregatorFn(aggregator) {
 
         if (argv.loop) {
             logger.info('Next tick in', aggregator.cacheTime.humanize());
-            setTimeout(tick, aggregator.cacheTime.asMilliseconds());
+            setTimeout(process, aggregator.cacheTime.asMilliseconds());
         }
     }
 
-    function tick() {
-        logger.info('Adding to queue');
-        return queue.add(process);
-    }
-
-    tick();
-    return tick;
+    process();
+    return process;
 }
 
 mkdirp.sync('data-out');
