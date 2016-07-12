@@ -5,14 +5,19 @@ function forceArray(arr) {
     return arr === undefined ? [] : _.isArray(arr) ? arr : [arr];
 }
 
+function getEventUnit(evt) {
+    return evt.discipline.eventUnit;
+}
+
 function parseScheduledEvent(evt) {
+    let eventUnit = getEventUnit(evt);
     return {
         'description': evt.description,
         'start': evt.start.utc,
         'end': evt.end.utc,
         'venue': evt.venue,
-        'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
-        'phase': evt.discipline.event.eventUnit.phaseDescription,
+        'unit': _.pick(eventUnit, ['identifier']),
+        'phase': eventUnit.phaseDescription,
         'event': _.pick(evt.discipline.event, ['description']),
         'discipline': _.pick(evt.discipline, ['identifier', 'description'])
     };
@@ -96,7 +101,7 @@ export default [
             return _.zip(dates.olympics.schedule, dateSchedules)
                 .map(([schedule, dateSchedule]) => {
                     let events = forceArray(dateSchedule.olympics.scheduledEvent)
-                        .filter(evt => !evt.discipline.event.eventUnit.identifier.endsWith('00'))
+                        .filter(evt => !getEventUnit(evt).identifier.endsWith('00'))
                         .filter(evt => evt.status !== 'Cancelled')
                         .map(parseScheduledEvent);
 
@@ -124,9 +129,12 @@ export default [
         'paMoreDeps': [
             dates => dates.olympics.schedule.map(s => `olympics/2016-summer-olympics/schedule/${s.date}`),
             (a, dateSchedules) => {
-                return _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent))
+                return _(dateSchedules)
+                    .flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent))
                     .filter(evt => evt.startListAvailable === 'Yes')
-                    .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.discipline.event.eventUnit.identifier}/start-list`)
+                    .map(evt => getEventUnit(evt).identifier)
+                    .map(eventUnit => `olympics/2016-summer-olympics/event-unit/${eventUnit}/start-list`)
+                    .valueOf();
             }
         ],
         'transform': (a, b, startLists) => {
@@ -144,9 +152,12 @@ export default [
         'paMoreDeps': [
             dates => dates.olympics.schedule.map(s => `olympics/2016-summer-olympics/schedule/${s.date}`),
             (a, dateSchedules) => {
-                return _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent))
+                return _(dateSchedules)
+                    .flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent))
                     .filter(evt => evt.resultAvailable === 'Yes')
-                    .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.discipline.event.eventUnit.identifier}/result`)
+                    .map(evt => getEventUnit(evt).identifier)
+                    .map(evt => `olympics/2016-summer-olympics/event-unit/${eventUnit}/result`)
+                    .valueOf();
             }
         ],
         'transform': (a, b, results) => {
