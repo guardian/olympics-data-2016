@@ -49,26 +49,40 @@ function requestCache(endpoint) {
     return fsReadFile(cacheFile(endpoint)).then(content => JSON.parse(content));
 }
 
-function requestUrl(endpoint) {
-    return limiter.schedule(() => {
-        logger.info('Requesting URL', endpoint);
-
-        return reqwest({
+function newRequest(endpoint) {
+    return new Promise(resolve => {
+        reqwest({
             'url': `${config.pa.baseUrl}/${endpoint}`,
             'type': 'json',
             'headers': {
                 'Accept': 'application/json',
                 'Apikey': config.pa.apiKey
-            }
+            },
+            'success': resp => resolve(resp)
         });
-    }).then(resp => {
-
-        if(resp.olympics){
-            return writeCache(endpoint, resp).then(() => resp);
-        } else {
-            return {}
-        }
     });
+}
+
+let rpCache = {};
+async function requestUrl(endpoint) {
+    await limiter.schedule(() => Promise.resolve());
+
+    if (rpCache[endpoint]) {
+        logger.info('Reusing request for URL', endpoint);
+    } else {
+        logger.info('Requesting URL', endpoint);
+        rpCache[endpoint] = newRequest(endpoint);
+    }
+
+    let resp = await rpCache[endpoint];
+    rpCache[endpoint] = null;
+
+    if (resp.olympics) {
+        await writeCache(endpoint, resp);
+        return resp;
+    } else {
+        return {};
+    }
 }
 
 function request(endpoint, forceCache=false) {
