@@ -30,7 +30,7 @@ function forceArray(arr) {
 
 function parseEntrants(entrants) {
     return _(entrants)
-        .filter(entrant => entrant.code !== 'NOCOMP')
+        .filter(entrant => entrant.code !== 'NOCOMP' && entrant.code !== 'BYE')
         .map(entrant => {
             let properties = _(forceArray(entrant.property || []))
                 .map(p => [p.type, p.value])
