@@ -81,7 +81,8 @@ async function requestUrl(endpoint) {
         await writeCache(endpoint, resp);
         return resp;
     } else {
-        return {};
+        logger.warn('Empty response for URL', endpoint);
+        return {'olympics': {}};
     }
 }
 

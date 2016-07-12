@@ -8,6 +8,7 @@ async function process() {
     await Promise.all(items.map(item => item.tick().then(item.resolve)));
     logger.info('Finished processing queue');
 
+    items = [];
     interval = undefined;
 }
 

@@ -63,11 +63,13 @@ function aggregatorFn(aggregator) {
         }
 
         if (argv.loop) {
+            logger.info('Next tick in', aggregator.cacheTime.humanize());
             setTimeout(tick, aggregator.cacheTime.asMilliseconds());
         }
     }
 
     function tick() {
+        logger.info('Adding to queue');
         return queue.add(process);
     }
 

@@ -68,29 +68,31 @@
             <button class="js-leaderboard-button om-expand-button">All countries</button>
         </section>
     </div>
-    <section class="om-filter">
-        <div class="om-filter__inner">
-            Who's winning? I'd like to see medals in
-            <select class='om-select-discipline om-filter__choice'>
-                <option value='' selected>All sports</option>
-                {% for d in disciplines %}
-                    <option value='{{ d.identifier }}'>{{ d.description }}</option>
-                {% endfor %}
-            </select>
-            <select class='om-select-country om-filter__choice'>
-                <option value='' selected>All countries</option>
-                {% for c in countries %}
-                    <option value='{{ c.identifier }}'>{{ c.name }}</option>
-                {% endfor %}
-            </select>
+    {% if recentMedalsByDay.length > 0 %}
+        <section class="om-filter">
+            <div class="om-filter__inner">
+                Who's winning? I'd like to see medals in
+                <select class='om-select-discipline om-filter__choice'>
+                    <option value='' selected>All sports</option>
+                    {% for d in disciplines %}
+                        <option value='{{ d.identifier }}'>{{ d.description }}</option>
+                    {% endfor %}
+                </select>
+                <select class='om-select-country om-filter__choice'>
+                    <option value='' selected>All countries</option>
+                    {% for c in countries %}
+                        <option value='{{ c.identifier }}'>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </section>
+        <div class="om-container om-recent">
+            <div class='om-recent-days'>
+                {% include './medals/days/dayMedals.html' { 'dayDisciplines': recentMedalsByDay[0].disciplines, 'day' : recentMedalsByDay[0].day } %}
+            </div>
+            <button class="js-recent-button om-expand-button">Results from previous days</button>
         </div>
-    </section>
-    <div class="om-container om-recent">
-        <div class='om-recent-days'>
-            {% include './medals/days/dayMedals.html' { 'dayDisciplines': recentMedalsByDay[0].disciplines, 'day' : recentMedalsByDay[0].day } %}
-        </div>
-        <button class="js-recent-button om-expand-button">Results from previous days</button>
-    </div>
+    {% endif %}
     <script src="./medals.js"></script>
 </body>
 </html>

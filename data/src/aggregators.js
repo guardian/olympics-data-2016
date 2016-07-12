@@ -20,7 +20,10 @@ export default [
     {
         'id' : 'schedule',
         'paDeps' : ['olympics/2016-summer-olympics/schedule'],
-        'transform' : schedule => schedule.olympics.schedule.map(s => s.date),
+        'transform' : schedule => {
+            return schedule.olympics.schedule.map(s => s.date)
+                .filter(d => d > '2016-08-01');
+        },
         'cacheTime' : moment.duration(14, 'days')
     }
 ];

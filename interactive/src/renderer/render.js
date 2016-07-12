@@ -119,11 +119,6 @@ async function getAllData() {
     return data;
 }
 
-function writeFile(file, data) {
-    console.log('Writing', file);
-    fs.writeFileSync(file, data, 'utf8');
-}
-
 async function renderAll() {
     let data = await getAllData();
 
@@ -134,54 +129,52 @@ async function renderAll() {
     mkdirp.sync('build/eventunits');
 
     (await readdir('./src/renderer/templates/*.html')).forEach(template => {
+        console.log('Rendering', template);
         let name = path.basename(template, '.html');
         let css = fs.readFileSync(`build/${name}.css`).toString();
         let html = swig.renderFile(template, {...data, css});
-        writeFile(`build/${name}.html`, html);
+        fs.writeFileSync(`build/${name}.html`, html, 'utf8');
     });
 
     (await readdir('./src/renderer/templates/days/*.html')).forEach(template => {
         let name = path.basename(template, '.html');
         data.scheduleAll.forEach(day => {
+            console.log('Rendering', template, day.date);
             let html = swig.renderFile(template, {
                 'schedule': day,
                 'results': data.results
             });
-            writeFile(`build/days/${name}-${moment(day.date).format('YYYY-MM-DD')}.html`, html);
+            fs.writeFileSync(`build/days/${name}-${moment(day.date).format('YYYY-MM-DD')}.html`, html, 'utf8');
         });
     });
 
     (await readdir('./src/renderer/templates/medals/days/*.html')).forEach(template => {
-
         let name = path.basename(template, '.html')
-
         data.recentMedalsByDay.forEach(obj => {
-
-            console.log(obj.day)
-
+            console.log('Rendering', template, obj.day);
             let html = swig.renderFile(template, {
                 'dayDisciplines' : obj.disciplines,
                 'day' : obj.day
-
-            })
-            writeFile(`build/medals/days/${name}-${moment(obj.day).format('YYYY-MM-DD')}.html`, html);
+            });
+            fs.writeFileSync(`build/medals/days/${name}-${moment(obj.day).format('YYYY-MM-DD')}.html`, html, 'utf8');
         })
     });
 
     (await readdir('./src/renderer/templates/eventunits/*.html')).forEach(template => {
-
         let name = path.basename(template, '.html')
-        for(let key in data.results){
+        data.results.forEach((result, key) => {
+            console.log('Rendering', template, key);
             let html = swig.renderFile(template, {
-                'results' : data.results[key].filter(res => res.order <= 10)
-            })
-            writeFile(`build/eventunits/${name}-${key}.html`, html)
-        }
-
+                'results' : result.filter(res => res.order <= 10)
+            });
+            fs.writeFileSync(`build/eventunits/${name}-${key}.html`, html, 'utf8');
+        });
     })
 
     let embedCSS = fs.readFileSync('build/embed.css');
     (await readdir('./src/renderer/templates/embeds/*.html')).forEach(template => {
+        console.log('Rendering', template);
+
         let name = path.basename(template, '.html');
         let html = swig.renderFile(template, data);
 
@@ -193,10 +186,10 @@ async function renderAll() {
             'headline': 'Olympics', // TODO
             'trailText': 'Olympics' // TODO
         };
-        writeFile(`build/${name}.json`, JSON.stringify(source));
+        fs.writeFileSync(`build/${name}.json`, JSON.stringify(source), 'utf8');
 
         let embedHTML = swig.renderFile('./src/renderer/templates/embeds/_base.html', {html, 'css': embedCSS});
-        writeFile(`build/embed/${name}.html`, embedHTML);
+        fs.writeFileSync(`build/embed/${name}.html`, embedHTML, 'utf8');
     });
 }
 

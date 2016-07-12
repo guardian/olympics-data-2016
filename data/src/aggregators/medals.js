@@ -45,16 +45,21 @@ export default [
         'id': 'medalTable',
         'paDeps': ['olympics/2016-summer-olympics/medal-table'],
         'transform': medals => {
-            var table = medals.olympics.games.medalTable.tableEntry.map(tableEntry => {
-                return {
-                    'position': parseInt(tableEntry.position),
-                    'gold': parseInt(tableEntry.gold.value),
-                    'silver': parseInt(tableEntry.silver.value),
-                    'bronze': parseInt(tableEntry.bronze.value),
-                    'countryCode': tableEntry.country.identifier,
-                    'country': tableEntry.country.name
-                };
-            });
+            let table;
+            if (medals.olympics.games) {
+                table = medals.olympics.games.medalTable.tableEntry.map(tableEntry => {
+                    return {
+                        'position': parseInt(tableEntry.position),
+                        'gold': parseInt(tableEntry.gold.value),
+                        'silver': parseInt(tableEntry.silver.value),
+                        'bronze': parseInt(tableEntry.bronze.value),
+                        'countryCode': tableEntry.country.identifier,
+                        'country': tableEntry.country.name
+                    };
+                });
+            } else {
+                table = [];
+            }
 
             return {table};
         },
@@ -71,7 +76,7 @@ export default [
         ],
         'transform' : (disciplines, medalCasts) => {
             return _(medalCasts)
-                .filter(mc => mc.olympics)
+                .filter(mc => mc.olympics.discipline)
                 .map(mc => mc.olympics.discipline.medalCast
                     .map(m => {
                         return {

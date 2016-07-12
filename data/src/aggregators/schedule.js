@@ -25,7 +25,7 @@ function getCompetitors(entrant) {
 }
 
 function forceArray(arr) {
-    return _.isArray(arr) ? arr : [arr];
+    return arr === undefined ? [] : _.isArray(arr) ? arr : [arr];
 }
 
 function parseEntrants(entrants) {
@@ -57,11 +57,14 @@ export default [
         'paMoreDeps': [
             dates => {
                 return dates.olympics.schedule
+                    .filter(a => a.date > '2016-08-01')
                     .sort((a, b) => a.date < b.date ? -1 : 1)
                     .map(s => `olympics/2016-summer-olympics/schedule/${s.date}`);
             }
         ],
         'transform': (dates, dateSchedules) => {
+            dates.olympics.schedule = dates.olympics.schedule.filter(a => a.date > '2016-08-01');
+
             return _.zip(dates.olympics.schedule, dateSchedules)
                 .map(([schedule, dateSchedule]) => {
                     let disciplines = _(forceArray(dateSchedule.olympics.scheduledEvent))
@@ -114,14 +117,16 @@ export default [
                     return {'date': schedule.date, disciplines};
                 });
         },
-        'cacheTime': moment.duration(2, 'hours')
+        'cacheTime': moment.duration(1, 'hour')
     },
     {
         'id': 'startLists',
         'paDeps': ['olympics/2016-summer-olympics/schedule'],
         'paMoreDeps': [
             dates => {
-                return dates.olympics.schedule.map(s => `olympics/2016-summer-olympics/schedule/${s.date}`);
+                return dates.olympics.schedule
+                    .filter(a => a.date > '2016-08-01')
+                    .map(s => `olympics/2016-summer-olympics/schedule/${s.date}`);
             },
             (a, dateSchedules) => {
                 return _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent))
@@ -136,14 +141,16 @@ export default [
                 .fromPairs()
                 .valueOf();
         },
-        'cacheTime': moment.duration(1, 'hour')
+        'cacheTime': moment.duration(30, 'minutes')
     },
     {
         'id': 'results',
         'paDeps': ['olympics/2016-summer-olympics/schedule'],
         'paMoreDeps': [
             dates => {
-                return dates.olympics.schedule.map(s => `olympics/2016-summer-olympics/schedule/${s.date}`);
+                return dates.olympics.schedule
+                    .filter(a => a.date > '2016-08-01')
+                    .map(s => `olympics/2016-summer-olympics/schedule/${s.date}`);
             },
             (a, dateSchedules) => {
                 return _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent))
@@ -158,6 +165,6 @@ export default [
                 .fromPairs()
                 .valueOf();
         },
-        'cacheTime': moment.duration(10, 'minutes')
+        'cacheTime': moment.duration(5, 'minutes')
     }
 ];
