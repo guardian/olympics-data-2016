@@ -18,7 +18,7 @@ function put(id, content) {
 
     return limiter.schedule(() => {
         logger.info('Putting', key);
-        s3PutObject({
+        return s3PutObject({
             'Bucket': config.aws.s3.bucket,
             'Key': key,
             'Body': JSON.stringify(content),
