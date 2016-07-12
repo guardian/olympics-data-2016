@@ -55,6 +55,10 @@
 	margin-bottom: 4px;
 }
 
+.om-recent-eventname--inline {
+	float: left;
+}
+
 .om-recent-medalists {
 
 	float: left;
@@ -63,8 +67,13 @@
 	vertical-align: bottom;
 }
 
-.om-recent-medalist{
+.om-recent-medalist {
 	display: block;
+}
+
+.om-recent-medalist--inline {
+	width: 20%;
+	float: left;
 }
 
 .om-medalist-name {

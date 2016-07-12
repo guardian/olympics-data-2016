@@ -55,7 +55,17 @@ async function getAllData() {
         }
     });
 
-    console.log(data.recentMedals)
+    data.recentMedalsByCountry = _(data.countries)
+        .map(country => {
+
+            return {
+                code : country.identifier,
+                name : country.name,
+                medals : data.recentMedals
+                    .filter(m => m.competitor.countryCode === country.identifier)
+            }
+        })
+        .valueOf()
 
     data.recentMedalsByDay = _(data.recentMedals)
         .groupBy(m => moment(m.time).format('YYYY-MM-DD'))
@@ -130,6 +140,7 @@ async function renderAll() {
     mkdirp.sync('build/days');
     mkdirp.sync('build/embed');
     mkdirp.sync('build/medals/days');
+    mkdirp.sync('build/medals/countries');
     mkdirp.sync('build/eventunits');
 
     (await readdir('./src/renderer/templates/*.html')).forEach(template => {
@@ -163,6 +174,24 @@ async function renderAll() {
             });
             fs.writeFileSync(`build/medals/days/${name}-${moment(obj.day).format('YYYY-MM-DD')}.html`, html, 'utf8');
         })
+    });
+
+    (await readdir('./src/renderer/templates/medals/countries/*.html')).forEach(template => {
+        let name = path.basename(template, '.html')
+
+        data.recentMedalsByCountry.forEach(obj => {
+
+
+
+            console.log('Rendering', template, obj.code);
+            let html = swig.renderFile(template, {
+                'country' : obj
+            });
+
+            fs.writeFileSync(`build/medals/countries/${name}-${obj.code}.html`, html, 'utf8');
+
+        })
+
     });
 
     (await readdir('./src/renderer/templates/eventunits/*.html')).forEach(template => {

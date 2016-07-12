@@ -31,25 +31,19 @@ function addResultHandlers() {
     $$('.js-results-button').forEach( el => {
         el.addEventListener('click', () => {
             let euid = el.getAttribute('data-euid');
-
             if(el.classList.contains('hide-button')) {
                 console.log(el.parentElement)
                 let table = el.parentElement.querySelector('.om-results-table')
                 table.classList.add('is-hidden')
             }
-
             else {
-
                 let p = resultsCached[euid] ? Promise.resolve(resultsCached[euid]) : Promise.resolve(reqwest(`./eventunits/results-${euid}.html`))
-
                 p.then(resp => {
                     el.parentElement.insertAdjacentHTML('beforeEnd', resp);
                 });
 
                 el.classList.toggle('hide-button');
-
             }
-
         })
     })
 }
@@ -67,21 +61,24 @@ lbButton.addEventListener('click', e => {
 let dSelect = $('.om-select-discipline')
 let cSelect = $('.om-select-country')
 let container = $('.om-recent-days')
+let countryContainer = $('.om-country')
 
 dSelect.addEventListener('change', () => {
     filterEls()
 })
 
 cSelect.addEventListener('change', () => {
-    let id_ = cSelect.options[cSelect.selectedIndex].value
-    console.log(id_)
+    let countryCode = cSelect.options[cSelect.selectedIndex].value
+    
+    let p = Promise.resolve(reqwest(`./medals/countries/countryMedals-${countryCode}.html`))
+
+    p.then(country => countryContainer.innerHTML = country);
+
 })
 
 rButton.addEventListener('click', e => {
 
     let dates = $$('.om-section-date')
-
-    //let nextDate = yesterday(dates[dates.length-1].getAttribute('data-date'))
 
     let p = daysCached ? Promise.resolve(daysCached) : Promise.resolve(reqwest('https://s3.amazonaws.com/gdn-cdn/olympics-2016/schedule.json'))
         p.then( days => {
