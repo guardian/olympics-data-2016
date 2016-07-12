@@ -121,7 +121,6 @@ export default [
                 return _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent))
                     .filter(evt => evt.startListAvailable === 'Yes')
                     .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.discipline.event.eventUnit.identifier}/start-list`)
-                    .slice(0, 100) // TODO: remove
             }
         ],
         'transform': (a, b, startLists) => {
@@ -144,7 +143,6 @@ export default [
                 return _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent))
                     .filter(evt => evt.resultAvailable === 'Yes')
                     .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.discipline.event.eventUnit.identifier}/result`)
-                    .slice(900, 1000) // TODO: remove
             }
         ],
         'transform': (a, b, results) => {
