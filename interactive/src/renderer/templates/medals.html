@@ -19,7 +19,7 @@
             <h3 class="om-section__title">Leaderboard</h3>
             <ol class='om-table'>
             {% for entry in medalTable.table %}
-                    <li class='om-table-row {%if loop.index > 10 %} om-table-row--hidden {% endif %}'>
+                    <li class='om-table-row {%if entry.position > 10 %} om-table-row--hidden {% endif %}'>
                         <div class='om-table-el om-table-el--position'>
                             {{ entry.position }}.
                         </div>

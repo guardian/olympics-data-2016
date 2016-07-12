@@ -27,8 +27,10 @@ function addResultHandlers() {
 
     $$('.js-results-button').forEach( el => {
         el.addEventListener('click', () => {
-            console.log(el.getAttribute('data-euid'))
-            el.parentElement.innerHTML += 'hihi'
+            let euid = el.getAttribute('data-euid');
+            reqwest(`./eventunits/results-${euid}.html`).then(resp => {
+                el.parentElement.innerHTML += resp;
+            });
         })
     })
 }

@@ -173,7 +173,7 @@ async function renderAll() {
         let name = path.basename(template, '.html')
         for(let key in data.results){
             let html = swig.renderFile(template, {
-                'results' : data.results[key]
+                'results' : data.results[key].filter(res => res.order <= 10)
             })
             writeFile(`build/eventunits/${name}-${key}.html`, html)
         }
