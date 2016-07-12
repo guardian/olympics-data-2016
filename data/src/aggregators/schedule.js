@@ -57,14 +57,11 @@ export default [
         'paMoreDeps': [
             dates => {
                 return dates.olympics.schedule
-                    .filter(a => a.date > '2016-08-01')
                     .sort((a, b) => a.date < b.date ? -1 : 1)
                     .map(s => `olympics/2016-summer-olympics/schedule/${s.date}`);
             }
         ],
         'transform': (dates, dateSchedules) => {
-            dates.olympics.schedule = dates.olympics.schedule.filter(a => a.date > '2016-08-01');
-
             return _.zip(dates.olympics.schedule, dateSchedules)
                 .map(([schedule, dateSchedule]) => {
                     let disciplines = _(forceArray(dateSchedule.olympics.scheduledEvent))
@@ -123,11 +120,7 @@ export default [
         'id': 'startLists',
         'paDeps': ['olympics/2016-summer-olympics/schedule'],
         'paMoreDeps': [
-            dates => {
-                return dates.olympics.schedule
-                    .filter(a => a.date > '2016-08-01')
-                    .map(s => `olympics/2016-summer-olympics/schedule/${s.date}`);
-            },
+            dates => dates.olympics.schedule.map(s => `olympics/2016-summer-olympics/schedule/${s.date}`),
             (a, dateSchedules) => {
                 return _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent))
                     .filter(evt => evt.startListAvailable === 'Yes')
@@ -147,11 +140,7 @@ export default [
         'id': 'results',
         'paDeps': ['olympics/2016-summer-olympics/schedule'],
         'paMoreDeps': [
-            dates => {
-                return dates.olympics.schedule
-                    .filter(a => a.date > '2016-08-01')
-                    .map(s => `olympics/2016-summer-olympics/schedule/${s.date}`);
-            },
+            dates => dates.olympics.schedule.map(s => `olympics/2016-summer-olympics/schedule/${s.date}`),
             (a, dateSchedules) => {
                 return _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent))
                     .filter(evt => evt.resultAvailable === 'Yes')

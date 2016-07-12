@@ -73,7 +73,7 @@ export default [
         'id' : 'recentMedals',
         'paDeps' : ['olympics/2016-summer-olympics/discipline'],
         'paMoreDeps' : [
-            (disciplines) => {
+            disciplines => {
                 return disciplines.olympics.discipline
                     .map(d => `olympics/2016-summer-olympics/discipline/${d.identifier}/medal-cast?limit=500`)
             }
