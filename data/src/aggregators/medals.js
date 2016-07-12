@@ -40,6 +40,10 @@ function parseDisplayStr(c) {
     return c.country
 }
 
+function forceArray(arr) {
+    return arr === undefined ? [] : _.isArray(arr) ? arr : [arr];
+}
+
 export default [
     {
         'id': 'medalTable',
@@ -77,8 +81,8 @@ export default [
         'transform' : (disciplines, medalCasts) => {
             return _(medalCasts)
                 .filter(mc => mc.olympics.discipline)
-                .map(mc => mc.olympics.discipline.medalCast
-                    .map(m => {
+                .map(mc => {
+                    return _.flatMap(forceArray(mc.olympics.discipline.medalCast), m => {
                         return {
                             type: m.type,
                             discipline: m.event.disciplineDescription.value,
@@ -89,9 +93,9 @@ export default [
                             eventName: m.event.description,
                             eventId: m.event.identifier,
                             eventUnitId : m.event.eventUnit.identifier
-                        }
-                    }))
-                .flatten()
+                        };
+                    });
+                });
         },
         'cacheTime' : moment.duration(10, 'minutes')
     }
