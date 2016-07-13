@@ -60,7 +60,9 @@ function addResultHandlers() {
 
 
 lbButton.addEventListener('click', e => {
-    countries.slice(10).forEach(function(el){
+    countries
+    .filter(el => el.getAttribute('data-position') > 10)
+    .forEach(function(el){
         el.classList.toggle('om-table-row--hidden')
     })
     lbButton.innerHTML = (lbButton.innerHTML === 'Hide countries') ? 'All countries' : 'Hide countries'
