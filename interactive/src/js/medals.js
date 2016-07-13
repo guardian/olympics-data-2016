@@ -103,7 +103,7 @@ rButton.addEventListener('click', e => {
 
             return Promise.resolve(reqwest(`./medals/days/dayMedals-${nextDate}.html`))
         }).then( resp => {
-            recentContainer.insertAdjacentHTML('beforeEnd', resp)
+            rButton.insertAdjacentHTML('beforeBegin', resp)
             filterEls()
             addResultHandlers()
 

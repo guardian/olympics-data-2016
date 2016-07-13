@@ -89,13 +89,14 @@
         <div class="om-container om-recent">
             <div class='om-recent-days'>
                 {% include './medals/days/dayMedals.html' { 'dayDisciplines': recentMedalsByDay[0].disciplines, 'day' : recentMedalsByDay[0].day } %}
+
+                <button class="js-recent-button om-expand-button">Results from previous days</button>
             </div>
 
-            <div class='om-country'>
+            <div class='om-country is-hidden'>
                 {% include './medals/countries/countryMedals.html' { 'country' : recentMedalsByCountry[29] }  %}
             </div>
             
-            <button class="js-recent-button om-expand-button">Results from previous days</button>
         </div>
     {% endif %}
     <script src="./medals.js"></script>
