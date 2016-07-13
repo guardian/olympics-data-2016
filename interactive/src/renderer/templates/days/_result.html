@@ -1,0 +1,17 @@
+<table class="om-result">
+    <tbody>
+        {% for entrant in entrants %}
+            <tr>
+                <td>
+                    {% if entrant.medal %}
+                        <div class="om-medal om-medal--{{ entrant.medal|lower }}"></div>
+                    {% else %}
+                        {{ entrant.order }}
+                    {% endif %}
+                </td>
+                <td><div class="om-flag om-flag--{{ entrant.countryCode }}"></div></td>
+                <td>{{ entrant.names }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

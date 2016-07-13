@@ -37,3 +37,7 @@ $$('.js-date').forEach(dateEl => {
         });
     });
 });
+
+$$('.js-expand-results').forEach(resultsEl => {
+    resultsEl.addEventListener('click', () => resultsEl.classList.toggle('is-expanded'));
+});

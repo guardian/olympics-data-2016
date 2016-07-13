@@ -103,7 +103,7 @@ export default [
         'paMoreDeps': [getScheduleDates],
         'transform': (dates, dateSchedules) => {
             return _.zip(dates.olympics.schedule, dateSchedules)
-                .map(([schedule, dateSchedule]) => {
+                .map(([schedule, dateSchedule], dateNo) => {
                     let events = forceArray(dateSchedule.olympics.scheduledEvent)
                         .filter(evt => !getEventUnit(evt).identifier.endsWith('00'))
                         .filter(evt => evt.status !== 'Cancelled')
@@ -122,7 +122,7 @@ export default [
                         })
                         .valueOf();
 
-                    return {'date': schedule.date, disciplines};
+                    return {'date': schedule.date, dateNo, disciplines};
                 });
         },
         'cacheTime': moment.duration(1, 'hour')
