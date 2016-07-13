@@ -60,19 +60,31 @@ lbButton.addEventListener('click', e => {
 
 let dSelect = $('.om-select-discipline')
 let cSelect = $('.om-select-country')
-let container = $('.om-recent-days')
+let recentContainer = $('.om-recent-days')
 let countryContainer = $('.om-country')
 
 dSelect.addEventListener('change', () => {
+    countryContainer.classList.add('is-hidden')
+    recentContainer.classList.remove('is-hidden')
+    cSelect.selectedIndex = 0
     filterEls()
 })
 
 cSelect.addEventListener('change', () => {
-    let countryCode = cSelect.options[cSelect.selectedIndex].value
-    
-    let p = Promise.resolve(reqwest(`./medals/countries/countryMedals-${countryCode}.html`))
 
-    p.then(country => countryContainer.innerHTML = country);
+    let countryCode = cSelect.options[cSelect.selectedIndex].value
+    console.log(countryCode)
+    if(countryCode !== ''){
+        countryContainer.classList.remove('is-hidden')
+        recentContainer.classList.add('is-hidden');
+        let p = Promise.resolve(reqwest(`./medals/countries/countryMedals-${countryCode}.html`))
+        p.then(country => countryContainer.innerHTML = country)
+    }
+    else {
+        dSelect.selectedIndex = 0
+        recentContainer.classList.remove('is-hidden')
+        countryContainer.classList.add('is-hidden')
+    }
 
 })
 
@@ -91,7 +103,7 @@ rButton.addEventListener('click', e => {
 
             return Promise.resolve(reqwest(`./medals/days/dayMedals-${nextDate}.html`))
         }).then( resp => {
-            container.insertAdjacentHTML('beforeEnd', resp)
+            recentContainer.insertAdjacentHTML('beforeEnd', resp)
             filterEls()
             addResultHandlers()
 
