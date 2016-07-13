@@ -13,18 +13,21 @@
                         {% for event in discipline.medals %}
                             <li class='om-recent-event'>
                                 <h4 class='om-recent-eventname'> {{ event.name }} </h4>
-                                {% for medalType in ['Gold', 'Silver', 'Bronze'] %}
-                                    <div class='om-recent-medalists'>
-                                        {% for medal in event.medals[medalType] %}
-                                            <div class="om-recent-medalist medal-{{medal.medal}} om-recent-el">
-                                                <span class="om-medal om-medal--{{medal.type|lower}}"></span>
-                                                <span class='om-medalist-name {% if medal.na %}om-medalist-na{% endif %}'>
-                                                    {{ medal.displayStr }}
-                                                </span>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                {% endfor %}
+
+                                <div class='om-recent-medals'>
+                                    {% for medalType in ['Gold', 'Silver', 'Bronze'] %}
+                                        <div class='om-recent-medalists'>
+                                            {% for medal in event.medals[medalType] %}
+                                                <div class="om-recent-medalist medal-{{medal.medal}} om-recent-el">
+                                                    <span class="om-medal om-medal--{{medal.type|lower}}"></span>
+                                                    <span class='om-medalist-name {% if medal.na %}om-medalist-na{% endif %}'>
+                                                        {{ medal.displayStr }}
+                                                    </span>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
                                 <button data-euid='{{ event.eventUnitId }}' class='om-recent-button js-results-button'></button>
                             </li>
                         {% endfor %}

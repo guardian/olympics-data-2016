@@ -20,14 +20,7 @@ function parseCompetitor(e) {
     if(e.type === 'Individual'){
         athlete = e.participant.competitor.firstName[0] + '. ' + e.participant.competitor.lastName
     }
-    // else if(e.type === 'Team'){
-    //     if(e.participant.length === 2){
-    //         athlete = e.participant.map(p => p.competitor.lastName).sort().join('/')
-    //     }
-    //     else {
-    //         athlete = e.country.name
-    //     }
-    // }
+
     return {
         'countryCode' : e.country.identifier,
         'country' : e.country.name,
@@ -97,5 +90,26 @@ export default [
                 });
         },
         'cacheTime' : moment.duration(10, 'minutes')
+    },
+    {
+        'id' : 'medalDays',
+        'paDeps' : ['olympics/2016-summer-olympics/discipline'],
+        'paMoreDeps' : [
+            disciplines => {
+                return disciplines.olympics.discipline
+                    .map(d => `olympics/2016-summer-olympics/discipline/${d.identifier}/medal-cast?limit=500`)
+            }
+        ],
+        'transform' : (disciplines, medalCasts) => {
+            return _(medalCasts)
+                .filter(mc => mc.olympics.discipline)
+                .flatMap(mc => forceArray(mc.olympics.discipline.medalCast))
+                .map(m => moment(m.utc).format('YYYY-MM-DD'))
+                .uniq()
+                .sort()
+                .valueOf()
+        },
+        'cacheTime' : moment.duration(10, 'minutes')
+
     }
 ];

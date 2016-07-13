@@ -65,7 +65,6 @@ async function getAllData() {
     data.recentMedalsByDay = _(data.recentMedals)
         .groupBy(m => moment(m.time).format('YYYY-MM-DD'))
         .map((events, day) => {
-
             let disciplines = _(events)
                 .groupBy('disciplineId')
                 .map((medals, disciplineId) => {
@@ -108,6 +107,8 @@ async function getAllData() {
 
             return {day, disciplines};
         })
+        .sortBy(obj => new Date(obj.day))
+        .reverse()
         .valueOf()
 
     _.forEach(data.results, results => {
