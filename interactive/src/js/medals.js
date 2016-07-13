@@ -17,6 +17,16 @@ function filterEls() {
 
     let id_ = dSelect.options[dSelect.selectedIndex].value
     let disciplines = $$('.om-recent-discipline')
+    let sections = $$('.om-recent-day-section')
+
+    // sections.forEach(ev => {
+    //     if (id_ === '' || id_ === ev.getAttribute('data-discipline')) {
+    //         ev.classList.remove('is-hidden')
+    //     } else {
+    //         ev.classList.add('is-hidden')
+    //     }
+    // })
+
     disciplines.forEach(ev => {
         if (id_ === '' || id_ === ev.getAttribute('data-discipline')) {
             ev.classList.remove('is-hidden')
@@ -75,16 +85,13 @@ cSelect.addEventListener('change', () => {
     let countryCode = cSelect.options[cSelect.selectedIndex].value
     console.log(countryCode)
     if(countryCode !== ''){
-        countryContainer.classList.remove('is-hidden')
-        recentContainer.classList.add('is-hidden');
+        dSelect.selectedIndex = 0
         let p = Promise.resolve(reqwest(`./medals/countries/countryMedals-${countryCode}.html`))
         p.then(country => countryContainer.innerHTML = country)
     }
-    else {
-        dSelect.selectedIndex = 0
-        recentContainer.classList.remove('is-hidden')
-        countryContainer.classList.add('is-hidden')
-    }
+
+    countryContainer.classList.remove('is-hidden')
+    recentContainer.classList.add('is-hidden')
 
 })
 
