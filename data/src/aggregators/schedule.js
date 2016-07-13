@@ -94,7 +94,7 @@ function getScheduleDates(dates) {
         .map(s => `olympics/2016-summer-olympics/schedule/${s.date}`);
 }
 
-const paTestDone = ['athletics', 'badminton', 'archery'];
+const paTestDone = ['archery', 'athletics', 'badminton', 'boxing', 'cycling-bmx', 'canoe-sprint', 'cycling-mountain-bike', 'cycling-road', 'canoe-slalom', 'cycling-track', 'diving', 'equestrian', 'football', 'tennis'];
 
 export default [
     {
