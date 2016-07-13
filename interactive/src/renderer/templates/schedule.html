@@ -23,14 +23,15 @@
                     <option value="{{ discipline.identifier }}">{{ discipline.description }}</option>
                 {% endfor %}
             </select>
+            on
+            <select class="om-filter__choice js-date-choice" disabled>
+                {% for date in schedule %}
+                    <option value="{{ date }}">Day {{ loop.index }} - {{ date|datefmt('ddd D') }}</option>
+                {% endfor %}
+            </select>
         </div>
     </div>
     <div class="om-container">
-        <div class="om-section">
-            {% for day in scheduleAll %}
-                <button class="js-date" data-date="{{ day.date }}">{{ day.date }}</button>
-            {% endfor %}
-        </div>
         <div class="js-date-schedule" data-startdate="{{ scheduleAll[0].date}}">
             {% include './days/schedule.html' {'schedule': scheduleAll[0]} %}
         </div>
