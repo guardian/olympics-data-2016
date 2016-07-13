@@ -38,6 +38,9 @@ $$('.js-date').forEach(dateEl => {
     });
 });
 
-$$('.js-expand-results').forEach(resultsEl => {
-    resultsEl.addEventListener('click', () => resultsEl.classList.toggle('is-expanded'));
+dateScheduleEl.addEventListener('click', evt => {
+    let target = evt.target;
+    if (target.classList.contains('js-expand-results')) {
+        target.parentNode.classList.toggle('is-expanded');
+    }
 });

@@ -56,7 +56,6 @@
     &.om-event--finished {
         background-color: #f1f1f1;
         color: #767676;
-        cursor: pointer;
     }
 
     &.is-expanded {
@@ -113,4 +112,14 @@
     .om-event--finished.is-expanded & {
         background-image: url(assets/imgs/minus.svg);
     }
+}
+
+.om-event__clicker {
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    cursor: pointer;
 }

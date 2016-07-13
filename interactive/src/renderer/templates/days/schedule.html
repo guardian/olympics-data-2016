@@ -17,7 +17,7 @@
             <ul class="om-events">
                 {% for event in discipline.events %}
                     {% set result = results[event.unit.identifier] %}
-                    <li class="om-event {% if result %}om-event--finished js-expand-results{% endif %}">
+                    <li class="om-event {% if result %}om-event--finished{% endif %}">
                         <time class="om-event__time" datetime="{{event.start}}">{{ event.start|datefmt('HH:mm') }}</time>
                         <span class="om-event__name">{{ event.description }}</span>
                         {% if discipline.venues.length > 1 %}
@@ -25,6 +25,7 @@
                         {% endif %}
                         {% if result %}
                             {% include '_result.html' {'entrants': result} %}
+                            <div class="om-event__clicker js-expand-results"></div>
                         {% endif %}
                         <div class="om-event__expand"></div>
                     </li>
