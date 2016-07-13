@@ -12,11 +12,6 @@ const dataDir = '../data/data-out/';
 
 swig.setFilter('datefmt', (date, fmt) => moment(date).format(fmt));
 
-let log = x => {
-    console.log(x)
-    return x
-}
-
 async function readdir(d) {
     let g = glob();
     let files = await denodeify(g.readdir.bind(g))(d);
@@ -133,6 +128,61 @@ async function getAllData() {
     return data;
 }
 
+async function renderTemplates(data, srcDir, arrGetter, transform, suffixGetter, log=true){
+
+    (await readdir(`./src/renderer/templates/${srcDir}/*.html`)).forEach(template => {
+
+        let name = path.basename(template, '.html')
+        if(typeof(arrGetter) === 'string') {
+            var collection = data[arrGetter]
+        }
+        else {
+            var collection = arrGetter.call(null, data)
+        }
+        collection.forEach( el => {
+            let obj = transform.call(null, el)
+            if(typeof(suffixGetter) === 'string') {
+                var suffix = el[suffixGetter]
+            }
+            else {
+                var suffix = suffixGetter.call(null, el)
+            }
+            if(log) console.log(`Rendering ${name}-${suffix}.html`)
+            let html = swig.renderFile(template, obj)
+            fs.writeFileSync(`build/${srcDir}/${name}-${suffix}.html`, html, 'utf8');
+        })
+    })
+}
+
+let renderTasks = [
+    {
+        'srcDir' : 'medals/days',
+        'arrGetter' : 'recentMedalsByDay',
+        'transform' : (obj) => { return { 'dayDisciplines' : obj.disciplines, 'day' : obj.day } },
+        'suffixGetter' : 'day'
+    },
+    {
+        'srcDir' : 'medals/countries',
+        'arrGetter' : 'recentMedalsByCountry',
+        'transform' : (obj) => { return { 'country' : obj } },
+        'suffixGetter' : 'code'
+    },
+    {
+        'srcDir' : 'eventunits',
+        'arrGetter' : (data) => _.toPairs(data.results) ,
+        'transform' : ([key, result]) => { return { 'results' : result.filter(res => res.order <= 10) } },
+        'suffixGetter' : ([key, result]) => key
+
+    }
+    // {
+    //     'id' : '',
+    //     'srcDir' : 'days',
+    //     'collectionFn' : (data) => data.scheduleAll,
+    //     'transform' : (day) => { return { 'schedule' : day, 'results' : data.results } },
+    //     'suffixFn' : (day) => moment(day.date).format('YYYY-MM-DD')
+    // },
+]
+
 async function renderAll() {
     let data = await getAllData();
 
@@ -151,59 +201,37 @@ async function renderAll() {
         fs.writeFileSync(`build/${name}.html`, html, 'utf8');
     });
 
-    (await readdir('./src/renderer/templates/days/*.html')).forEach(template => {
-        let name = path.basename(template, '.html');
-        data.scheduleAll.forEach(day => {
-            console.log('Rendering', template, day.date);
-            let html = swig.renderFile(template, {
-                'schedule': day,
-                'results': data.results
-            });
-            fs.writeFileSync(`build/days/${name}-${moment(day.date).format('YYYY-MM-DD')}.html`, html, 'utf8');
-        });
-    });
+    for(let task of renderTasks){
+        renderTemplates(data, task.srcDir, task.arrGetter, task.transform, task.suffixGetter)
+    }
 
-    (await readdir('./src/renderer/templates/medals/days/*.html')).forEach(template => {
-        let name = path.basename(template, '.html')
-        data.recentMedalsByDay.forEach(obj => {
+    // (await readdir('./src/renderer/templates/days/*.html')).forEach(template => {
+    //     let name = path.basename(template, '.html');
+    //     data.scheduleAll.forEach(day => {
+    //         console.log('Rendering', template, day.date);
+    //         let html = swig.renderFile(template, {
+    //             'schedule': day,
+    //             'results': data.results
+    //         });
+    //         fs.writeFileSync(`build/days/${name}-${moment(day.date).format('YYYY-MM-DD')}.html`, html, 'utf8');
+    //     });
+    // });
 
-            console.log('Rendering', template, obj.day);
-            let html = swig.renderFile(template, {
-                'dayDisciplines' : obj.disciplines,
-                'day' : obj.day
-            });
-            fs.writeFileSync(`build/medals/days/${name}-${moment(obj.day).format('YYYY-MM-DD')}.html`, html, 'utf8');
-        })
-    });
+    // (await readdir('./src/renderer/templates/medals/countries/*.html')).forEach(template => {
+    //     let name = path.basename(template, '.html')
 
-    (await readdir('./src/renderer/templates/medals/countries/*.html')).forEach(template => {
-        let name = path.basename(template, '.html')
+    //     data.recentMedalsByCountry.forEach(obj => {
 
-        data.recentMedalsByCountry.forEach(obj => {
+    //         //console.log('Rendering', template, obj.code);
+    //         let html = swig.renderFile(template, {
+    //             'country' : obj
+    //         });
 
+    //         fs.writeFileSync(`build/medals/countries/${name}-${obj.code}.html`, html, 'utf8');
 
+    //     })
 
-            console.log('Rendering', template, obj.code);
-            let html = swig.renderFile(template, {
-                'country' : obj
-            });
-
-            fs.writeFileSync(`build/medals/countries/${name}-${obj.code}.html`, html, 'utf8');
-
-        })
-
-    });
-
-    (await readdir('./src/renderer/templates/eventunits/*.html')).forEach(template => {
-        let name = path.basename(template, '.html')
-        _(data.results).forEach((result, key) => {
-            console.log('Rendering', template, key);
-            let html = swig.renderFile(template, {
-                'results' : result.filter(res => res.order <= 10)
-            });
-            fs.writeFileSync(`build/eventunits/${name}-${key}.html`, html, 'utf8');
-        });
-    })
+    // });
 
     let embedCSS = fs.readFileSync('build/embed.css');
     (await readdir('./src/renderer/templates/embeds/*.html')).forEach(template => {
