@@ -128,6 +128,13 @@ async function getAllData() {
         });
     });
 
+    data.getOrdinal = (pos) => {
+        if (String(pos).endsWith(1)) return pos + 'st'
+        else if (String(pos).endsWith(2)) return pos + 'nd'
+        else if (String(pos).endsWith(3)) return pos + 'rd'
+        return pos + 'th'
+    }
+
     return data;
 }
 
@@ -184,7 +191,7 @@ async function renderAll() {
         console.log('Rendering', template);
         let name = path.basename(template, '.html');
 
-        if (name !== 'leaderboardEntry') {
+        if (name !== 'leaderboardEntry' && name !== 'events') {
             let css = fs.readFileSync(`build/${name}.css`).toString();
             var html = swig.renderFile(template, {...data, css});
         }

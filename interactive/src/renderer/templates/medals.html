@@ -30,12 +30,9 @@
     <div class="om-container om-country-container">
 
         <section class='om-section'>
-            <ol class='om-table om-table--favourite'>
-                {% include 'leaderboardEntry.html' { 'entry' : favourite } %}
-            </ol>
 
             <div class='om-country'>
-                {% include './medals/countries/countryMedals.html' { 'country' : recentMedalsByCountry[0] }  %}
+                {% include './medals/countries/countryMedals.html' { 'country' : recentMedalsByCountry[0], 'entry' : medalTable.table[2] }  %}
             </div>
 
         </section>
@@ -50,25 +47,9 @@
             <button class="js-leaderboard-button om-expand-button">All countries</button>
         </section>
     </div>
-    {% if recentMedalsByDay.length > 0 %}
-        <section class="om-filter">
-            <div class="om-filter__inner">
-                I'd like to see medals and results for
-                <select class='om-select-discipline om-filter__choice'>
-                    <option value='' selected>All sports</option>
-                    {% for d in disciplines %}
-                        <option value='{{ d.identifier }}'>{{ d.description }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </section>
-        <div class="om-container om-recent">
-            <div class='om-recent-days'>
-                {% include './medals/days/dayMedals.html' { 'dayDisciplines': recentMedalsByDay[0].disciplines, 'day' : recentMedalsByDay[0].day } %}
-                <button class="js-recent-button om-expand-button">Results from previous days</button>
-            </div>
-        </div>
-    {% endif %}
+
+    {% include './events.html' %}
+    
     <script src="./medals.js"></script>
 </body>
 </html>

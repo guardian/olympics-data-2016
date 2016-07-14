@@ -5,58 +5,7 @@ let lbButton = $('.js-leaderboard-button')
 let rButton = $('.js-recent-button')
 let countries = $$('.om-table-row')
 
-let daysCached = null
-let resultsCached = {}
-
-function yesterday(dayStr){
-    let date = new Date(dayStr)
-    return (new Date(date - 24*3600*1000)).toISOString().slice(0,10)
-}
-
-function filterEls() {
-
-    let id_ = dSelect.options[dSelect.selectedIndex].value
-    let disciplines = $$('.om-recent-discipline')
-    let sections = $$('.om-recent-day-section')
-
-    // sections.forEach(ev => {
-    //     if (id_ === '' || id_ === ev.getAttribute('data-discipline')) {
-    //         ev.classList.remove('is-hidden')
-    //     } else {
-    //         ev.classList.add('is-hidden')
-    //     }
-    // })
-
-    disciplines.forEach(ev => {
-        if (id_ === '' || id_ === ev.getAttribute('data-discipline')) {
-            ev.classList.remove('is-hidden')
-        } else {
-            ev.classList.add('is-hidden')
-        }
-    })
-} 
-
-function addResultHandlers() {
-
-    $$('.js-results-button').forEach( el => {
-        el.addEventListener('click', () => {
-            let euid = el.getAttribute('data-euid');
-            //console.log(el.parentElement.querySelector('h4').innerHTML)
-            let table = el.parentElement.querySelector('.om-results-table')
-
-            if(!(table)){
-                let p = Promise.resolve(reqwest(`./eventunits/results-${euid}.html`))
-                p.then(resp => {
-                    el.parentElement.insertAdjacentHTML('beforeEnd', resp);
-                });
-            } else {
-                table.classList.toggle('is-hidden')
-            }
-            el.classList.toggle('hide-button');
-        })
-    })
-}
-
+let countryCache = {}
 
 lbButton.addEventListener('click', e => {
     countries
@@ -74,60 +23,27 @@ let cSelect = $('.om-select-country')
 let recentContainer = $('.om-recent-days')
 let countryContainer = $('.om-country')
 
-let favouriteTable = $('.om-table--favourite')
-
-dSelect.addEventListener('change', () => {
-    countryContainer.classList.add('is-hidden')
-    recentContainer.classList.remove('is-hidden')
-    cSelect.selectedIndex = 0
-    filterEls()
-})
-
 cSelect.addEventListener('change', () => {
 
-    let countryCode = cSelect.options[cSelect.selectedIndex].value
+    let cc = cSelect.options[cSelect.selectedIndex].value
+    console.log(cc)
+    let p = countryCache[cc] ? Promise.resolve(countryCache[cc]) : Promise.resolve(reqwest(`./medals/countries/countryMedals-${cc}.html`))
+    
+    p.then(country => {
 
-    if(countryCode !== ''){
-        dSelect.selectedIndex = 0
-        let p = Promise.resolve(reqwest(`./medals/countries/countryMedals-${countryCode}.html`))
-        p.then(country => {
+        countryCache[cc] = country
+        countryContainer.innerHTML = country
+        let favouriteTable = $('.om-table--favourite')
+        favouriteTable.innerHTML = $(`.om-table-row[data-id="${cc}"]`).outerHTML
+        let cmButton = $('.js-country-medals-button')
+        if(cmButton){
 
-            countryContainer.innerHTML = country
-            favouriteTable.innerHTML = $(`.om-table-row[data-id="${countryCode}"]`).outerHTML
-            let cmButton = $('.js-country-medals-button')
-            if(cmButton){
-
-                console.log(cmButton)
-                cmButton.addEventListener('click', e => {
-                    let medals = $$('.om-country-medal')
-                    medals.slice(3).forEach(m => m.classList.toggle('is-hidden'))
-                    cmButton.innerHTML = (cmButton.innerHTML === 'All medals') ? 'Fewer medals' : 'All medals'
-                })
-            }
-        })
-    }
+            console.log(cmButton)
+            cmButton.addEventListener('click', e => {
+                let medals = $$('.om-country-medal')
+                medals.slice(3).forEach(m => m.classList.toggle('is-hidden'))
+                cmButton.innerHTML = (cmButton.innerHTML === 'All medals') ? 'Fewer medals' : 'All medals'
+            })
+        }
+    })
 })
-
-rButton.addEventListener('click', e => {
-
-    let dates = $$('.om-section-date')
-
-    let p = daysCached ? Promise.resolve(daysCached) : Promise.resolve(reqwest('https://s3.amazonaws.com/gdn-cdn/olympics-2016/medalDays.json'))
-        p.then( days => {
-            daysCached = days
-            let ind = days.indexOf(dates[dates.length-1].getAttribute('data-date'))
-            console.log(days)
-            let nextDate = days[ind-1]
-
-            if(ind === 0) rButton.classList.add('is-hidden');
-
-            return Promise.resolve(reqwest(`./medals/days/dayMedals-${nextDate}.html`))
-        }).then( resp => {
-            rButton.insertAdjacentHTML('beforeBegin', resp)
-            filterEls()
-            addResultHandlers()
-
-        }).catch( err => console.log(err))
-})
-
-addResultHandlers()

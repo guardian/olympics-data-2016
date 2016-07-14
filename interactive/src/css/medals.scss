@@ -10,6 +10,31 @@
 	}
 }
 
+.om-country-medal-entry {
+	@include fs-textSans(3);
+
+	&:after {
+		display: block;
+		content: '';
+		clear: both;
+	}
+}
+
+.om-country-timestamp {
+	float: left;
+	width: 100px;
+}
+
+.om-country-medal {
+	float: left;
+	width: 100px;
+}
+
+.om-country-eventname {
+	float: left;
+	width: 300px;
+}
+
 .om-recent-disciplines {
 	list-style-type: none;
 	padding-left: 0;

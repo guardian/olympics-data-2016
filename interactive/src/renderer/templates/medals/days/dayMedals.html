@@ -21,7 +21,11 @@
                                                 <div class="om-recent-medalist medal-{{medal.medal}} om-recent-el">
                                                     <span class="om-medal om-medal--{{medal.type|lower}}"></span>
                                                     <span class='om-medalist-name {% if medal.na %}om-medalist-na{% endif %}'>
-                                                        {{ medal.displayStr }}
+                                                        {% if medal.athlete %}
+                                                            Niko Kommenda
+                                                        {% else %}
+                                                            Team competition
+                                                        {% endif %}
                                                     </span>
                                                 </div>
                                             {% endfor %}
