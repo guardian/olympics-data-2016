@@ -74,6 +74,8 @@ let cSelect = $('.om-select-country')
 let recentContainer = $('.om-recent-days')
 let countryContainer = $('.om-country')
 
+let favouriteTable = $('.om-table--favourite')
+
 dSelect.addEventListener('change', () => {
     countryContainer.classList.add('is-hidden')
     recentContainer.classList.remove('is-hidden')
@@ -84,16 +86,26 @@ dSelect.addEventListener('change', () => {
 cSelect.addEventListener('change', () => {
 
     let countryCode = cSelect.options[cSelect.selectedIndex].value
-    console.log(countryCode)
+
     if(countryCode !== ''){
         dSelect.selectedIndex = 0
         let p = Promise.resolve(reqwest(`./medals/countries/countryMedals-${countryCode}.html`))
-        p.then(country => countryContainer.innerHTML = country)
+        p.then(country => {
+
+            countryContainer.innerHTML = country
+            favouriteTable.innerHTML = $(`.om-table-row[data-id="${countryCode}"]`).outerHTML
+            let cmButton = $('.js-country-medals-button')
+            if(cmButton){
+
+                console.log(cmButton)
+                cmButton.addEventListener('click', e => {
+                    let medals = $$('.om-country-medal')
+                    medals.slice(3).forEach(m => m.classList.toggle('is-hidden'))
+                    cmButton.innerHTML = (cmButton.innerHTML === 'All medals') ? 'Fewer medals' : 'All medals'
+                })
+            }
+        })
     }
-
-    countryContainer.classList.remove('is-hidden')
-    recentContainer.classList.add('is-hidden')
-
 })
 
 rButton.addEventListener('click', e => {

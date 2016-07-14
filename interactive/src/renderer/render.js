@@ -50,6 +50,8 @@ async function getAllData() {
         }
     });
 
+    data.favourite = data.medalTable.table[2]
+
     data.recentMedalsByCountry = _(data.countries)
         .map(country => {
 
@@ -181,8 +183,15 @@ async function renderAll() {
     (await readdir('./src/renderer/templates/*.html')).forEach(template => {
         console.log('Rendering', template);
         let name = path.basename(template, '.html');
-        let css = fs.readFileSync(`build/${name}.css`).toString();
-        let html = swig.renderFile(template, {...data, css});
+
+        if (name !== 'leaderboardEntry') {
+            let css = fs.readFileSync(`build/${name}.css`).toString();
+            var html = swig.renderFile(template, {...data, css});
+        }
+        else {
+            var html = swig.renderFile(template, {...data})
+        }
+        
         fs.writeFileSync(`build/${name}.html`, html, 'utf8');
     });
 

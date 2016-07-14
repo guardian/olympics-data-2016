@@ -14,56 +14,37 @@
             <b>Medal count</b>
         </div>
     </h2>
-    <div class="om-container">
+
+    <section class="om-filter">
+        <div class="om-filter__inner">
+            How is 
+            <select class='om-select-country om-filter__choice'>
+                {% for c in countries %}
+                    <option value='{{ c.identifier }}'>{{ c.name }}</option>
+                {% endfor %}
+            </select>
+            doing?
+        </div>
+        </section>
+
+    <div class="om-container om-country-container">
+
+        <section class='om-section'>
+            <ol class='om-table om-table--favourite'>
+                {% include 'leaderboardEntry.html' { 'entry' : favourite } %}
+            </ol>
+
+            <div class='om-country'>
+                {% include './medals/countries/countryMedals.html' { 'country' : recentMedalsByCountry[0] }  %}
+            </div>
+
+        </section>
+
         <section class="om-section">
             <h3 class="om-section__title">Leaderboard</h3>
             <ol class='om-table'>
             {% for entry in medalTable.table %}
-                    <li class='om-table-row {%if entry.position > 10 %} om-table-row--hidden {% endif %}'
-                    data-position='{{entry.position}}'>
-                        <div class='om-table-el om-table-el--position'>
-                            {{ entry.position }}.
-                        </div>
-                        <div class='om-table-el om-table-el--flag om-flag om-flag--{{ entry.countryCode }}'>
-                        </div>
-                        <div class='om-table-el om-table-el--country'>
-                            <span class='om-table-country-label'>{{ entry.countryCode }}</span>
-                        </div>
-                        <div class='om-table-el om-table-el--medal'>
-
-                        <div class="om-medal-white"
-                        style="transform:scale({{entry.maskSizes.gold + 1}})">
-                        </div>
-                            <div class="om-medal-circle om-medal-circle--gold" style="transform:scale({{entry.circleSizes.gold}})">
-                            </div>
-                            <span class="om-medal-label" data-count="{{ entry.gold }}">
-                                {{ entry.gold }}
-                            </span>
-                        </div>
-                        <div class='om-table-el om-table-el--medal'>
-                            <div class="om-medal-white"
-                            style="transform:scale({{entry.maskSizes.silver + 1}})">
-                            </div>
-                            <div class="om-medal-circle om-medal-circle--silver" style="transform:scale({{entry.circleSizes.silver}})">
-                            </div>
-                            <span class="om-medal-label" data-count="{{ entry.silver }}">
-                                {{ entry.silver }}
-                            </span>
-                        </div>
-                        <div class='om-table-el om-table-el--medal'>
-                            <div class="om-medal-white"
-                            style="transform:scale({{entry.maskSizes.bronze + 1}})">
-                            </div>
-                            <div class="om-medal-circle om-medal-circle--bronze" style="transform:scale({{entry.circleSizes.bronze}})">
-                            </div>
-                            <span class="om-medal-label" data-count="{{ entry.bronze }}">
-                                {{ entry.bronze }}
-                            </span>
-                        </div>
-                        <div class='om-table-el om-table-el--total'>
-                            {{ entry.gold + entry.silver + entry.bronze }}
-                        </div>
-                    </li>
+                    {% include 'leaderboardEntry.html' { entry } %}
             {% endfor %}
             </ol>
             <button class="js-leaderboard-button om-expand-button">All countries</button>
@@ -72,17 +53,11 @@
     {% if recentMedalsByDay.length > 0 %}
         <section class="om-filter">
             <div class="om-filter__inner">
-                Who's winning? I'd like to see medals in
+                I'd like to see medals and results for
                 <select class='om-select-discipline om-filter__choice'>
                     <option value='' selected>All sports</option>
                     {% for d in disciplines %}
                         <option value='{{ d.identifier }}'>{{ d.description }}</option>
-                    {% endfor %}
-                </select>
-                <select class='om-select-country om-filter__choice'>
-                    <option value='' selected>All countries</option>
-                    {% for c in countries %}
-                        <option value='{{ c.identifier }}'>{{ c.name }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -90,14 +65,8 @@
         <div class="om-container om-recent">
             <div class='om-recent-days'>
                 {% include './medals/days/dayMedals.html' { 'dayDisciplines': recentMedalsByDay[0].disciplines, 'day' : recentMedalsByDay[0].day } %}
-
                 <button class="js-recent-button om-expand-button">Results from previous days</button>
             </div>
-
-            <div class='om-country is-hidden'>
-                {% include './medals/countries/countryMedals.html' { 'country' : recentMedalsByCountry[0] }  %}
-            </div>
-            
         </div>
     {% endif %}
     <script src="./medals.js"></script>
