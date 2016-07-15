@@ -23,7 +23,7 @@ let cSelect = $('.om-select-country')
 let recentContainer = $('.om-recent-days')
 let countryContainer = $('.om-country')
 
-cSelect.addEventListener('change', () => {
+function changeCountry() {
 
     let cc = cSelect.options[cSelect.selectedIndex].value
     console.log(cc)
@@ -33,17 +33,28 @@ cSelect.addEventListener('change', () => {
 
         countryCache[cc] = country
         countryContainer.innerHTML = country
+
         let favouriteTable = $('.om-table--favourite')
-        favouriteTable.innerHTML = $(`.om-table-row[data-id="${cc}"]`).outerHTML
+        let row = $(`.om-table-row[data-id="${cc}"]`).cloneNode(true)
+        row.classList.remove('om-table-row--hidden')
+        favouriteTable.innerHTML = row.outerHTML
+
         let cmButton = $('.js-country-medals-button')
         if(cmButton){
-
             console.log(cmButton)
             cmButton.addEventListener('click', e => {
-                let medals = $$('.om-country-medal')
+                let medals = $$('.om-country-medal-entry')
                 medals.slice(3).forEach(m => m.classList.toggle('is-hidden'))
                 cmButton.innerHTML = (cmButton.innerHTML === 'All medals') ? 'Fewer medals' : 'All medals'
             })
         }
     })
+}
+
+cSelect.addEventListener('change', () => {
+    changeCountry()
 })
+
+// select GBR by default
+cSelect.selectedIndex = Array.from(cSelect.options).find(o => o.value === 'GBR').index
+changeCountry()

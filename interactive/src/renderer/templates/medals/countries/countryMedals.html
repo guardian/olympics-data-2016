@@ -1,47 +1,42 @@
-<h3 class='om-medaltable-row'>{{ country.name }}'s medals</h3>
+<h3 class='om-medaltable-row'>Your favourite country's medals</h3>
 <div class='om-recent om-country-medals'>
 
-    Currently ranked {{ getOrdinal(entry.position) }}, with {{ country.medals.length }} medals.
-    {% if country.medals.length > 0 %}
-        Most recently, ABC won a gold medal in XYZ.
+    Currently ranked Xth, with {{ medals.length }} medal{% if medals.length !== 1 %}s{% endif %}.
+    {% if medals.length > 0 %}
+        Most recently, ABC won a gold medal in {{ medals[0].scheduled.event.description }}
+         in {{ medals[0].scheduled.discipline.description }}.
     {% endif %}
 
     <ol class='om-table om-table--favourite'>
-        {% include './../../leaderboardEntry.html' { 'entry' : entry } %}
+       <!--  {% include './../../leaderboardEntry.html' { 'entry' : entry } %} -->
     </ol>
 
-    {% if country.medals.length > 0 %}
+    {% if medals.length > 0 %}
 
         <ul class='om-recent-events'>
-            {% for medal in country.medals %}
+            {% for medal in medals %}
                 <li class='om-country-medal-entry om-recent-event {% if loop.index > 3 %} is-hidden {% endif %}'>
 
-                    <div class='om-country-timestamp'>4 days ago</div>
+                    <div class='om-country-timestamp'>{{ medal.scheduled.end }}</div>
                     <div class='om-country-medal'>
-                        <span class="om-medal om-medal--{{medal.type|lower}}"></span>
-                        <span class='om-medal-type'>{{ medal.type }}</span>
+                        <span class="om-medal om-medal--{{medal.result.medal|lower}}"></span>
+                        <span class='om-medal-type'>{{ medal.result.medal }}</span>
                     </div>
-                    <div class='om-country-eventname'>{{ medal.discipline }}, {{ medal.eventName }}</div>
+                    <div class='om-country-eventname'>{{ medal.scheduled.discipline.description }}, {{ medal.scheduled.event.description }}</div>
                     <div class='om-recent-el'>
                         <span class='om-medalist-name'>
-                            {% if medal.athlete %}
-                                {{ medal.athlete }}
-                            {% endif %}     
+                            {{ medal.result.names }}
                         </span>
                     </div>
                 </li>
             {% endfor %}
         </ul>
 
-        {% if country.medals.length > 3 %}  
+        {% if medals.length > 3 %}  
 
             <button class="js-country-medals-button om-expand-button">All medals</button>
 
         {% endif %}
-
-    {% else %}
-
-        {{ country.name }} hasn't won any medals yet.
 
     {% endif %}
 </div>

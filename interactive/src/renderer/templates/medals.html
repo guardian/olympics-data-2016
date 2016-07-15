@@ -32,7 +32,7 @@
         <section class='om-section'>
 
             <div class='om-country'>
-                {% include './medals/countries/countryMedals.html' { 'country' : recentMedalsByCountry[0], 'entry' : medalTable.table[2] }  %}
+                {% include './medals/countries/countryMedals.html' { 'medals' : recentMedalsByCountry['GBR'], 'entry' : fullTable[2] }  %}
             </div>
 
         </section>
@@ -40,7 +40,7 @@
         <section class="om-section">
             <h3 class="om-section__title">Leaderboard</h3>
             <ol class='om-table'>
-            {% for entry in medalTable.table %}
+            {% for entry in fullTable %}
                     {% include 'leaderboardEntry.html' { entry } %}
             {% endfor %}
             </ol>
@@ -51,5 +51,6 @@
     {% include './events.html' %}
     
     <script src="./medals.js"></script>
+    <script src="./schedule.js"></script>
 </body>
 </html>

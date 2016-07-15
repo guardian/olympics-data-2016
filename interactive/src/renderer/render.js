@@ -31,38 +31,9 @@ async function getAllData() {
         data[path.basename(file, '.json')] = JSON.parse(fs.readFileSync(file));
     });
 
-    let maxMedalCount = _.max(data.medalTable.table.map(entry => Math.max(entry.bronze, entry.silver, entry.gold)));
-
-    let scale = d3.scaleSqrt()
-        .domain([0, maxMedalCount])
-        .range([0,8])
-
-    data.medalTable.table.forEach(row => {
-        row.circleSizes = {
-            "bronze": row.bronze === 0 ? 0 : scale(row.bronze),
-            "silver": row.silver === 0 ? 0 : scale(row.silver),
-            "gold": row.gold === 0 ? 0 : scale(row.gold)
-        }
-        row.maskSizes = {
-            "bronze" : row.bronze === 0 ? scale(1) : scale(row.bronze),
-            "silver" : row.silver === 0 ? scale(1) : scale(row.silver),
-            "gold" : row.gold === 0 ? scale(1) : scale(row.gold),
-        }
-    });
-
     data.favourite = data.medalTable.table[2]
 
-    data.recentMedalsByCountry = _(data.countries)
-        .map(country => {
 
-            return {
-                code : country.identifier,
-                name : country.name,
-                medals : data.recentMedals
-                    .filter(m => m.competitor.countryCode === country.identifier)
-            }
-        })
-        .valueOf()
 
     data.recentMedalsByDay = _(data.recentMedals)
         .groupBy(m => moment(m.time).format('YYYY-MM-DD'))
@@ -164,9 +135,9 @@ let renderTasks = [
     },
     {
         'srcDir': 'medals/countries',
-        'arrGetter': data => data.recentMedalsByCountry,
-        'transform': (obj) => { return { 'country': obj } },
-        'suffixGetter': el => el.code
+        'arrGetter': data => _.toPairs(data.recentMedalsByCountry),
+        'transform': ([code, medals]) => { return { 'medals': medals } },
+        'suffixGetter': ([code, medals]) => code
     },
     {
         'srcDir': 'eventunits',
@@ -179,11 +150,153 @@ let renderTasks = [
         'arrGetter' : data => data.scheduleAll,
         'transform' : day => { return {'schedule': day}; },
         'suffixGetter' : day => moment(day.date).format('YYYY-MM-DD')
+    },
+    {
+        'srcDir' : 'days',
+        'arrGetter' : data => data.resultsAll,
+        'transform' : day => { return { 'schedule' : day } },
+        'suffixGetter' : day => 'resultsOnly-' + moment(day.date).format('YYYY-MM-DD')
     }
 ]
 
 async function renderAll() {
     let data = await getAllData();
+
+    data.resultsAll = data.scheduleAll
+        .map(({date, disciplines, dateNo}) => {
+            return {
+                date,
+                dateNo,
+                disciplines : disciplines
+                    .map(({identifier, description, events, venues}) => {
+                        return {
+                            identifier,
+                            description,
+                            venues,
+                            events : events
+                                .filter(e => {
+                                    return data.results[e.unit.identifier]
+                                })
+                        }
+                    })
+                    .filter(d => {
+                        return d.events && d.events.length > 0
+                    })
+            }
+        })
+
+    // data.recentMedalsByCountry = _(data.countries)
+    //     .map(country => {
+
+    //         return {
+    //             code : country.identifier,
+    //             name : country.name,
+    //             medals : data.recentMedals
+    //                 .filter(m => m.competitor.countryCode === country.identifier)
+    //         }
+    //     })
+    //     .valueOf()
+
+    let awardedMedalsByCountry = _(data.results)
+        .toPairs()
+        .map(([euid, results]) => {
+            return _(results)
+                .filter(r => r.medal)
+                .map(result => {
+                    return {
+                        euid : euid,
+                        scheduled : data.scheduleAllFlat.find(s => s.unit.identifier === euid),
+                        result
+                    }
+                })
+                .filter(r => r.scheduled) // TODO find out why this is sometimes undefined
+                .sortBy(r => new Date(r.scheduled.end))
+                .valueOf()
+        })
+        .flatten()
+        .groupBy(obj => obj.result.countryCode)
+        .valueOf()
+
+    // and now for the poor sods w/o any medals
+    
+    let noMedalsByCountry = _(data.countries)
+        .filter(c => !awardedMedalsByCountry[c.identifier])
+        .map(c => [c.identifier, []])
+        .fromPairs()
+        .valueOf()
+
+    data.recentMedalsByCountry = _.merge(awardedMedalsByCountry, noMedalsByCountry)
+
+    data.resultsMedalTable = _(data.results)
+        .values()
+        .flatten()
+        .filter(r => r.medal)
+        .groupBy(r => r.countryCode)
+        .toPairs()
+        .map(([code, results ]) => {
+            return [
+                code,
+                ['Gold', 'Silver', 'Bronze']
+                    .map(type => results.filter(r => r.medal === type ).length)
+            ]
+        })
+
+        .orderBy([
+            ([code, medals]) => medals[0],
+            ([code, medals]) => medals[1],
+            ([code, medals]) => medals[2],
+            ([code, medals]) => code
+        ], ['desc', 'desc', 'desc', 'asc']
+        )
+        .map(([code, medals], i, arr) => {
+            return {
+                'countryCode' : code,
+                'gold' : medals[0],
+                'silver' : medals[1],
+                'bronze' : medals[2],
+                'position' : arr.slice(0, i+1).reduce((pos, cur, j, sliced) => {
+
+                    if(j === 0) return j+1
+
+                    let prev = sliced[j-1]
+
+                    if(_.isEqual(prev[1], cur[1])){
+                        return pos
+                    }
+                    return j+1
+                }, 0)
+            }
+        })
+        .valueOf()
+
+    data.fullTable = data.resultsMedalTable
+        .concat(_(data.countries)
+            .filter(c => !(data.resultsMedalTable.find(e => e.countryCode === c.identifier)))
+            .map(c => {
+                return {
+                    'countryCode' : c.identifier,
+                    'gold' : 0,
+                    'silver' : 0,
+                    'bronze' : 0,
+                    'position' : data.resultsMedalTable.length + 1
+                }
+            })
+            .sortBy(c => c.identifier)
+            .valueOf()
+        )
+
+    let maxMedalCount = _.max(data.resultsMedalTable.map(entry => Math.max(entry.bronze, entry.silver, entry.gold)));
+
+    let scale = d3.scaleSqrt()
+        .domain([0, maxMedalCount])
+        .range([0,8])
+
+    data.circleScale = (num) => {
+        return num === 0 ? 0 : scale(num)
+    }
+    data.maskScale = (num) => {
+        return num === 0 ? scale(1) : scale(num)
+    }
 
     mkdirp.sync('build');
 

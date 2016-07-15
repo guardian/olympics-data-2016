@@ -128,6 +128,59 @@ export default [
         'cacheTime': moment.duration(1, 'hour')
     },
     {
+        'id' : 'scheduleAllFlat',
+        'paDeps': ['olympics/2016-summer-olympics/schedule'],
+        'paMoreDeps': [getScheduleDates],
+        'transform': (dates, dateSchedules) => {
+            let scheduleAll = _.zip(dates.olympics.schedule, dateSchedules)
+                .map(([schedule, dateSchedule], dateNo) => {
+                    let events = forceArray(dateSchedule.olympics.scheduledEvent)
+                        .filter(evt => !getEventUnit(evt).identifier.endsWith('00'))
+                        .filter(evt => evt.status !== 'Cancelled')
+                        .map(parseScheduledEvent);
+
+                    let disciplines = _(events)
+                        .groupBy('discipline.identifier')
+                        .map(disciplineEvents => {
+                            let events = combineEvents(disciplineEvents);
+                            let venues = _(events).map('venue').uniqBy('identifier').valueOf();
+                            return {
+                                'identifier': disciplineEvents[0].discipline.identifier,
+                                'description': disciplineEvents[0].discipline.description,
+                                events, venues
+                            };
+                        })
+                        .valueOf();
+
+                    return {'date': schedule.date, dateNo, disciplines};
+                })
+
+            return _(scheduleAll)
+                .map(day => {
+                    return day.disciplines.map( discipline => {
+                        return discipline.events.map(e => {
+                            return {
+                                'description' : e.description,
+                                'start' : e.start,
+                                'end' : e.end,
+                                'venue' : e.venue,
+                                'unit' : e.unit,
+                                'phase' : e.phase,
+                                'event' : e.event,
+                                'discipline' : e.discipline,
+                                'date' : day.date,
+                                'dateNo' : day.dateNo
+                            }
+                        })
+                    })
+                })
+                .flattenDeep()
+                .valueOf()
+        },
+        'cacheTime': moment.duration(1, 'hour')
+
+    },
+    {
         'id': 'startLists',
         'paDeps': ['olympics/2016-summer-olympics/schedule'],
         'paMoreDeps': [

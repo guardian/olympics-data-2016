@@ -40,9 +40,10 @@ function forceArray(arr) {
 export default [
     {
         'id': 'medalTable',
-        'paDeps': ['olympics/2016-summer-olympics/medal-table'],
-        'transform': medals => {
-            let table;
+        'paDeps': ['olympics/2016-summer-olympics/medal-table',
+        'olympics/2016-summer-olympics/country'],
+        'transform': (medals, countriesObj) => {
+            let table = []
             if (medals.olympics.games) {
                 table = medals.olympics.games.medalTable.tableEntry.map(tableEntry => {
                     return {
@@ -54,9 +55,9 @@ export default [
                         'country': tableEntry.country.name
                     };
                 });
-            } else {
-                table = [];
             }
+
+            let countries = countriesObj.olympics.country
 
             return {table};
         },
