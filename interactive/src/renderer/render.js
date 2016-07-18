@@ -178,18 +178,6 @@ async function renderAll() {
             }
         })
 
-    // data.recentMedalsByCountry = _(data.countries)
-    //     .map(country => {
-
-    //         return {
-    //             code : country.identifier,
-    //             name : country.name,
-    //             medals : data.recentMedals
-    //                 .filter(m => m.competitor.countryCode === country.identifier)
-    //         }
-    //     })
-    //     .valueOf()
-
     let awardedMedalsByCountry = _(data.results)
         .toPairs()
         .map(([euid, results]) => {
