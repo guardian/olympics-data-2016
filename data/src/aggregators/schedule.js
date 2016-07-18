@@ -5,19 +5,14 @@ function forceArray(arr) {
     return arr === undefined ? [] : _.isArray(arr) ? arr : [arr];
 }
 
-function getEventUnit(evt) {
-    return evt.discipline.event.eventUnit;
-}
-
 function parseScheduledEvent(evt) {
-    let eventUnit = getEventUnit(evt);
     return {
         'description': evt.description,
         'start': evt.start.utc,
         'end': evt.end && evt.end.utc,
         'venue': evt.venue,
-        'unit': _.pick(eventUnit, ['identifier']),
-        'phase': eventUnit.phaseDescription,
+        'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
+        'phase': evt.discipline.event.eventUnit.phaseDescription,
         'event': _.pick(evt.discipline.event, ['description']),
         'discipline': _.pick(evt.discipline, ['identifier', 'description']),
         'resultAvailable': evt.resultAvailable,
