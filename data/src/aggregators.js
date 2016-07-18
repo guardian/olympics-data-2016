@@ -1,9 +1,27 @@
-import basicAggregators from './aggregators/basic'
-import scheduleAggregators from './aggregators/schedule'
-import medalAggregators from './aggregators/medals'
+import moment from 'moment'
+
+import scheduleAggregator from './aggregators/schedule'
 
 export default [
-    ...basicAggregators,
-    ...scheduleAggregators,
-    ...medalAggregators
+    {
+        'id': 'disciplines',
+        'inputs': [{
+            'name': 'disciplines',
+            'dependencies': () => ['olympics/2016-summer-olympics/discipline'],
+            'process': (a, [disciplines]) => disciplines.olympics.discipline
+        }],
+        'outputs': [],
+        'cacheTime': moment.duration(14, 'days')
+    },
+    {
+        'id': 'countries',
+        'inputs': [{
+            'name' : 'countries',
+            'dependencies' : () => ['olympics/2016-summer-olympics/country'],
+            'process' : ({}, [countries]) => countries.olympics.country
+        }],
+        'outputs': [],
+        'cacheTime' : moment.duration(14, 'days')
+    },
+    scheduleAggregator
 ];

@@ -40,7 +40,7 @@
         <section class="om-section">
             <h3 class="om-section__title">Leaderboard</h3>
             <ol class='om-table'>
-            {% for entry in fullTable %}
+            {% for entry in medalTable %}
                 {% include '_leaderboardEntry.html' { entry } %}
             {% endfor %}
             </ol>
@@ -49,8 +49,7 @@
     </div>
 
     {% include './_events.html' %}
-    
+
     <script src="./medals.js"></script>
-    <script src="./schedule.js"></script>
 </body>
 </html>

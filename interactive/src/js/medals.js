@@ -1,6 +1,8 @@
 import { $, $$ } from './lib/selector'
 import reqwest from 'reqwest'
 
+import './schedule'
+
 let lbButton = $('.js-leaderboard-button')
 let rButton = $('.js-recent-button')
 let countries = $$('.om-table-row')

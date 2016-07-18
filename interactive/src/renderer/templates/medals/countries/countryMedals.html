@@ -3,8 +3,9 @@
 
     Currently ranked Xth, with {{ medals.length }} medal{% if medals.length !== 1 %}s{% endif %}.
     {% if medals.length > 0 %}
-        Most recently, ABC won a gold medal in {{ medals[0].scheduled.event.description }}
-         in {{ medals[0].scheduled.discipline.description }}.
+        {% set recent = medals[0] %}
+        Most recently, {{ recent.entrant|entrantname }} won a {{ recent.entrant.medal }} medal
+        in {{ recent.event.description }} in {{ recent.event.discipline.description }}.
     {% endif %}
 
     <ol class='om-table om-table--favourite'>
@@ -17,12 +18,15 @@
             {% for medal in medals %}
                 <li class='om-country-medal-entry om-recent-event {% if loop.index > 3 %} is-hidden {% endif %}'>
 
-                    <div class='om-country-timestamp'>{{ medal.scheduled.end }}</div>
+                    <div class='om-country-timestamp'>{{ medal.event.end }}</div>
                     <div class='om-country-medal'>
                         <span class="om-medal om-medal--{{medal.result.medal|lower}}"></span>
                         <span class='om-medal-type'>{{ medal.result.medal }}</span>
                     </div>
-                    <div class='om-country-eventname'>{{ medal.scheduled.discipline.description }}, {{ medal.scheduled.event.description }}</div>
+                    <div class='om-country-eventname'>
+                        {{ medal.event.discipline.description }},
+                        {{ medal.event.description }}
+                    </div>
                     <div class='om-recent-el'>
                         <span class='om-medalist-name'>
                             {{ medal.result.names }}
