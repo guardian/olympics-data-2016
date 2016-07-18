@@ -13,11 +13,11 @@ swig.setFilter('datefmt', (date, fmt) => moment(date).format(fmt));
 swig.setFilter('entrantname', entrant => {
     //console.log(entrant);
     if (entrant.type === 'Individual') {
-        return entrant.competitors[0].fullName;
+        return `${entrant.competitors[0].fullName} (${entrant.countryCode})`;
     } else if (entrant.competitors.length > 2) {
         return entrant.countryName;
     } else {
-        return entrant.competitors.map(c => c.lastName).join('/');
+        return `${entrant.competitors.map(c => c.lastName).join('/')} (${entrant.countryCode})`;
     }
 });
 
