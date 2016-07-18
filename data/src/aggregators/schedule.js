@@ -88,13 +88,134 @@ function parseEntrants(entrants) {
         .valueOf();
 }
 
-function getScheduleDates(dates) {
-    return dates.olympics.schedule
-        .sort((a, b) => a.date < b.date ? -1 : 1)
-        .map(s => `olympics/2016-summer-olympics/schedule/${s.date}`);
-}
-
 export default [
+    {
+        'id': 'schedule',
+        'inputs': [
+            {
+                'name': 'dates',
+                'dependencies': () => ['olympics/2016-summer-olympics/schedule'],
+                'process': ({}, [schedule]) => {
+                    return forceArray(schedule.olympics.schedule).map(s => s.date);
+                }
+            },
+            {
+                'name': 'events',
+                'dependencies': ({dates}) => {
+                    return dates.map(date => `olympics/2016-summer-olympics/schedule/${date}`);
+                },
+                'process': ({dates}, dateSchedules) => {
+                    let datesEvents = dateSchedules.map(ds => forceArray(ds.olympics.scheduledEvent));
+
+                    return _(dates)
+                        .zip(datesEvents)
+                        .flatMap(([date, dateEvents], dateNo) => {
+                            return dateEvents.map(de => { return {...de, 'schedule': {date, dateNo}}; });
+                        })
+                        .valueOf();
+                }
+            },
+            {
+                'name': 'startLists',
+                'dependencies': ({events}) => {
+                    return events
+                        .filter(evt => evt.startListAvailable === 'Yes')
+                        .map(evt => getEventUnit(evt).identifier)
+                        .map(unitId => `olympics/2016-summer-olympics/event-unit/${unitId}/start-list`);
+                },
+                'process': ({}, startLists) => {
+                    return _(startLists)
+                        .map(startList => startList.olympics.eventUnit)
+                        .map(eventUnit => [
+                            eventUnit.identifier,
+                            {'entrants': forceArray(eventUnit.startList.entrant)}
+                        ])
+                        .fromPairs()
+                        .valueOf();
+                }
+            },
+            {
+                'name': 'results',
+                'dependencies': ({events}) => {
+                    return events
+                        .filter(evt => evt.resultAvailable === 'Yes')
+                        .map(evt => getEventUnit(evt).identifier)
+                        .map(unitId => `olympics/2016-summer-olympics/event-unit/${unitId}/result`);
+                },
+                'process': ({}, results) => {
+                    return _(results)
+                        .map(result => result.olympics.eventUnit)
+                        .map(eventUnit => [
+                            eventUnit.identifier,
+                            {'entrants': parseEntrants(forceArray(eventUnit.result.entrant))}
+                        ])
+                        .fromPairs()
+                        .valueOf();
+                }
+            }
+        ],
+        'outputs': [
+            {
+                'name': 'schedule',
+                'process': ({events}) => {
+                }
+            },
+            {
+                'name': 'medalTable',
+                'process': ({results}) => {
+                    let countries = _(results)
+                        .flatMap('entrants')
+                        .filter(entrant => !!entrant.medal)
+                        .groupBy('countryCode')
+                        .map((countryEntrants, countryCode) => {
+                            let medals = _(['gold', 'silver', 'bronze'])
+                                .map(medal => {
+                                    let count = countryEntrants.filter(e => e.medal.toLowerCase() === medal).length;
+                                    return [medal, count];
+                                })
+                                .fromPairs()
+                                .valueOf();
+
+                            let total = _(medals).values().sum();
+                            return {countryCode, medals, total};
+                        })
+                        .orderBy(
+                            ['medals.gold', 'medals.silver', 'medals.bronze', 'countryCode'],
+                            ['desc', 'desc', 'desc', 'asc']
+                        )
+                        .valueOf();
+
+                    let medalTable = countries.map(c1 => {
+                        return {
+                            ...c1,
+                           'position': countries.findIndex(c2 => _.isEqual(c1.medals, c2.medals)) + 1
+                        };
+                    });
+
+                    return medalTable;
+                }
+            }
+        ],
+        'cacheTime': moment.duration(5, 'minutes')
+    }
+
+     /*   'paDeps': ['olympics/2016-summer-olympics/schedule'],
+        'paMoreDeps': [getScheduleDates],
+        'transform': (schedule, dateSchedules) => {
+            let dates = forceArray(schedule.olympics.schedule).map(s => s.date);
+            let datesEvents = dateSchedules.map(ds => forceArray(ds.olympics.scheduledEvent));
+
+            let events = _(dates)
+                .zip(datesEvents)
+                .flatMap(([date, dateEvents], dateNo) => {
+                    return dateEvents.map(de => { return {...de, 'schedule': {date, dateNo}}; });
+                })
+                .valueOf();
+
+            return {events};
+        },
+        'cacheTime': moment.duration(5, 'minutes')
+    },
     {
         'id': 'scheduleAll',
         'paDeps': ['olympics/2016-summer-olympics/schedule'],
@@ -223,5 +344,5 @@ export default [
                 .valueOf();
         },
         'cacheTime': moment.duration(5, 'minutes')
-    }
+    }*/
 ];

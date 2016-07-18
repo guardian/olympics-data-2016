@@ -25,19 +25,23 @@ if (argv.test) {
 
 var regExps = argv._.map(r => new RegExp(r))
 
-function getDeps(deps) {
+async function processInputs([input, ...inputs], data) {
+    if (!input) return data;
+
+    let deps = input.dependencies(data);
     mainLogger.info(`Requesting ${deps.length} resources`);
-    return Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
+    let contents = await Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
+
+    let inputData = input.process(data, contents);
+    await writeData(input.name, inputData);
+
+    return await processInputs(inputs, {...data, [input.name]: inputData});
 }
 
-async function getMoreDeps([depFn, ...restDepFns], contents) {
-    if (depFn) {
-        let moreDeps = depFn(...contents);
-        let moreContents = await getDeps(moreDeps);
-        return await getMoreDeps(restDepFns, [...contents, moreContents]);
-    } else {
-        return contents;
-    }
+async function writeData(name, data) {
+    let localPath = `data-out/${name}.json`;
+    await fsWrite(localPath, JSON.stringify(data, null, 2));
+    if (argv.s3) await s3.put(name, data);
 }
 
 function aggregatorFn(aggregator) {
@@ -47,18 +51,17 @@ function aggregatorFn(aggregator) {
         logger.info('Starting');
 
         try {
-            let initialContents = await getDeps(aggregator.paDeps);
-            let contents = await getMoreDeps(aggregator.paMoreDeps || [], initialContents);
+            let data = await processInputs(aggregator.inputs, {});
 
-            let data = aggregator.transform(...contents);
-            let localPath = path.join('data-out/', aggregator.id + '.json');
-            await fsWrite(localPath, JSON.stringify(data, null, 2));
-            if (argv.s3) await s3.put(aggregator.id, data);
+            await Promise.all(aggregator.outputs.map(output => {
+                let outputData = output.process(data);
+                return writeData(output.name, outputData);
+            }));
         } catch (err) {
             logger.error(`Error processing ${aggregator.id}`, err);
             logger.error(err.stack);
             if (argv.notify) {
-                notify.send(`Error processing ${aggregator.id}`, `${util.inspect(err)}`);
+                notify.send(`Error processing ${aggregator.id}`, util.inspect(err));
             }
         }
 
