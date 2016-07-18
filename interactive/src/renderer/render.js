@@ -84,40 +84,11 @@ let renderTasks = [
         'arrGetter' : data => data.scheduleAll,
         'transform' : day => { return {'schedule': day}; },
         'suffixGetter' : day => moment(day.date).format('YYYY-MM-DD')
-    },
-    {
-        'srcDir' : 'days',
-        'arrGetter' : data => data.resultsAll,
-        'transform' : day => { return { 'schedule' : day } },
-        'suffixGetter' : day => 'resultsOnly-' + moment(day.date).format('YYYY-MM-DD')
     }
 ]
 
 async function renderAll() {
     let data = await getAllData();
-
-    data.resultsAll = data.scheduleAll
-        .map(({date, disciplines, dateNo}) => {
-            return {
-                date,
-                dateNo,
-                disciplines : disciplines
-                    .map(({identifier, description, events, venues}) => {
-                        return {
-                            identifier,
-                            description,
-                            venues,
-                            events : events
-                                .filter(e => {
-                                    return data.results[e.unit.identifier]
-                                })
-                        }
-                    })
-                    .filter(d => {
-                        return d.events && d.events.length > 0
-                    })
-            }
-        })
 
     let awardedMedalsByCountry = _(data.results)
         .toPairs()
