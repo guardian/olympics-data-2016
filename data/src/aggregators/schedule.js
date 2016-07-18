@@ -53,8 +53,8 @@ function combineEvents(evts) {
                 return {...first, description, start, end, group};
             }
         })
-        .sort((a, b) => a.start < b.start ? -1 : 1)
-        .valueOf();
+        .sort((a, b) => a.start < b.start ? -1 : 1);
+
     return combinedEvents;
 }
 
