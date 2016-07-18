@@ -294,3 +294,10 @@
 .is-hidden {
 	display: none;
 }
+
+.om-event {
+    display: none;
+    &.om-event--finished {
+        display: block;
+    }
+}
