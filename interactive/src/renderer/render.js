@@ -11,7 +11,6 @@ import moment from 'moment'
 swig.setFilter('datefmt', (date, fmt) => moment(date).format(fmt));
 
 swig.setFilter('entrantname', entrant => {
-    //console.log(entrant);
     if (entrant.type === 'Individual') {
         return `${entrant.competitors[0].fullName} (${entrant.countryCode})`;
     } else if (entrant.competitors.length > 2) {
@@ -67,77 +66,22 @@ async function renderTask(task, data) {
 }
 
 let renderTasks = [
-    /*{
-        'srcDir': 'medals/days',
-        'arrGetter': data => data.recentMedalsByDay,
-        'context': (obj) => { return { 'dayDisciplines': obj.disciplines, 'day': obj.day } },
-        'suffix': el => el.day
-    },*/
     {
         'srcDir': 'medals/countries',
         'arrGetter': data => _.toPairs(data.medalsByCountry),
         'context': ([code, medals]) => { return {medals}; },
         'suffix': ([code, medals]) => code
     },
-    /*{
-        'srcDir': 'eventunits',
-        'arrGetter': data => _.toPairs(data.results),
-        'context': ([key, result]) => { return { 'results': result.filter(res => res.order <= 10) } },
-        'suffix': ([key, result]) => key
-    },*/
     {
         'srcDir' : 'days',
         'arrGetter': data => data.scheduleByDay,
         'context': schedule => { return {schedule}; },
         'suffix': schedule => schedule.day.date
     }
-]
+];
 
 async function renderAll() {
     let data = await getAllData();
-
-    /*let awardedMedalsByCountry = _(data.results)
-        .toPairs()
-        .map(([euid, results]) => {
-            return _(results)
-                .filter(r => r.medal)
-                .map(result => {
-                    return {
-                        euid : euid,
-                        scheduled : data.schedule[euid],
-                        result
-                    }
-                })
-                .filter(r => r.scheduled) // TODO find out why this is sometimes undefined
-                .sortBy(r => new Date(r.scheduled.end))
-                .valueOf()
-        })
-        .flatten()
-        .groupBy(obj => obj.result.countryCode)
-        .valueOf()
-
-    // and now for the poor sods w/o any medals
-    
-    let noMedalsByCountry = _(data.countries)
-        .filter(c => !awardedMedalsByCountry[c.identifier])
-        .map(c => [c.identifier, []])
-        .fromPairs()
-        .valueOf()
-
-    data.recentMedalsByCountry = _.merge(awardedMedalsByCountry, noMedalsByCountry)
-
-    let maxMedalCount = _.max(data.resultsMedalTable.map(entry => Math.max(entry.bronze, entry.silver, entry.gold)));
-
-    let scale = d3.scaleSqrt()
-        .domain([0, maxMedalCount])
-        .range([0,8])
-
-    data.circleScale = (num) => {
-        return num === 0 ? 0 : scale(num)
-    }
-    data.maskScale = (num) => {
-        return num === 0 ? scale(1) : scale(num)
-    }*/
 
     mkdirp.sync('build');
 
