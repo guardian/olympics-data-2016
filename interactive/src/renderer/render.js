@@ -38,6 +38,13 @@ async function getAllData() {
 
     data.scheduleToday = data.scheduleByDay.find(schedule => schedule.day.date === data.today);
 
+    let maxMedalCount = _.max(data.medalTable.map(entry => _(entry.medals).values().max()));
+    let scale = d3.scaleSqrt()
+        .domain([0, maxMedalCount])
+        .range([0,8])
+    swig.setFilter('circleScale', num => num === 0 ? 0 : scale(num));
+    swig.setFilter('maskScale', num => 1 + (num === 0 ? scale(1) : scale(num)));
+
     return data;
 }
 
