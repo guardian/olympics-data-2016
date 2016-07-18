@@ -8,8 +8,6 @@ import _ from 'lodash'
 import * as d3 from 'd3'
 import moment from 'moment'
 
-const dataDir = '../data/data-out/';
-
 swig.setFilter('datefmt', (date, fmt) => moment(date).format(fmt));
 
 async function readdir(d) {
@@ -21,11 +19,15 @@ async function readdir(d) {
 async function getAllData() {
     let data = {};
 
-    (await readdir(dataDir + '*.json')).map(file => {
+    (await readdir('../data/data-out/*.json')).map(file => {
         data[path.basename(file, '.json')] = JSON.parse(fs.readFileSync(file));
     });
 
-    _.forEach(data.results, results => {
+    data.today = '2016-08-17';
+
+    data.scheduleToday = data.scheduleByDay.find(schedule => schedule.day.date === data.today);
+
+    /*_.forEach(data.results, results => {
 
         results.forEach(result => {
             let names;
@@ -38,9 +40,24 @@ async function getAllData() {
             }
             result.names = names;
         });
-    });
+    });*/
 
     return data;
+}
+
+async function renderTask(task, data) {
+    mkdirp.sync(`build/${task.srcDir}`);
+
+    (await readdir(`./src/renderer/templates/${task.srcDir}/*.html`)).forEach(template => {
+        let name = path.basename(template, '.html');
+
+        task.iterator(data).forEach(item => {
+            let filename = `${name}-${item.suffix}`;
+            console.log(`Rendering ${filename}`);
+            let html = swig.renderFile(template, {...data, ...item.context});
+            fs.writeFileSync(`build/${task.srcDir}/${filename}`, html, 'utf8');
+        });
+    });
 }
 
 async function renderTemplates(data, srcDir, arrGetter, transform, suffixGetter) {
@@ -61,7 +78,7 @@ async function renderTemplates(data, srcDir, arrGetter, transform, suffixGetter)
 }
 
 let renderTasks = [
-    {
+    /*{
         'srcDir': 'medals/days',
         'arrGetter': data => data.recentMedalsByDay,
         'transform': (obj) => { return { 'dayDisciplines': obj.disciplines, 'day': obj.day } },
@@ -78,19 +95,24 @@ let renderTasks = [
         'arrGetter': data => _.toPairs(data.results),
         'transform': ([key, result]) => { return { 'results': result.filter(res => res.order <= 10) } },
         'suffixGetter': ([key, result]) => key
-    },
+    },*/
     {
         'srcDir' : 'days',
-        'arrGetter' : data => data.scheduleAll,
-        'transform' : day => { return {'schedule': day}; },
-        'suffixGetter' : day => moment(day.date).format('YYYY-MM-DD')
+        'iterator': data => {
+            return data.scheduleByDay.map(schedule => {
+                return {
+                    'context': {schedule},
+                    'suffix': schedule.day.date + '.html'
+                };
+            });
+        }
     }
 ]
 
 async function renderAll() {
     let data = await getAllData();
 
-    let awardedMedalsByCountry = _(data.results)
+    /*let awardedMedalsByCountry = _(data.results)
         .toPairs()
         .map(([euid, results]) => {
             return _(results)
@@ -131,7 +153,7 @@ async function renderAll() {
     }
     data.maskScale = (num) => {
         return num === 0 ? scale(1) : scale(num)
-    }
+    }*/
 
     mkdirp.sync('build');
 
@@ -151,8 +173,8 @@ async function renderAll() {
     });
 
     for (let task of renderTasks) {
-        console.log(task.srcDir);
-        renderTemplates(data, task.srcDir, task.arrGetter, task.transform, task.suffixGetter)
+        renderTask(task, data);
+        //renderTemplates(data, task.srcDir, task.arrGetter, task.transform, task.suffixGetter)
     }
 
     mkdirp.sync('build/embed');
