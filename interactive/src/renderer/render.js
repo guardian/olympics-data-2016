@@ -52,10 +52,10 @@ async function renderTask(task, data) {
         let name = path.basename(template, '.html');
 
         task.iterator(data).forEach(item => {
-            let filename = `${name}-${item.suffix}`;
+            let filename = `${task.srcDir}/${name}-${item.suffix}`;
             console.log(`Rendering ${filename}`);
             let html = swig.renderFile(template, {...data, ...item.context});
-            fs.writeFileSync(`build/${task.srcDir}/${filename}`, html, 'utf8');
+            fs.writeFileSync(`build/${filename}`, html, 'utf8');
         });
     });
 }
@@ -158,17 +158,13 @@ async function renderAll() {
     mkdirp.sync('build');
 
     (await readdir('./src/renderer/templates/*.html')).forEach(template => {
-        console.log('Rendering', template);
         let name = path.basename(template, '.html');
 
-        if (name !== 'leaderboardEntry' && name !== 'events') {
-            let css = fs.readFileSync(`build/${name}.css`).toString();
-            var html = swig.renderFile(template, {...data, css});
-        }
-        else {
-            var html = swig.renderFile(template, {...data})
-        }
-        
+        console.log(`Rendering ${name}.html`);
+
+        let css = fs.readFileSync(`build/${name}.css`).toString();
+        let html = swig.renderFile(template, {...data, css});
+
         fs.writeFileSync(`build/${name}.html`, html, 'utf8');
     });
 
@@ -181,11 +177,10 @@ async function renderAll() {
 
     let embedCSS = fs.readFileSync('build/embed.css');
     (await readdir('./src/renderer/templates/embeds/*.html')).forEach(template => {
-        console.log('Rendering', template);
-
         let name = path.basename(template, '.html');
-        let html = swig.renderFile(template, data);
+        console.log(`Rendering embeds/${name}.html`);
 
+        let html = swig.renderFile(template, data);
         let source = {
             'html': `<style>${embedCSS}</style>${html}`,
             'previous': '',
