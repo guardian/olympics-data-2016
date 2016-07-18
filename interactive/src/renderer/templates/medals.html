@@ -41,7 +41,7 @@
             <h3 class="om-section__title">Leaderboard</h3>
             <ol class='om-table'>
             {% for entry in fullTable %}
-                    {% include 'leaderboardEntry.html' { entry } %}
+                {% include '_leaderboardEntry.html' { entry } %}
             {% endfor %}
             </ol>
             <button class="js-leaderboard-button om-expand-button">All countries</button>
