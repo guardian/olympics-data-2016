@@ -18,71 +18,12 @@ async function readdir(d) {
     return files.filter(file => /^[^_.]/.test(path.basename(file)));
 }
 
-function getMedals(type, medals){
-
-    let filtered = medals.filter(m => m.type === type)
-    return filtered.length === 0 ? [{ 'displayStr' : '– (not awarded)', 'type' : type, 'na' : true }] : filtered
-}
-
 async function getAllData() {
     let data = {};
 
     (await readdir(dataDir + '*.json')).map(file => {
         data[path.basename(file, '.json')] = JSON.parse(fs.readFileSync(file));
     });
-
-    data.favourite = data.medalTable.table[2]
-
-
-
-    data.recentMedalsByDay = _(data.recentMedals)
-        .groupBy(m => moment(m.time).format('YYYY-MM-DD'))
-        .map((events, day) => {
-            let disciplines = _(events)
-                .groupBy('disciplineId')
-                .map((medals, disciplineId) => {
-                    return {
-                        disciplineId,
-                        disciplineName : medals[0].discipline,
-                        medals
-                    }
-                })
-                .sortBy( obj => {
-                    return _(obj.medals)
-                        .maxBy(m => new Date(m.time))
-                        .valueOf()
-                        .time
-                })
-                .reverse()
-                .map( obj => {
-
-                    let medalsGrouped = _(obj.medals)
-                        .groupBy('eventName')
-                        .map((medals, eventName) => {
-                            return {
-                                'name': eventName,
-                                'eventUnitId': medals[0].eventUnitId,
-                                'medals': _(['Gold', 'Silver', 'Bronze'])
-                                    .map(type => [type, getMedals(type, medals)])
-                                    .fromPairs()
-                                    .valueOf()
-                            };
-                        })
-                        .valueOf();
-
-                    return {
-                        disciplineId : obj.disciplineId,
-                        disciplineName : obj.disciplineName,
-                        medals : medalsGrouped
-                    } 
-                })
-                .valueOf()
-
-            return {day, disciplines};
-        })
-        .sortBy(obj => new Date(obj.day))
-        .reverse()
-        .valueOf()
 
     _.forEach(data.results, results => {
 
@@ -186,7 +127,7 @@ async function renderAll() {
                 .map(result => {
                     return {
                         euid : euid,
-                        scheduled : data.scheduleAllFlat.find(s => s.unit.identifier === euid),
+                        scheduled : data.schedule[euid],
                         result
                     }
                 })
@@ -207,64 +148,6 @@ async function renderAll() {
         .valueOf()
 
     data.recentMedalsByCountry = _.merge(awardedMedalsByCountry, noMedalsByCountry)
-
-    data.resultsMedalTable = _(data.results)
-        .values()
-        .flatten()
-        .filter(r => r.medal)
-        .groupBy(r => r.countryCode)
-        .toPairs()
-        .map(([code, results ]) => {
-            return [
-                code,
-                ['Gold', 'Silver', 'Bronze']
-                    .map(type => results.filter(r => r.medal === type ).length)
-            ]
-        })
-
-        .orderBy([
-            ([code, medals]) => medals[0],
-            ([code, medals]) => medals[1],
-            ([code, medals]) => medals[2],
-            ([code, medals]) => code
-        ], ['desc', 'desc', 'desc', 'asc']
-        )
-        .map(([code, medals], i, arr) => {
-            return {
-                'countryCode' : code,
-                'gold' : medals[0],
-                'silver' : medals[1],
-                'bronze' : medals[2],
-                'position' : arr.slice(0, i+1).reduce((pos, cur, j, sliced) => {
-
-                    if(j === 0) return j+1
-
-                    let prev = sliced[j-1]
-
-                    if(_.isEqual(prev[1], cur[1])){
-                        return pos
-                    }
-                    return j+1
-                }, 0)
-            }
-        })
-        .valueOf()
-
-    data.fullTable = data.resultsMedalTable
-        .concat(_(data.countries)
-            .filter(c => !(data.resultsMedalTable.find(e => e.countryCode === c.identifier)))
-            .map(c => {
-                return {
-                    'countryCode' : c.identifier,
-                    'gold' : 0,
-                    'silver' : 0,
-                    'bronze' : 0,
-                    'position' : data.resultsMedalTable.length + 1
-                }
-            })
-            .sortBy(c => c.identifier)
-            .valueOf()
-        )
 
     let maxMedalCount = _.max(data.resultsMedalTable.map(entry => Math.max(entry.bronze, entry.silver, entry.gold)));
 

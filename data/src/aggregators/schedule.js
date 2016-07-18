@@ -14,7 +14,7 @@ function parseScheduledEvent(evt) {
     return {
         'description': evt.description,
         'start': evt.start.utc,
-        'end': evt.end.utc,
+        'end': evt.end && evt.end.utc,
         'venue': evt.venue,
         'unit': _.pick(eventUnit, ['identifier']),
         'phase': eventUnit.phaseDescription,
@@ -110,7 +110,7 @@ export default [
                     return _(dates)
                         .zip(datesEvents)
                         .flatMap(([date, dateEvents], dateNo) => {
-                            return dateEvents.map(de => { return {...de, 'schedule': {date, dateNo}}; });
+                            return dateEvents.map(de => { return {...de, 'day': {date, dateNo}}; });
                         })
                         .valueOf();
                 }
@@ -126,11 +126,10 @@ export default [
                 'process': ({}, startLists) => {
                     return _(startLists)
                         .map(startList => startList.olympics.eventUnit)
-                        .map(eventUnit => [
-                            eventUnit.identifier,
-                            {'entrants': forceArray(eventUnit.startList.entrant)}
-                        ])
-                        .fromPairs()
+                        .keyBy('identifier')
+                        .mapValues(eventUnit => {
+                            return {'entrants': forceArray(eventUnit.startList.entrant)}
+                        })
                         .valueOf();
                 }
             },
@@ -145,11 +144,10 @@ export default [
                 'process': ({}, results) => {
                     return _(results)
                         .map(result => result.olympics.eventUnit)
-                        .map(eventUnit => [
-                            eventUnit.identifier,
-                            {'entrants': parseEntrants(forceArray(eventUnit.result.entrant))}
-                        ])
-                        .fromPairs()
+                        .keyBy('identifier')
+                        .mapValues(eventUnit => {
+                            return {'entrants': parseEntrants(forceArray(eventUnit.result.entrant))};
+                        })
                         .valueOf();
                 }
             }
@@ -157,7 +155,37 @@ export default [
         'outputs': [
             {
                 'name': 'schedule',
+                'process': ({events}) => _.keyBy(events.map(parseScheduledEvent), 'unit.identifier')
+            },
+            {
+                'name': 'scheduleByDay',
                 'process': ({events}) => {
+                    let scheduleByDay = _(events)
+                        .filter(evt => evt.status !== 'Cancelled')
+                        .groupBy('day.date')
+                        .map(dateEvents => {
+                            let day = dateEvents[0].day;
+
+                            let disciplines = _(dateEvents)
+                                .map(parseScheduledEvent)
+                                .groupBy('discipline.identifier')
+                                .map(disciplineEvents => {
+                                    let events = combineEvents(disciplineEvents);
+                                    let venues = _(events).map('venue').uniqBy('identifier').valueOf();
+                                    return {
+                                        'identifier': disciplineEvents[0].discipline.identifier,
+                                        'description': disciplineEvents[0].discipline.description,
+                                        events, venues
+                                    };
+                                })
+                                .valueOf();
+
+                            return {day, disciplines};
+                        })
+                        .sortBy('day.date')
+                        .valueOf();
+
+                    return scheduleByDay;
                 }
             },
             {
@@ -186,10 +214,8 @@ export default [
                         .valueOf();
 
                     let medalTable = countries.map(c1 => {
-                        return {
-                            ...c1,
-                           'position': countries.findIndex(c2 => _.isEqual(c1.medals, c2.medals)) + 1
-                        };
+                        let position = countries.findIndex(c2 => _.isEqual(c1.medals, c2.medals)) + 1;
+                        return {...c1, position};
                     });
 
                     return medalTable;
@@ -198,151 +224,4 @@ export default [
         ],
         'cacheTime': moment.duration(5, 'minutes')
     }
-
-     /*   'paDeps': ['olympics/2016-summer-olympics/schedule'],
-        'paMoreDeps': [getScheduleDates],
-        'transform': (schedule, dateSchedules) => {
-            let dates = forceArray(schedule.olympics.schedule).map(s => s.date);
-            let datesEvents = dateSchedules.map(ds => forceArray(ds.olympics.scheduledEvent));
-
-            let events = _(dates)
-                .zip(datesEvents)
-                .flatMap(([date, dateEvents], dateNo) => {
-                    return dateEvents.map(de => { return {...de, 'schedule': {date, dateNo}}; });
-                })
-                .valueOf();
-
-            return {events};
-        },
-        'cacheTime': moment.duration(5, 'minutes')
-    },
-    {
-        'id': 'scheduleAll',
-        'paDeps': ['olympics/2016-summer-olympics/schedule'],
-        'paMoreDeps': [getScheduleDates],
-        'transform': (dates, dateSchedules) => {
-            return _.zip(dates.olympics.schedule, dateSchedules)
-                .map(([schedule, dateSchedule], dateNo) => {
-                    let events = forceArray(dateSchedule.olympics.scheduledEvent)
-                        .filter(evt => !getEventUnit(evt).identifier.endsWith('00'))
-                        .filter(evt => evt.status !== 'Cancelled')
-                        .map(parseScheduledEvent);
-
-                    let disciplines = _(events)
-                        .groupBy('discipline.identifier')
-                        .map(disciplineEvents => {
-                            let events = combineEvents(disciplineEvents);
-                            let venues = _(events).map('venue').uniqBy('identifier').valueOf();
-                            return {
-                                'identifier': disciplineEvents[0].discipline.identifier,
-                                'description': disciplineEvents[0].discipline.description,
-                                events, venues
-                            };
-                        })
-                        .valueOf();
-
-                    return {'date': schedule.date, dateNo, disciplines};
-                });
-        },
-        'cacheTime': moment.duration(1, 'hour')
-    },
-    {
-        'id' : 'scheduleAllFlat',
-        'paDeps': ['olympics/2016-summer-olympics/schedule'],
-        'paMoreDeps': [getScheduleDates],
-        'transform': (dates, dateSchedules) => {
-            let scheduleAll = _.zip(dates.olympics.schedule, dateSchedules)
-                .map(([schedule, dateSchedule], dateNo) => {
-                    let events = forceArray(dateSchedule.olympics.scheduledEvent)
-                        .filter(evt => !getEventUnit(evt).identifier.endsWith('00'))
-                        .filter(evt => evt.status !== 'Cancelled')
-                        .map(parseScheduledEvent);
-
-                    let disciplines = _(events)
-                        .groupBy('discipline.identifier')
-                        .map(disciplineEvents => {
-                            let events = combineEvents(disciplineEvents);
-                            let venues = _(events).map('venue').uniqBy('identifier').valueOf();
-                            return {
-                                'identifier': disciplineEvents[0].discipline.identifier,
-                                'description': disciplineEvents[0].discipline.description,
-                                events, venues
-                            };
-                        })
-                        .valueOf();
-
-                    return {'date': schedule.date, dateNo, disciplines};
-                })
-
-            return _(scheduleAll)
-                .map(day => {
-                    return day.disciplines.map( discipline => {
-                        return discipline.events.map(e => {
-                            return {
-                                'description' : e.description,
-                                'start' : e.start,
-                                'end' : e.end,
-                                'venue' : e.venue,
-                                'unit' : e.unit,
-                                'phase' : e.phase,
-                                'event' : e.event,
-                                'discipline' : e.discipline,
-                                'date' : day.date,
-                                'dateNo' : day.dateNo
-                            }
-                        })
-                    })
-                })
-                .flattenDeep()
-                .valueOf()
-        },
-        'cacheTime': moment.duration(1, 'hour')
-
-    },
-    {
-        'id': 'startLists',
-        'paDeps': ['olympics/2016-summer-olympics/schedule'],
-        'paMoreDeps': [
-            getScheduleDates,
-            (a, dateSchedules) => {
-                let events = _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent));
-                let urls = events
-                    .filter(evt => evt.startListAvailable === 'Yes')
-                    .map(evt => getEventUnit(evt).identifier)
-                    .map(eventUnit => `olympics/2016-summer-olympics/event-unit/${eventUnit}/start-list`);
-                return urls;
-            }
-        ],
-        'transform': (a, b, startLists) => {
-            return _(startLists)
-                .map(startList => startList.olympics.eventUnit)
-                .map(eventUnit => [eventUnit.identifier, forceArray(eventUnit.startList.entrant)])
-                .fromPairs()
-                .valueOf();
-        },
-        'cacheTime': moment.duration(30, 'minutes')
-    },
-    {
-        'id': 'results',
-        'paDeps': ['olympics/2016-summer-olympics/schedule'],
-        'paMoreDeps': [
-            getScheduleDates,
-            (a, dateSchedules) => {
-                let events = _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent));
-                let urls = events
-                    .filter(evt => evt.resultAvailable === 'Yes')
-                    .map(evt => getEventUnit(evt).identifier)
-                    .map(unitId => `olympics/2016-summer-olympics/event-unit/${unitId}/result`);
-                return urls;
-            }
-        ],
-        'transform': (a, b, results) => {
-            return _(results)
-                .map(result => result.olympics.eventUnit)
-                .map(eventUnit => [eventUnit.identifier, parseEntrants(forceArray(eventUnit.result.entrant))])
-                .fromPairs()
-                .valueOf();
-        },
-        'cacheTime': moment.duration(5, 'minutes')
-    }*/
 ];
