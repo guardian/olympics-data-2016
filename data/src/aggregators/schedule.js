@@ -94,8 +94,6 @@ function getScheduleDates(dates) {
         .map(s => `olympics/2016-summer-olympics/schedule/${s.date}`);
 }
 
-const paTestDone = ['archery', 'athletics', 'badminton', 'boxing', 'cycling-bmx', 'canoe-sprint', 'cycling-mountain-bike', 'cycling-road', 'canoe-slalom', 'cycling-track', 'diving', 'equestrian', 'football', 'fencing', 'gymnastics-artistic', 'gymnastics-rhythmic', 'gymnastics-trampoline'];
-
 export default [
     {
         'id': 'scheduleAll',
@@ -189,7 +187,6 @@ export default [
                 let events = _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent));
                 let urls = events
                     .filter(evt => evt.startListAvailable === 'Yes')
-                    .filter(evt => paTestDone.indexOf(evt.discipline.identifier) === -1)
                     .map(evt => getEventUnit(evt).identifier)
                     .map(eventUnit => `olympics/2016-summer-olympics/event-unit/${eventUnit}/start-list`);
                 return urls;
@@ -213,7 +210,6 @@ export default [
                 let events = _.flatMap(dateSchedules, s => forceArray(s.olympics.scheduledEvent));
                 let urls = events
                     .filter(evt => evt.resultAvailable === 'Yes')
-                    .filter(evt => paTestDone.indexOf(evt.discipline.identifier) === -1)
                     .map(evt => getEventUnit(evt).identifier)
                     .map(unitId => `olympics/2016-summer-olympics/event-unit/${unitId}/result`);
                 return urls;
