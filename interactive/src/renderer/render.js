@@ -10,6 +10,17 @@ import moment from 'moment'
 
 swig.setFilter('datefmt', (date, fmt) => moment(date).format(fmt));
 
+swig.setFilter('entrantname', entrant => {
+    //console.log(entrant);
+    if (entrant.type === 'Individual') {
+        return entrant.competitors[0].fullName;
+    } else if (entrant.competitors.length > 2) {
+        return entrant.countryName;
+    } else {
+        return entrant.competitors.map(c => c.lastName).join('/');
+    }
+});
+
 async function readdir(d) {
     let g = glob();
     let files = await denodeify(g.readdir.bind(g))(d);
@@ -27,21 +38,6 @@ async function getAllData() {
 
     data.scheduleToday = data.scheduleByDay.find(schedule => schedule.day.date === data.today);
 
-    /*_.forEach(data.results, results => {
-
-        results.forEach(result => {
-            let names;
-            if (result.type === 'Individual') {
-                names = result.competitors[0].fullName;
-            } else if (result.competitors.length > 2) {
-                names = result.countryName;
-            } else {
-                names = result.competitors.map(c => c.lastName).join('/');
-            }
-            result.names = names;
-        });
-    });*/
-
     return data;
 }
 
@@ -51,61 +47,42 @@ async function renderTask(task, data) {
     (await readdir(`./src/renderer/templates/${task.srcDir}/*.html`)).forEach(template => {
         let name = path.basename(template, '.html');
 
-        task.iterator(data).forEach(item => {
-            let filename = `${task.srcDir}/${name}-${item.suffix}`;
+        task.arrGetter(data).forEach(item => {
+            let context = task.context(item);
+            let suffix = task.suffix(item);
+            let filename = `${task.srcDir}/${name}-${suffix}.html`;
+
             console.log(`Rendering ${filename}`);
-            let html = swig.renderFile(template, {...data, ...item.context});
+            let html = swig.renderFile(template, {...data, ...context});
             fs.writeFileSync(`build/${filename}`, html, 'utf8');
         });
     });
 }
 
-async function renderTemplates(data, srcDir, arrGetter, transform, suffixGetter) {
-    mkdirp.sync(`build/${srcDir}`);
-
-    (await readdir(`./src/renderer/templates/${srcDir}/*.html`)).forEach(template => {
-        let name = path.basename(template, '.html');
-
-        arrGetter(data).forEach(el => {
-            let obj = transform(el);
-            let suffix = suffixGetter(el);
-
-            console.log(`Rendering ${name}-${suffix}.html`);
-            let html = swig.renderFile(template, {...data, ...obj});
-            fs.writeFileSync(`build/${srcDir}/${name}-${suffix}.html`, html, 'utf8');
-        });
-    });
-}
-
 let renderTasks = [
-    /*{
+    {
         'srcDir': 'medals/days',
         'arrGetter': data => data.recentMedalsByDay,
-        'transform': (obj) => { return { 'dayDisciplines': obj.disciplines, 'day': obj.day } },
-        'suffixGetter': el => el.day
+        'context': (obj) => { return { 'dayDisciplines': obj.disciplines, 'day': obj.day } },
+        'suffix': el => el.day
     },
     {
         'srcDir': 'medals/countries',
         'arrGetter': data => _.toPairs(data.recentMedalsByCountry),
-        'transform': ([code, medals]) => { return { 'medals': medals } },
-        'suffixGetter': ([code, medals]) => code
+        'context': ([code, medals]) => { return { 'medals': medals } },
+        'suffix': ([code, medals]) => code
     },
     {
         'srcDir': 'eventunits',
         'arrGetter': data => _.toPairs(data.results),
-        'transform': ([key, result]) => { return { 'results': result.filter(res => res.order <= 10) } },
-        'suffixGetter': ([key, result]) => key
-    },*/
+        'context': ([key, result]) => { return { 'results': result.filter(res => res.order <= 10) } },
+        'suffix': ([key, result]) => key
+    },
     {
         'srcDir' : 'days',
-        'iterator': data => {
-            return data.scheduleByDay.map(schedule => {
-                return {
-                    'context': {schedule},
-                    'suffix': schedule.day.date + '.html'
-                };
-            });
-        }
+        'arrGetter': data => data.scheduleByDay,
+        'context': schedule => { return {schedule}; },
+        'suffix': schedule => schedule.day.date
     }
 ]
 
@@ -170,7 +147,6 @@ async function renderAll() {
 
     for (let task of renderTasks) {
         renderTask(task, data);
-        //renderTemplates(data, task.srcDir, task.arrGetter, task.transform, task.suffixGetter)
     }
 
     mkdirp.sync('build/embed');

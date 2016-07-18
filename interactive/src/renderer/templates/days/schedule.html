@@ -28,7 +28,7 @@
                             <span class="om-event__venue">{{ event.venue.name }}</span>
                         {% endif %}
                         {% if result %}
-                            {% include '_result.html' {'entrants': result} %}
+                            {% include '_result.html' result %}
                             <div class="om-event__clicker js-expand-results"></div>
                         {% endif %}
                         <div class="om-event__expand"></div>
