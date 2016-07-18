@@ -1,0 +1,45 @@
+<li class='om-table-row {%if entry.position > 10 %} om-table-row--hidden {% endif %}'
+data-position='{{entry.position}}' data-id='{{entry.countryCode}}'>
+    <div class='om-table-el om-table-el--position'>
+        {{ entry.position }}.
+    </div>
+    <div class='om-table-el om-table-el--flag om-flag om-flag--{{ entry.countryCode }}'>
+    </div>
+    <div class='om-table-el om-table-el--country'>
+        <span class='om-table-country-label'>{{ entry.countryCode }}</span>
+    </div>
+    <div class='om-table-el om-table-el--medal'>
+
+    <div class="om-medal-white"
+    style="transform:scale({{1 + maskScale(entry.gold)}})">
+    </div>
+        <div class="om-medal-circle om-medal-circle--gold" style="transform:scale({{circleScale(entry.gold)}})">
+        </div>
+        <span class="om-medal-label" data-count="{{ entry.gold }}">
+            {{ entry.gold }}
+        </span>
+    </div>
+    <div class='om-table-el om-table-el--medal'>
+        <div class="om-medal-white"
+        style="transform:scale({{ 1 + maskScale(entry.silver)}})">
+        </div>
+        <div class="om-medal-circle om-medal-circle--silver" style="transform:scale({{circleScale(entry.silver)}})">
+        </div>
+        <span class="om-medal-label" data-count="{{ entry.silver }}">
+            {{ entry.silver }}
+        </span>
+    </div>
+    <div class='om-table-el om-table-el--medal'>
+        <div class="om-medal-white"
+        style="transform:scale({{1 + maskScale(entry.bronze)}})">
+        </div>
+        <div class="om-medal-circle om-medal-circle--bronze" style="transform:scale({{circleScale(entry.bronze)}})">
+        </div>
+        <span class="om-medal-label" data-count="{{ entry.bronze }}">
+            {{ entry.bronze }}
+        </span>
+    </div>
+    <div class='om-table-el om-table-el--total'>
+        {{ entry.gold + entry.silver + entry.bronze }}
+    </div>
+</li>
