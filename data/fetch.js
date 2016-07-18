@@ -29,7 +29,7 @@ async function processInputs([input, ...inputs], data) {
     if (!input) return data;
 
     let deps = input.dependencies(data);
-    mainLogger.info(`Requesting ${deps.length} resources`);
+    mainLogger.info(`Requesting ${deps.length} resources for ${input.name}`);
     let contents = await Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
 
     let inputData = input.process(data, contents);

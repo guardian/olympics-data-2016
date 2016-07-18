@@ -19,7 +19,9 @@ function parseScheduledEvent(evt) {
         'unit': _.pick(eventUnit, ['identifier']),
         'phase': eventUnit.phaseDescription,
         'event': _.pick(evt.discipline.event, ['description']),
-        'discipline': _.pick(evt.discipline, ['identifier', 'description'])
+        'discipline': _.pick(evt.discipline, ['identifier', 'description']),
+        'resultAvailable': evt.resultAvailable,
+        'startListAvailable': evt.startListAvailable
     };
 }
 
@@ -105,7 +107,9 @@ export default [
                     return dates.map(date => `olympics/2016-summer-olympics/schedule/${date}`);
                 },
                 'process': ({dates}, dateSchedules) => {
-                    let datesEvents = dateSchedules.map(ds => forceArray(ds.olympics.scheduledEvent));
+                    let datesEvents = dateSchedules.map(ds => {
+                        return forceArray(ds.olympics.scheduledEvent).map(parseScheduledEvent);
+                    });
 
                     return _(dates)
                         .zip(datesEvents)
@@ -120,8 +124,7 @@ export default [
                 'dependencies': ({events}) => {
                     return events
                         .filter(evt => evt.startListAvailable === 'Yes')
-                        .map(evt => getEventUnit(evt).identifier)
-                        .map(unitId => `olympics/2016-summer-olympics/event-unit/${unitId}/start-list`);
+                        .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/start-list`);
                 },
                 'process': ({}, startLists) => {
                     return _(startLists)
@@ -138,8 +141,7 @@ export default [
                 'dependencies': ({events}) => {
                     return events
                         .filter(evt => evt.resultAvailable === 'Yes')
-                        .map(evt => getEventUnit(evt).identifier)
-                        .map(unitId => `olympics/2016-summer-olympics/event-unit/${unitId}/result`);
+                        .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/result`);
                 },
                 'process': ({}, results) => {
                     return _(results)
@@ -155,7 +157,7 @@ export default [
         'outputs': [
             {
                 'name': 'schedule',
-                'process': ({events}) => _.keyBy(events.map(parseScheduledEvent), 'unit.identifier')
+                'process': ({events}) => _.keyBy(events, 'unit.identifier')
             },
             {
                 'name': 'scheduleByDay',
@@ -167,7 +169,6 @@ export default [
                             let day = dateEvents[0].day;
 
                             let disciplines = _(dateEvents)
-                                .map(parseScheduledEvent)
                                 .groupBy('discipline.identifier')
                                 .map(disciplineEvents => {
                                     let events = combineEvents(disciplineEvents);
