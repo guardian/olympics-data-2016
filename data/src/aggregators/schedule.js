@@ -5,21 +5,6 @@ function forceArray(arr) {
     return arr === undefined ? [] : _.isArray(arr) ? arr : [arr];
 }
 
-function parseScheduledEvent(evt) {
-    return {
-        'description': evt.description,
-        'start': evt.start.utc,
-        'end': evt.end && evt.end.utc,
-        'venue': evt.venue,
-        'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
-        'phase': evt.discipline.event.eventUnit.phaseDescription,
-        'event': _.pick(evt.discipline.event, ['description']),
-        'discipline': _.pick(evt.discipline, ['identifier', 'description']),
-        'resultAvailable': evt.resultAvailable,
-        'startListAvailable': evt.startListAvailable
-    };
-}
-
 const combineBlacklist = ['football', 'water-polo', 'hockey', 'volleyball', 'basketball'];
 
 function canCombine(group, evt1) {
@@ -58,9 +43,23 @@ function combineEvents(evts) {
     return combinedEvents;
 }
 
-function getCompetitors(entrant) {
-    let participants = entrant.participant ? forceArray(entrant.participant) : [];
-    return participants.map(p => p.competitor);
+function parseScheduledEvent(evt) {
+    return {
+        'description': evt.description,
+        'start': evt.start.utc,
+        'end': evt.end && evt.end.utc,
+        'venue': evt.venue,
+        'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
+        'phase': evt.discipline.event.eventUnit.phaseDescription,
+        'event': _.pick(evt.discipline.event, ['description']),
+        'discipline': _.pick(evt.discipline, ['identifier', 'description']),
+        'resultAvailable': evt.resultAvailable,
+        'startListAvailable': evt.startListAvailable
+    };
+}
+
+function parseCompetitors(entrant) {
+    return forceArray(entrant.participant).map(p => p.competitor);
 }
 
 function parseEntrants(entrants) {
@@ -75,7 +74,7 @@ function parseEntrants(entrants) {
             return {
                 'order': parseInt(entrant.order),
                 'type': entrant.type,
-                'competitors': getCompetitors(entrant), // forceArray(entrant.participant).map(p => p ? p.competitor : null),
+                'competitors': parseCompetitors(entrant),
                 'countryCode': entrant.country.identifier,
                 'countryName': entrant.country.name,
                 'medal': properties['Medal Awarded']
