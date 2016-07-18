@@ -145,9 +145,7 @@ async function renderAll() {
         fs.writeFileSync(`build/${name}.html`, html, 'utf8');
     });
 
-    for (let task of renderTasks) {
-        renderTask(task, data);
-    }
+    renderTasks.forEach(task => renderTask(task, data));
 
     mkdirp.sync('build/embed');
 
