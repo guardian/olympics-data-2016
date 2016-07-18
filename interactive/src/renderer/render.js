@@ -99,17 +99,6 @@ async function getAllData() {
         });
     });
 
-    data.getOrdinal = (pos) => {
-
-        if([11, 12, 13].indexOf(parseInt(pos) % 100) !== -1) {
-            return pos + 'th'
-        }
-        if (String(pos).endsWith(1)) return pos + 'st'
-        else if (String(pos).endsWith(2)) return pos + 'nd'
-        else if (String(pos).endsWith(3)) return pos + 'rd'
-        return pos + 'th'
-    }
-
     return data;
 }
 
