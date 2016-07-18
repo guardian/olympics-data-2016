@@ -109,13 +109,14 @@ export default {
                     .flatMap(([date, dateEvents], dateNo) => {
                         return dateEvents.map(de => { return {...de, 'day': {date, dateNo}}; });
                     })
+                    .keyBy('unit.identifier')
                     .valueOf();
             }
         },
         {
             'name': 'startLists',
             'dependencies': ({events}) => {
-                return events
+                return _.values(events)
                     .filter(evt => evt.startListAvailable === 'Yes')
                     .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/start-list`);
             },
@@ -124,7 +125,10 @@ export default {
                     .map('olympics.eventUnit')
                     .keyBy('identifier')
                     .mapValues(eventUnit => {
-                        return {'entrants': forceArray(eventUnit.startList.entrant)}
+                        return {
+                            'identifier': eventUnit.identifier,
+                            'entrants': forceArray(eventUnit.startList.entrant)
+                        };
                     })
                     .valueOf();
             }
@@ -132,7 +136,7 @@ export default {
         {
             'name': 'results',
             'dependencies': ({events}) => {
-                return events
+                return _.values(events)
                     .filter(evt => evt.resultAvailable === 'Yes')
                     .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/result`);
             },
@@ -141,17 +145,17 @@ export default {
                     .map('olympics.eventUnit')
                     .keyBy('identifier')
                     .mapValues(eventUnit => {
-                        return {'entrants': parseEntrants(forceArray(eventUnit.result.entrant))};
+                        return {
+                            'identifier': eventUnit.identifier,
+                            'hasMedals': eventUnit.medalEvent === 'Yes',
+                            'entrants': parseEntrants(forceArray(eventUnit.result.entrant))
+                        };
                     })
                     .valueOf();
             }
         }
     ],
     'outputs': [
-        {
-            'name': 'schedule',
-            'process': ({events}) => _.keyBy(events, 'unit.identifier')
-        },
         {
             'name': 'scheduleByDay',
             'process': ({events}) => {
@@ -213,6 +217,24 @@ export default {
                 });
 
                 return medalTable;
+            }
+        },
+        {
+            'name': 'medalsByCountry',
+            'process': ({events, results}) => {
+                return _(results)
+                    .filter(result => result.hasMedals)
+                    .flatMap(result => {
+                        return result.entrants
+                            .filter(entrant => !!entrant.medal)
+                            .map(entrant => {
+                                return {entrant, 'event': events[result.identifier]};
+                            });
+                    })
+                    .sortBy('event.end')
+                    .reverse()
+                    .groupBy('entrant.countryCode')
+                    .valueOf();
             }
         }
     ],

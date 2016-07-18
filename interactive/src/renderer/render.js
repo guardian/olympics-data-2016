@@ -60,24 +60,24 @@ async function renderTask(task, data) {
 }
 
 let renderTasks = [
-    {
+    /*{
         'srcDir': 'medals/days',
         'arrGetter': data => data.recentMedalsByDay,
         'context': (obj) => { return { 'dayDisciplines': obj.disciplines, 'day': obj.day } },
         'suffix': el => el.day
-    },
+    },*/
     {
         'srcDir': 'medals/countries',
-        'arrGetter': data => _.toPairs(data.recentMedalsByCountry),
-        'context': ([code, medals]) => { return { 'medals': medals } },
+        'arrGetter': data => _.toPairs(data.medalsByCountry),
+        'context': ([code, medals]) => { return {medals}; },
         'suffix': ([code, medals]) => code
     },
-    {
+    /*{
         'srcDir': 'eventunits',
         'arrGetter': data => _.toPairs(data.results),
         'context': ([key, result]) => { return { 'results': result.filter(res => res.order <= 10) } },
         'suffix': ([key, result]) => key
-    },
+    },*/
     {
         'srcDir' : 'days',
         'arrGetter': data => data.scheduleByDay,
@@ -145,7 +145,9 @@ async function renderAll() {
         fs.writeFileSync(`build/${name}.html`, html, 'utf8');
     });
 
-    renderTasks.forEach(task => renderTask(task, data));
+    for (let task of renderTasks) {
+        await renderTask(task, data);
+    }
 
     mkdirp.sync('build/embed');
 
