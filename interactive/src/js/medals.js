@@ -16,7 +16,6 @@ lbButton.addEventListener('click', e => {
         el.classList.toggle('om-is-hidden')
     })
     lbButton.innerHTML = (lbButton.innerHTML === 'Hide countries') ? 'All countries' : 'Hide countries'
-    console.log(lbButton.classList)
     lbButton.classList.toggle('hide-button')
 })
 
@@ -48,15 +47,16 @@ function changeCountry() {
 
     p.then(country => {
 
+        console.log(country)
+
         countryCache[identifier] = country
         countryContainer.innerHTML = country
 
         let row = $(`.om-table-row[data-id="${identifier}"]`).cloneNode(true)
         row.classList.remove('om-is-hidden')
 
-        let span = $('.om-position-ordinal')
-        console.log(span)
-        span.innerHTML = ordinal(parseInt(row.getAttribute('data-position')))
+        let posSpan = $('.om-position-ordinal')
+        posSpan.innerHTML = ordinal(parseInt(row.getAttribute('data-position')))
 
         let favouriteTable = $('.om-table--favourite')
         favouriteTable.innerHTML = row.outerHTML
