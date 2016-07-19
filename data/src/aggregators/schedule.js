@@ -195,10 +195,15 @@ export default {
                             .map(disciplineEvents => {
                                 let events = combineEvents(disciplineEvents);
                                 let venues = _(events).map('venue').uniqBy('identifier').valueOf();
+
+                                disciplineEvents.map(de => {
+                                    console.log(de)
+                                })
+
                                 return {
                                     'identifier': disciplineEvents[0].discipline.identifier,
                                     'description': disciplineEvents[0].discipline.description,
-                                    events, venues
+                                    events, venues, results : disciplineEvents.some(de => de.resultAvailable === 'Yes')
                                 };
                             })
                             .valueOf();
