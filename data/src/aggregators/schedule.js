@@ -153,6 +153,10 @@ export default {
                     })
                     .valueOf();
             }
+        },{
+            'name' : 'countries',
+            'dependencies' : () => ['olympics/2016-summer-olympics/country'],
+            'process' : ({}, [countries]) => countries.olympics.country
         }
     ],
     'outputs': [
@@ -188,8 +192,8 @@ export default {
         },
         {
             'name': 'medalTable',
-            'process': ({results}) => {
-                let countries = _(results)
+            'process': ({results, countries}) => {
+                let medalCountries = _(results)
                     .flatMap('entrants')
                     .filter(entrant => !!entrant.medal)
                     .groupBy('countryCode')
@@ -211,8 +215,26 @@ export default {
                     )
                     .valueOf();
 
-                let medalTable = countries.map(c1 => {
-                    let position = countries.findIndex(c2 => _.isEqual(c1.medals, c2.medals)) + 1;
+                let noMedalCountries = _(countries)
+                    .filter(c1 => !medalCountries.find(c2 => c2.countryCode === c1.identifier))
+                    .map(c => {
+                        return {
+                            countryCode : c.identifier,
+                            medals : {
+                                gold : 0,
+                                silver : 0,
+                                bronze : 0
+                            },
+                            total : 0
+                        }
+                    })
+                    .sortBy(c => c.countryCode)
+                    .valueOf()
+
+                let allCountries = medalCountries.concat(noMedalCountries)
+
+                let medalTable = allCountries.map(c1 => {
+                    let position = allCountries.findIndex(c2 => _.isEqual(c1.medals, c2.medals)) + 1;
                     return {...c1, position};
                 });
 
@@ -221,8 +243,8 @@ export default {
         },
         {
             'name': 'medalsByCountry',
-            'process': ({events, results}) => {
-                return _(results)
+            'process': ({events, results, countries}) => {
+                let medals = _(results)
                     .filter(result => result.hasMedals)
                     .flatMap(result => {
                         return result.entrants
@@ -234,7 +256,26 @@ export default {
                     .sortBy('event.end')
                     .reverse()
                     .groupBy('entrant.countryCode')
+                    .toPairs()
+                    .map(([code, medals]) => {
+                        return [code, {
+                            country : countries.find(c => c.identifier === code),
+                            medals
+                        }]
+                    })
+                    .fromPairs()
                     .valueOf();
+
+                let noMedals = _(countries)
+                    .filter(c => !(medals)[c.identifier])
+                    .map(c => [c.identifier, {
+                        country : c,
+                        medals : []
+                    }])
+                    .fromPairs()
+                    .valueOf()
+
+                return _.merge(medals, noMedals)
             }
         }
     ],

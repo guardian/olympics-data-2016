@@ -20,6 +20,22 @@ swig.setFilter('entrantname', entrant => {
     }
 });
 
+swig.setFilter('ordinal', num => {
+    if([11,12,13].includes(num % 100)){
+        return num + 'th'
+    }
+    else if(num % 10 === 1){
+        return num + 'st'
+    }
+    else if(num % 10 === 2){
+        return num + 'nd'
+    }
+    else if(num % 10 === 3){
+        return num + 'rd'
+    }
+    return num + 'th'
+})
+
 async function readdir(d) {
     let g = glob();
     let files = await denodeify(g.readdir.bind(g))(d);
@@ -69,8 +85,8 @@ let renderTasks = [
     {
         'srcDir': 'medals/countries',
         'arrGetter': data => _.toPairs(data.medalsByCountry),
-        'context': ([code, medals]) => { return {medals}; },
-        'suffix': ([code, medals]) => code
+        'context': ([code, obj]) => { return {obj}; },
+        'suffix': ([code, obj]) => code
     },
     {
         'srcDir' : 'days',

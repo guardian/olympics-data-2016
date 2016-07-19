@@ -167,10 +167,6 @@
 	}
 }
 
-.om-table-row--hidden {
-	display: none;
-}
-
 .om-table-el {
 	float: left;
 	position: relative;
@@ -290,7 +286,7 @@
 	}
 }
 
-.is-hidden {
+.om-is-hidden {
 	display: none;
 }
 
