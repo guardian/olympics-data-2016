@@ -27,8 +27,11 @@
                         {% if discipline.venues.length > 1 %}
                             <span class="om-event__venue">{{ event.venue.name }}</span>
                         {% endif %}
+                        <span class="om-event__id">{{ event.unit.identifier }}</span>
                         {% if result %}
-                            {% include '_result.html' result %}
+                            <div class="om-event__result">
+                                {% include '_result.html' {'result': result} %}
+                            </div>
                             <div class="om-event__clicker js-expand-results"></div>
                         {% endif %}
                         <div class="om-event__expand"></div>

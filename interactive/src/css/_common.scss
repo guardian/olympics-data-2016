@@ -227,25 +227,122 @@ a {
 .om-event {
     @include fs-textSans(2);
     position: relative;
-    border-top: 1px dotted #dcdcdc;
-    padding: 3px 20px 3px 65px;
+    border-top: 1px dotted #bdbdbd;
+    padding: 5px 0 1px 65px;
 
     @include mq(mobileLandscape) {
-        @include fs-textSans(3, $size-only: true);
         padding-left: 80px;
     }
 
     &.om-event--finished.is-expanded {
         background-color: white;
         color: #333;
+        &,
+        & + .om-event {
+            border-top-style: solid;
+        }
     }
 
 }
 .om-result {
-    display: none;
+    display: none; // TODO: revert
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 480px;
+    margin: 6px 0 18px;
+
     .is-expanded & {
-        display: block;
+        display: table;
     }
+
+    thead {
+        border-bottom: 1px solid #dcdcdc;
+    }
+
+    th {
+        font-size: 11px;
+        font-weight: normal;
+        line-height: 14px;
+        color: #999;
+    }
+    td {
+        vertical-align: middle;
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
+    td,
+    th {
+        padding-left: 4px;
+        padding-right: 4px;
+        @include mq(mobileLandscape) {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        &:first-child {
+            padding-left: 0;
+        }
+        &:last-child {
+            padding-right: 0;
+        }
+    }
+}
+
+.om-entrant {
+    border-bottom: 1px solid #eaeaea;
+    &:last-child {
+        border-bottom: 0;
+    }
+}
+
+.om-entrant__name {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 0;
+    white-space: nowrap;
+
+    .om-entrant--winner & {
+        font-weight: 500;
+    }
+}
+
+.om-entrant__round {
+    width: 30px;
+    text-align: center;
+    border-left: 1px dotted #eaeaea;
+    font-size: 11px;
+    @include mq(mobileLandscape) {
+        font-size: 12px;
+    }
+
+    color: #999;
+    &.om-entrant__round--winner {
+        color: #333;
+        font-weight: 500;
+    }
+}
+
+.om-entrant__score {
+    text-align: right;
+    white-space: nowrap;
+    border-left: 1px dotted #eaeaea;
+
+    .om-entrant--winner & {
+        font-weight: 500;
+    }
+
+    & > span {
+        display: inline-block;
+        background-color: #f1f1f1;
+        border-radius: 2px;
+        border: 1px solid #dfdfdf;
+        width: 30px;
+        text-align: center;
+    }
+}
+
+th.om-entrant__score {
+    text-align: center;
 }
 
 .om-event__time {
@@ -256,11 +353,25 @@ a {
 
 .om-event__name {
     font-weight: 500;
-    margin-right: 20px;
+    padding-right: 40px;
+}
+
+.om-event__id {
+    position: relative;
+    z-index: 5;
 }
 
 .om-event__venue {
     white-space: nowrap;
+}
+
+.om-event__result {
+    padding: 3px 3px 0;
+    margin-left: -65px;
+    @include mq(mobileLandscape) {
+        padding-left: 0;
+        margin-left: 0;
+    }
 }
 
 .om-event__expand {

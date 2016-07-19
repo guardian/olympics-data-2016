@@ -1,16 +1,41 @@
 <table class="om-result">
+    <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            <th>{{ result|entranttype }}</th>
+            {% for roundName in result.roundNames %}
+                <th class="om-entrant__round">{{ roundName }}</th>
+            {% endfor %}
+            <th class="om-entrant__score">Score</th>
+        </tr>
+    </thead>
     <tbody>
-        {% for entrant in entrants %}
-            <tr>
+        {% for entrant in result.entrants %}
+            <tr class="om-entrant {% if entrant.winner %}om-entrant--winner{% endif %}">
                 <td>
                     {% if entrant.medal %}
                         <div class="om-medal om-medal--{{ entrant.medal|lower }}"></div>
                     {% else %}
-                        {{ entrant.order }}
+                        {{ entrant.order }}.
                     {% endif %}
                 </td>
-                <td><div class="om-flag om-flag--{{ entrant.countryCode }}"></div></td>
-                <td>{{ entrant|entrantname }}</td>
+                <td><div class="om-flag om-flag--{{ entrant.country.identifier }}"></div></td>
+                <td class="om-entrant__name" title="{{ entrant|entrantname }}">
+                    {{ entrant|entrantname }}
+                </td>
+                {% for round in entrant.rounds %}
+                    <td class="om-entrant__round {% if round.winner %}om-entrant__round--winner{% endif %}">
+                        {{ round.score }}
+                    </td>
+                {% endfor %}
+                <td class="om-entrant__score">
+                    {% if entrant.invalidResultMark %}
+                        {{ entrant.invalidResultMark }}
+                    {% elif entrant.value !== undefined %}
+                        <span>{{ entrant.value }}</span>
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
     </tbody>

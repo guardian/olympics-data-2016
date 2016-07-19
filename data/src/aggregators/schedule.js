@@ -58,31 +58,106 @@ function parseScheduledEvent(evt) {
     };
 }
 
-function parseCompetitors(entrant) {
-    return forceArray(entrant.participant).map(p => p.competitor);
+function parseEntrant(entrant) {
+    let properties = _(forceArray(entrant.property))
+        .keyBy('type')
+        .mapValues('value')
+        .valueOf();
+
+    return {
+        'code': entrant.code,
+        'order': parseInt(entrant.order),
+        'type': entrant.type,
+        'competitors': forceArray(entrant.participant).map(p => p.competitor),
+        'country': entrant.country,
+        'value': parseFloat(entrant.value),
+        'medal': properties['Medal Awarded'],
+        'record': properties['Record Set'],
+        'winner': properties['Won Lost Tied'] === 'Won',
+        'invalidResultMark': properties['Invalid Result Mark']
+    };
 }
 
-function parseEntrants(entrants) {
-    return _(entrants)
-        .filter(entrant => entrant.code !== 'NOCOMP' && entrant.code !== 'BYE')
-        .map(entrant => {
-            let properties = _(forceArray(entrant.property || []))
-                .map(p => [p.type, p.value])
+function parseResult(eventUnit) {
+    let resultParser = resultParsers.find(rp => rp.test(eventUnit));
+
+    let result = resultParser.parse(eventUnit);
+
+    return {
+        'identifier': eventUnit.identifier,
+        'medalEvent': eventUnit.medalEvent === 'Yes',
+        'teamEvent': eventUnit.teamEvent === 'Yes',
+        ...result
+    }
+}
+
+function isDiscipline(disciplines) {
+    return eventUnit => {
+        return disciplines.indexOf(eventUnit.disciplineDescription.identifier) > -1;
+    };
+}
+
+const roundDisciplines = [
+    'badminton', 'handball', 'tennis', 'football', 'beach-volleyball', 'basketball',
+    'volleyball', 'water-polo', 'hockey'
+];
+
+const resultParsers = [
+    {
+        'test': isDiscipline(roundDisciplines),
+        'parse': eventUnit => {
+            let entrants = forceArray(eventUnit.result.entrant)
+                .map(entrant => {
+                    let basics = parseEntrant(entrant);
+                    let rounds;
+
+                    if (entrant.resultExtension) {
+                        rounds = forceArray(entrant.resultExtension.extension)
+                            .sort((a, b) => +a.position - b.position)
+                            .map(extension => {
+                                return {'name': extension.description, 'score': parseInt(extension.value)};
+                            });
+                    } else {
+                        rounds = [];
+                    }
+
+                    return {...basics, rounds};
+                })
+                .sort((a, b) => a.order - b.order);
+
+            let roundNames = _(entrants).flatMap('rounds').uniqBy('name').sortBy('position').map('name').valueOf();
+
+            let bestRoundScores = _(roundNames)
+                .map(roundName => {
+                    let scores = entrants
+                        .map(entrant => {
+                            return entrant.rounds.find(round => round.name === roundName).score;
+                        })
+                        .sort((a, b) => b - a);
+                    return [roundName, scores[0]];
+                })
                 .fromPairs()
                 .valueOf();
 
-            return {
-                'order': parseInt(entrant.order),
-                'type': entrant.type,
-                'competitors': parseCompetitors(entrant),
-                'countryCode': entrant.country.identifier,
-                'countryName': entrant.country.name,
-                'medal': properties['Medal Awarded']
-            };
-        })
-        .sortBy('order')
-        .valueOf();
-}
+            entrants.forEach(entrant => {
+                entrant.rounds.forEach(round => {
+                    round.winner = bestRoundScores[round.name] === round.score;
+                });
+            });
+
+            return {entrants, roundNames};
+        }
+    },
+    {
+        'test': () => true,
+        'parse': eventUnit => {
+            let entrants = forceArray(eventUnit.result.entrant)
+                .map(parseEntrant)
+                .sort((a, b) => a.order - b.order);
+            return {entrants};
+        }
+    }
+];
 
 export default {
     'id': 'schedule',
@@ -113,7 +188,7 @@ export default {
                     .valueOf();
             }
         },
-        {
+        /*{
             'name': 'startLists',
             'dependencies': ({events}) => {
                 return _.values(events)
@@ -132,7 +207,7 @@ export default {
                     })
                     .valueOf();
             }
-        },
+        },*/
         {
             'name': 'results',
             'dependencies': ({events}) => {
@@ -144,13 +219,7 @@ export default {
                 return _(results)
                     .map('olympics.eventUnit')
                     .keyBy('identifier')
-                    .mapValues(eventUnit => {
-                        return {
-                            'identifier': eventUnit.identifier,
-                            'hasMedals': eventUnit.medalEvent === 'Yes',
-                            'entrants': parseEntrants(forceArray(eventUnit.result.entrant))
-                        };
-                    })
+                    .mapValues(parseResult)
                     .valueOf();
             }
         }
@@ -192,8 +261,9 @@ export default {
                 let countries = _(results)
                     .flatMap('entrants')
                     .filter(entrant => !!entrant.medal)
-                    .groupBy('countryCode')
-                    .map((countryEntrants, countryCode) => {
+                    .groupBy('country.identifier')
+                    .map((countryEntrants, countryId) => {
+                        let country = countryEntrants[0].country;
                         let medals = _(['gold', 'silver', 'bronze'])
                             .map(medal => {
                                 let count = countryEntrants.filter(e => e.medal.toLowerCase() === medal).length;
@@ -203,10 +273,10 @@ export default {
                             .valueOf();
 
                         let total = _(medals).values().sum();
-                        return {countryCode, medals, total};
+                        return {country, medals, total};
                     })
                     .orderBy(
-                        ['medals.gold', 'medals.silver', 'medals.bronze', 'countryCode'],
+                        ['medals.gold', 'medals.silver', 'medals.bronze', 'country.code'],
                         ['desc', 'desc', 'desc', 'asc']
                     )
                     .valueOf();
@@ -223,7 +293,7 @@ export default {
             'name': 'medalsByCountry',
             'process': ({events, results}) => {
                 return _(results)
-                    .filter(result => result.hasMedals)
+                    .filter(result => result.medalEvent)
                     .flatMap(result => {
                         return result.entrants
                             .filter(entrant => !!entrant.medal)
