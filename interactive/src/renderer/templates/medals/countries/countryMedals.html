@@ -19,7 +19,7 @@
 
                 <li class='om-country-medal-entry om-recent-event {% if loop.index > 5 %} om-is-hidden {% endif %}'>
 
-                    <div class='om-country-timestamp'>{{ medal.event.end }}</div>
+                    <div class='om-country-timestamp' datetime='{{ medal.event.end }}'>{{ medal.event.end }}</div>
                     <div class='om-country-medal'>
                         <span class="om-medal om-medal--{{medal.entrant.medal|lower}}"></span>
                         <span class='om-medal-type'>{{ medal.entrant.medal }}</span>

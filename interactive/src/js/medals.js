@@ -1,4 +1,5 @@
 import { $, $$ } from './lib/selector'
+import RelativeTime from './lib/relative'
 import reqwest from 'reqwest'
 
 import './schedule'
@@ -8,6 +9,8 @@ let rButton = $('.js-recent-button')
 let countries = $$('.om-table-row')
 
 let countryCache = {}
+
+RelativeTime.setNow(Date.now())
 
 lbButton.addEventListener('click', e => {
     countries
@@ -47,10 +50,12 @@ function changeCountry() {
 
     p.then(country => {
 
-        console.log(country)
-
         countryCache[identifier] = country
         countryContainer.innerHTML = country
+
+        $$('.om-country-timestamp').forEach(el => {
+            RelativeTime.processEl(el)
+        })
 
         let row = $(`.om-table-row[data-id="${identifier}"]`).cloneNode(true)
         row.classList.remove('om-is-hidden')
