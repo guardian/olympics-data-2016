@@ -1,9 +1,9 @@
 <h3 class='om-medaltable-row'>{{ obj.country.name }}'s medals</h3>
 <div class='om-recent om-country-medals'>
 
-    Currently ranked <span class='om-position-ordinal'></span>, with {{ medals.length }} medal{% if medals.length !== 1 %}s{% endif %}.
-    {% if medals.length > 0 %}
-        {% set recent = medals[0] %}
+    Currently ranked <span class='om-position-ordinal'></span>, with {{ obj.medals.length }} medal{% if obj.medals.length !== 1 %}s{% endif %}.
+    {% if obj.medals.length > 0 %}
+        {% set recent = obj.medals[0] %}
         Most recently, {{ recent.entrant|entrantname }} won a {{ recent.entrant.medal }} medal
         in {{ recent.event.event.description }} in {{ recent.event.discipline.description }}.
     {% endif %}
@@ -12,10 +12,10 @@
        <!--  {% include './../../_leaderboardEntry.html' { 'entry' : entry } %} -->
     </ol>
 
-    {% if medals.length > 0 %}
+    {% if obj.medals.length > 0 %}
 
         <ul class='om-recent-events'>
-            {% for medal in medals %}
+            {% for medal in obj.medals %}
                 <li class='om-country-medal-entry om-recent-event {% if loop.index > 5 %} om-is-hidden {% endif %}'>
 
                     <div class='om-country-timestamp'>{{ medal.event.end }}</div>
@@ -36,7 +36,7 @@
             {% endfor %}
         </ul>
 
-        {% if medals.length > 5 %}  
+        {% if obj.medals.length > 5 %}  
 
             <button class="js-country-medals-button om-expand-button">All medals</button>
 
