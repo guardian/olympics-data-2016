@@ -51,7 +51,7 @@ function parseScheduledEvent(evt) {
         'venue': evt.venue,
         'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
         'phase': evt.discipline.event.eventUnit.phaseDescription,
-        'event': _.pick(evt.discipline.event, ['description']),
+        'event': _.pick(evt.discipline.event, ['identifier', 'description']),
         'discipline': _.pick(evt.discipline, ['identifier', 'description']),
         'resultAvailable': evt.resultAvailable,
         'startListAvailable': evt.startListAvailable
@@ -111,6 +111,27 @@ export default {
                     })
                     .keyBy('unit.identifier')
                     .valueOf();
+            }
+        },
+        {
+            'name' : 'eventDetails',
+            'dependencies' : ({events}) => _.map(events, v => {
+                return `olympics/2016-summer-olympics/event/${v.event.identifier}`
+            }),
+            'process' : ({}, fullEvents) => {
+
+                let flat = _(fullEvents)
+                    .map(fe => fe.olympics.event)
+                    .map(fe => {
+                        return [ fe.identifier, {
+                            gender : fe.gender
+                        }]
+                    })
+                    .fromPairs()
+                    .valueOf()
+
+                return flat
+            
             }
         },
         {
@@ -243,14 +264,15 @@ export default {
         },
         {
             'name': 'medalsByCountry',
-            'process': ({events, results, countries}) => {
+            'process': ({events, results, countries, eventDetails}) => {
                 let medals = _(results)
                     .filter(result => result.hasMedals)
                     .flatMap(result => {
+
                         return result.entrants
                             .filter(entrant => !!entrant.medal)
                             .map(entrant => {
-                                return {entrant, 'event': events[result.identifier]};
+                                return {entrant, 'event': events[result.identifier], 'eventDetails' : eventDetails[result.identifier.slice(0,-3)]};
                             });
                     })
                     .sortBy('event.end')

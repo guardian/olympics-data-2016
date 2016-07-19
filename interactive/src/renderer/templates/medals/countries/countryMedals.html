@@ -4,7 +4,7 @@
     Currently ranked <span class='om-position-ordinal'></span>, with {{ obj.medals.length }} medal{% if obj.medals.length !== 1 %}s{% endif %}.
     {% if obj.medals.length > 0 %}
         {% set recent = obj.medals[0] %}
-        Most recently, {{ recent.entrant|entrantname }} won a {{ recent.entrant.medal | lower }} medal
+        Most recently, {{ recent | countryEntrant }} won a {{ recent.entrant.medal | lower }} medal
         in {{ recent.event.event.description }} in {{ recent.event.discipline.description }}.
     {% endif %}
 
@@ -16,6 +16,7 @@
 
         <ul class='om-recent-events'>
             {% for medal in obj.medals %}
+
                 <li class='om-country-medal-entry om-recent-event {% if loop.index > 5 %} om-is-hidden {% endif %}'>
 
                     <div class='om-country-timestamp'>{{ medal.event.end }}</div>
@@ -29,7 +30,7 @@
                     </div>
                     <div class='om-recent-el'>
                         <span class='om-medalist-name'>
-                            {{ medal.entrant | entrantname }}
+                            {{ medal | countryEntrant }}
                         </span>
                     </div>
                 </li>
