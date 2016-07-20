@@ -235,7 +235,7 @@ a {
     @include fs-textSans(2);
     position: relative;
     border-top: 1px dotted #bdbdbd;
-    padding: 5px 20px 1px 65px;
+    padding: 5px 20px 3px 65px;
 
     @include mq(mobileLandscape) {
         padding-left: 80px;
@@ -251,15 +251,12 @@ a {
     }
 
 }
+
 .om-result {
-    display: none; // TODO: revert
+    border-spacing: 0;
     border-collapse: collapse;
     width: 100%;
-    margin: 6px 0 18px;
-
-    .is-expanded & {
-        display: table;
-    }
+    margin: 0 0 18px;
 
     thead {
         border-bottom: 1px solid #dcdcdc;
@@ -268,7 +265,7 @@ a {
 
     th {
         font-size: 11px;
-        font-weight: normal;
+        font-weight: 500;
         line-height: 14px;
         color: #999;
         padding: 1px 0;
@@ -311,10 +308,6 @@ a {
     text-overflow: ellipsis;
     max-width: 0;
     white-space: nowrap;
-
-    .om-entrant--winner & {
-        font-weight: 500;
-    }
 }
 
 .om-entrant__name__note {
@@ -370,10 +363,6 @@ a {
     white-space: nowrap;
     border-left: 1px dotted #eaeaea;
 
-    .om-entrant--winner & {
-        font-weight: 500;
-    }
-
     & > span {
         display: inline-block;
         width: 100%;
@@ -403,6 +392,13 @@ a {
     padding-right: 40px;
 }
 
+.om-event__sub-name {
+}
+
+.om-event__name__events {
+    font-weight: normal;
+}
+
 .om-event__id {
     position: relative;
     z-index: 5;
@@ -413,11 +409,14 @@ a {
 }
 
 .om-event__result {
-    padding: 3px 3px 0;
-    margin-left: -65px;
+    margin: 12px 0 0 -65px;
     @include mq(mobileLandscape) {
-        padding-left: 0;
         margin-left: 0;
+    }
+
+    display: none;
+    .is-expanded & {
+        display: block;
     }
 }
 

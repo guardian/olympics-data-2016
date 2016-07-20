@@ -1,11 +1,25 @@
 import _ from 'lodash'
 import moment from 'moment'
 
+const roundDisciplines = {
+    'badminton': 'Game Scores',
+    'basketball': 'Quarter Scores',
+    'beach-volleyball': 'Set Scores',
+    'boxing': 'Round Scores',
+    'football': 'Period Scores',
+    'handball': 'Period Scores',
+    'hockey': 'Period Scores',
+    'table-tennis': 'Game Scores',
+    'tennis': 'Set Scores',
+    'volleyball': 'Set Scores',
+    'water-polo': 'Quarter Scores'
+}
+
 function forceArray(arr) {
     return arr === undefined ? [] : _.isArray(arr) ? arr : [arr];
 }
 
-const combineBlacklist = ['football', 'water-polo', 'hockey', 'volleyball', 'basketball'];
+const combineBlacklist = Object.keys(roundDisciplines);
 
 function canCombine(group, evt1) {
     if (group && combineBlacklist.indexOf(evt1.discipline.identifier) === -1) {
@@ -30,7 +44,7 @@ function combineEvents(evts) {
         .map(group => {
             let first = group[0];
             if (group.length === 1) {
-                return first;
+                return {...first, group};
             } else {
                 let description = `${first.event.description} ${first.phase.value}`;
                 let start = _.min(group.map(evt => evt.start));
@@ -48,6 +62,7 @@ function parseScheduledEvent(evt) {
         'description': evt.description,
         'start': evt.start.utc,
         'end': evt.end && evt.end.utc,
+        'status': evt.status,
         'venue': evt.venue,
         'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
         'phase': evt.discipline.event.eventUnit.phaseDescription,
@@ -108,20 +123,6 @@ function parseResult(eventUnit) {
     };
 
     return resultReducers.reduce((res, reducer) => reducer(res), result);
-}
-
-const roundDisciplines = {
-    'badminton': 'Game Scores',
-    'basketball': 'Quarter Scores',
-    'beach-volleyball': 'Set Scores',
-    'boxing': 'Round Scores',
-    'football': 'Period Scores',
-    'handball': 'Period Scores',
-    'hockey': 'Period Scores',
-    'table-tennis': 'Game Scores',
-    'tennis': 'Set Scores',
-    'volleyball': 'Set Scores',
-    'water-polo': 'Quarter Scores'
 }
 
 const resultReducers = [
