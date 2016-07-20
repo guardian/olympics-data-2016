@@ -64,13 +64,17 @@ function parseEntrant(entrant) {
         .mapValues('value')
         .valueOf();
 
+    let resultExtensions = _.keyBy(forceArray(entrant.resultExtension), 'type');
+
     return {
         'code': entrant.code,
         'order': parseInt(entrant.order),
         'type': entrant.type,
         'competitors': forceArray(entrant.participant).map(p => p.competitor),
         'country': entrant.country,
-        'value': parseFloat(entrant.value),
+        'value': entrant.value,
+        properties,
+        resultExtensions,
         'medal': properties['Medal Awarded'],
         'record': properties['Record Set'],
         'winner': properties['Won Lost Tied'] === 'Won',
@@ -79,83 +83,97 @@ function parseEntrant(entrant) {
 }
 
 function parseResult(eventUnit) {
-    let resultParser = resultParsers.find(rp => rp.test(eventUnit));
+    let entrants = forceArray(eventUnit.result.entrant)
+        .map(parseEntrant)
+        .sort((a, b) => a.order - b.order);
 
-    let result = resultParser.parse(eventUnit);
-
-    return {
+    let result = {
         'identifier': eventUnit.identifier,
+        'discipline': eventUnit.disciplineDescription,
         'medalEvent': eventUnit.medalEvent === 'Yes',
         'teamEvent': eventUnit.teamEvent === 'Yes',
-        ...result
-    }
-}
-
-function isDiscipline(disciplines) {
-    return eventUnit => {
-        return disciplines.indexOf(eventUnit.disciplineDescription.identifier) > -1;
+        entrants
     };
+
+    return resultReducers.reduce((res, reducer) => reducer(res), result);
 }
 
-const roundDisciplines = [
-    'badminton', 'handball', 'tennis', 'football', 'beach-volleyball', 'basketball',
-    'volleyball', 'water-polo', 'hockey'
+const roundDisciplines = {
+    'badminton': 'Game Scores',
+    'handball': 'Period Scores',
+    'tennis': 'Set Scores',
+    'table-tennis': 'Game Scores',
+    'football': 'Period Scores',
+    'hockey': 'Period Scores',
+    'boxing': 'Round Scores',
+    'volleyball': 'Set Scores'
+}
+
+const aspectDisciplines = [
+    'gymnastics-rhythmic', 'gymnastics-artistic'//, 'gymnastics-trampoline'
 ];
 
-const resultParsers = [
-    {
-        'test': isDiscipline(roundDisciplines),
-        'parse': eventUnit => {
-            let entrants = forceArray(eventUnit.result.entrant)
-                .map(entrant => {
-                    let basics = parseEntrant(entrant);
-                    let rounds;
-
-                    if (entrant.resultExtension) {
-                        rounds = forceArray(entrant.resultExtension.extension)
-                            .sort((a, b) => +a.position - b.position)
-                            .map(extension => {
-                                return {'name': extension.description, 'score': parseInt(extension.value)};
-                            });
-                    } else {
-                        rounds = [];
-                    }
-
-                    return {...basics, rounds};
-                })
-                .sort((a, b) => a.order - b.order);
-
-            let roundNames = _(entrants).flatMap('rounds').uniqBy('name').sortBy('position').map('name').valueOf();
-
-            let bestRoundScores = _(roundNames)
-                .map(roundName => {
-                    let scores = entrants
-                        .map(entrant => {
-                            return entrant.rounds.find(round => round.name === roundName).score;
-                        })
-                        .sort((a, b) => b - a);
-                    return [roundName, scores[0]];
-                })
-                .fromPairs()
-                .valueOf();
-
-            entrants.forEach(entrant => {
-                entrant.rounds.forEach(round => {
-                    round.winner = bestRoundScores[round.name] === round.score;
-                });
-            });
-
-            return {entrants, roundNames};
-        }
+const resultReducers = [
+    // Reaction times
+    result => {
+        let entrants = result.entrants.map(entrant => {
+            let reactionExtension = entrant.resultExtensions['Reaction Time'] || {};
+            return {...entrant, 'reactionTime': reactionExtension.value};
+        });
+        return result;
     },
-    {
-        'test': () => true,
-        'parse': eventUnit => {
-            let entrants = forceArray(eventUnit.result.entrant)
-                .map(parseEntrant)
-                .sort((a, b) => a.order - b.order);
-            return {entrants};
-        }
+    // Split times
+    result => {
+        let entrants = result.entrants.map(entrant => {
+            let splitExtension = entrant.resultExtensions['Split Times'] || {};
+            let splits = forceArray(splitExtension.extension)
+                .sort((a, b) => +a.position - b.position)
+                .map(extension => extension.value);
+
+            return {...entrant, splits};
+        });
+
+        return {...result, entrants};
+    },
+    // Round scores
+    result => {
+        let roundExtensionType = roundDisciplines[result.discipline.identifier];
+        if (!roundExtensionType) return result;
+
+        let entrants = result.entrants.map(entrant => {
+            let roundExtension = entrant.resultExtensions[roundExtensionType] || {};
+            let rounds = forceArray(roundExtension.extension)
+                .sort((a, b) => +a.position - b.position)
+                .map(extension => {
+                    return {'name': extension.description, 'score': extension.value};
+                });
+
+            return {...entrant, rounds};
+        });
+
+        // Can we just assume all entrants have the same rounds?
+        let roundNames = _(entrants).flatMap('rounds').uniqBy('name').sortBy('position').map('name').valueOf();
+
+        let bestRoundScores = _(roundNames)
+            .map(roundName => {
+                let scores = entrants
+                    .map(entrant => {
+                        let round = entrant.rounds.find(round => round.name === roundName);
+                        return round ? round.score : 0;
+                    })
+                    .sort((a, b) => b - a);
+                return [roundName, scores[0]];
+            })
+            .fromPairs()
+            .valueOf();
+
+        entrants.forEach(entrant => {
+            entrant.rounds.forEach(round => {
+                round.winner = bestRoundScores[round.name] === round.score;
+            });
+        });
+
+        return {...result, entrants, roundNames};
     }
 ];
 

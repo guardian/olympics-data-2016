@@ -23,8 +23,8 @@ swig.setFilter('entrantname', entrant => {
 
 swig.setFilter('entranttype', result => {
     let entrant = result.entrants[0];
-    if (!entrant) return '';
-    else return entrant.type === 'Individual' ? 'Athlete' : 'Team';
+    if (entrant) return entrant.type === 'Individual' ? 'Athlete' : 'Team';
+    else return '';
 });
 
 async function readdir(d) {
