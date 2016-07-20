@@ -86,7 +86,8 @@ function parseEntrant(entrant) {
         'medal': properties['Medal Awarded'],
         'record': properties['Record Set'],
         'winner': properties['Won Lost Tied'] === 'Won',
-        'invalidResultMark': properties['Invalid Result Mark']
+        'invalidResultMark': properties['Invalid Result Mark'],
+        'qualified': (properties['Qualification Mark'] || '').startsWith('Qualified')
     };
 }
 
@@ -95,12 +96,15 @@ function parseResult(eventUnit) {
         .map(parseEntrant)
         .sort((a, b) => a.order - b.order);
 
+    let qualificationSpots = entrants.filter(e => e.qualified).length;
+
     let result = {
         'identifier': eventUnit.identifier,
         'discipline': eventUnit.disciplineDescription,
         'medalEvent': eventUnit.medalEvent === 'Yes',
         'teamEvent': eventUnit.teamEvent === 'Yes',
-        entrants
+        entrants,
+        qualificationSpots
     };
 
     return resultReducers.reduce((res, reducer) => reducer(res), result);
@@ -120,10 +124,6 @@ const roundDisciplines = {
     'water-polo': 'Quarter Scores'
 }
 
-const aspectDisciplines = [
-    'gymnastics-rhythmic', 'gymnastics-artistic'//, 'gymnastics-trampoline'
-];
-
 const resultReducers = [
     // Reaction times/wind speed
     result => {
@@ -138,7 +138,10 @@ const resultReducers = [
             };
         });
 
-        return {...result, entrants};
+        let hasReactionTime = !!entrants.find(e => e.reactionTime !== undefined);
+        let hasWindSpeed = !!entrants.find(e => e.windSpeed !== undefined);
+
+        return {...result, entrants, hasReactionTime, hasWindSpeed};
     },
     // Split/intermediate times
     result => {
@@ -168,7 +171,8 @@ const resultReducers = [
             entrant.splits = _.range(0, splitCount).map(splitNo => {
                 let split = entrant.splits[splitNo] || {};
                 let position = splitTimes[splitNo].indexOf(split.cmp) + 1;
-                return {...split, position};
+                let qualifying = position > 0 && position <= result.qualificationSpots;
+                return {...split, position, qualifying};
             });
         });
 
@@ -211,7 +215,7 @@ const resultReducers = [
             });
         });
 
-        let roundType = roundExtensionType.replace(' Scores', '') + 's';
+        let roundType = roundExtensionType.replace(' Scores', 's');
 
         return {...result, entrants, roundNames, roundType};
     }

@@ -4,33 +4,47 @@
             <th></th>
             <th></th>
             <th></th>
-            {% if result.splitCount > 0 %}
-                <th colspan="{{ result.splitCount }}">Splits</th>
+            {% if result.hasWindSpeed %}
+                <th></th>
             {% endif %}
-            {% if result.roundNames %}
-                <th colspan="{{ result.roundNames.length }}">{{ result.roundType }}</th>
+            {% if result.hasReactionTime %}
+                <th></th>
+            {% endif %}
+            {% if result.splitCount > 0 %}
+                <th colspan="{{ result.splitCount }}"></th>
+            {% endif %}
+            {% if result.roundNames.length > 0 %}
+                <th class="om-result__cat" colspan="{{ result.roundNames.length }}">{{ result.roundType }}</th>
             {% endif %}
             <th></th>
         </th>
-        <tr>
+        <tr class="om-result__subheaders">
             <th></th>
             <th></th>
             <th>{{ result|entranttype }}</th>
-            {% for split in result.entrants['0'].splits %}
-                <th class="om-entrant__round">{{ loop.index }}</th>
-            {% endfor %}
+            {% if result.hasWindSpeed %}
+                <th>Wind</th>
+            {% endif %}
+            {% if result.hasReactionTime %}
+                <th>Reaction</th>
+            {% endif %}
+            {% if result.splitCount > 0 %}
+                <th class="om-entrant__header" colspan="{{ result.splitCount }}">Splits</th>
+            {% endif %}
             {% for roundName in result.roundNames %}
-                <th class="om-entrant__round">{{ roundName }}</th>
+                <th class="om-entrant__header">{{ roundName }}</th>
             {% endfor %}
-            <th class="om-entrant__score">Score</th>
+            <th class="om-entrant__header">Result</th>
         </tr>
     </thead>
     <tbody>
         {% for entrant in result.entrants %}
-            <tr class="om-entrant {% if entrant.winner %}om-entrant--winner{% endif %}">
+            <tr class="om-entrant {% if entrant.winner %}om-entrant--winner{% endif %} {% if entrant.qualified %}om-entrant--qualified{% endif %}">
                 <td>
                     {% if entrant.medal %}
                         <div class="om-medal om-medal--{{ entrant.medal|lower }}"></div>
+                    {% elif entrant.qualified %}
+                        <div class="om-qualified"></div>
                     {% else %}
                         {{ entrant.rank || entrant.order }}.
                     {% endif %}
@@ -38,21 +52,29 @@
                 <td><div class="om-flag om-flag--{{ entrant.country.identifier }}"></div></td>
                 <td class="om-entrant__name" title="{{ entrant|entrantname }}">
                     {{ entrant|entrantname }}
+                    {% if entrant.invalidResultMark %}
+                        <p class="om-entrant__name__note">{{ entrant.invalidResultMark }}</p>
+                    {% endif %}
                 </td>
+                {% if result.hasWindSpeed %}
+                    <td>{{ entrant.windSpeed }}</td>
+                {% endif %}
+                {% if result.hasReactionTime %}
+                    <td>{{ entrant.reactionTime }}</td>
+                {% endif %}
                 {% for split in entrant.splits %}
-                    <td class="om-entrant__round om-entrant__round--position-{{ split.position }}">
-                        {{ split.str }}
-                    </td>
+                    <td class="om-entrant__split
+                               {% if result.medalEvent %}om-entrant__split--pos-{{ split.position }}{% endif %}
+                               {% if loop.index0 === 0 %}om-entrant__split--first{% endif %}
+                               {% if split.qualifying %}om-entrant__split--qual{% endif %}"></td>
                 {% endfor %}
                 {% for round in entrant.rounds %}
                     <td class="om-entrant__round {% if round.winner %}om-entrant__round--winner{% endif %}">
                         {{ round.score }}
                     </td>
                 {% endfor %}
-                <td class="om-entrant__score">
-                    {% if entrant.invalidResultMark %}
-                        {{ entrant.invalidResultMark }}
-                    {% elif entrant.value.str !== undefined %}
+                <td class="om-entrant__result">
+                    {% if entrant.value.str !== undefined %}
                         <span>{{ entrant.value.str }}</span>
                     {% endif %}
                 </td>

@@ -167,7 +167,8 @@ a {
     }
 }
 
-.om-medal {
+.om-medal,
+.om-qualified {
     display: inline-block;
     box-sizing: border-box;
     width: 12px;
@@ -177,10 +178,16 @@ a {
     border: 2px solid #fff;
     margin-right: 4px;
     margin-bottom: -1px;
+}
 
+.om-medal {
     &.om-medal--bronze { border-color: $bronze; }
     &.om-medal--silver { border-color: $silver; }
     &.om-medal--gold { border-color: $gold; }
+}
+
+.om-qualified {
+    border-color: #4a7801;
 }
 
 .om-schedule-date {
@@ -285,11 +292,11 @@ a {
             padding-right: 0;
         }
     }
+}
 
-    th[colspan] {
-        text-align: center;
-        border-bottom: 1px solid #f1f1f1;
-    }
+.om-result__cat {
+    text-align: center;
+    border-bottom: 1px solid #f1f1f1;
 }
 
 .om-entrant {
@@ -311,33 +318,60 @@ a {
     }
 }
 
+.om-entrant__name__note {
+    font-size: 11px;
+    color: #999;
+    padding-left: 10px;
+    margin: -3px 0 0;
+}
+
 .om-entrant__round {
     width: 30px;
     text-align: center;
     border-left: 1px dotted #eaeaea;
     font-size: 11px;
+    color: #999;
+
     @include mq(mobileLandscape) {
         font-size: 12px;
     }
 
-    color: #999;
     &.om-entrant__round--winner {
         color: #333;
         font-weight: 500;
     }
+}
 
-    &.om-entrant__round--position-1 {
-        background-color: $goldLight;
+.om-entrant__header {
+    border-left: 1px dotted #eaeaea;
+}
+
+.om-entrant__split {
+    &::before {
+        content: "";
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border: 2px solid white;
+        border-radius: 100px;
+        background-color: #efefef;
+        vertical-align: middle;
     }
-    &.om-entrant__round--position-2 {
-        background-color: $silverLight;
+
+    &.om-entrant__split--first {
+        border-left: 1px dotted #eaeaea;
     }
-    &.om-entrant__round--position-3 {
-        background-color: $bronzeLight;
+
+    $positionColors: (pos-1: $gold, pos-2: $silver, pos-3: $bronze, qual: #4a7801);
+    @each $pos, $color in $positionColors {
+        &.om-entrant__split--#{$pos}::before {
+            background-color: transparent;
+            border-color: $color;
+        }
     }
 }
 
-.om-entrant__score {
+.om-entrant__result {
     text-align: right;
     white-space: nowrap;
     border-left: 1px dotted #eaeaea;
@@ -356,7 +390,7 @@ a {
     }
 }
 
-th.om-entrant__score {
+th.om-entrant__result {
     text-align: center;
 }
 
