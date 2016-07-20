@@ -40,7 +40,7 @@ async function getAllData() {
         data[path.basename(file, '.json')] = JSON.parse(fs.readFileSync(file));
     });
 
-    data.today = '2016-08-17';
+    data.today = '2016-01-15';
 
     data.scheduleToday = data.scheduleByDay.find(schedule => schedule.day.date === data.today);
 

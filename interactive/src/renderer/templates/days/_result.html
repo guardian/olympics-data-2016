@@ -23,10 +23,10 @@
             <th></th>
             <th>{{ result|entranttype }}</th>
             {% if result.hasWindSpeed %}
-                <th>Wind</th>
+                <th class="om-entrant__extra">Wind speed</th>
             {% endif %}
             {% if result.hasReactionTime %}
-                <th>Reaction</th>
+                <th class="om-entrant__extra">Reaction time</th>
             {% endif %}
             {% if result.splitCount > 0 %}
                 <th class="om-entrant__header" colspan="{{ result.splitCount }}">Splits</th>
@@ -57,10 +57,10 @@
                     {% endif %}
                 </td>
                 {% if result.hasWindSpeed %}
-                    <td>{{ entrant.windSpeed }}</td>
+                    <td class="om-entrant__extra">{{ entrant.windSpeed }}</td>
                 {% endif %}
                 {% if result.hasReactionTime %}
-                    <td>{{ entrant.reactionTime }}</td>
+                    <td class="om-entrant__extra">{{ entrant.reactionTime }}</td>
                 {% endif %}
                 {% for split in entrant.splits %}
                     <td class="om-entrant__split
@@ -75,7 +75,7 @@
                 {% endfor %}
                 <td class="om-entrant__result">
                     {% if entrant.value.str !== undefined %}
-                        <span>{{ entrant.value.str }}</span>
+                        {{ entrant.value.str }}
                     {% endif %}
                 </td>
             </tr>

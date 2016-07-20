@@ -235,7 +235,7 @@ a {
     @include fs-textSans(2);
     position: relative;
     border-top: 1px dotted #bdbdbd;
-    padding: 5px 0 1px 65px;
+    padding: 5px 20px 1px 65px;
 
     @include mq(mobileLandscape) {
         padding-left: 80px;
@@ -255,7 +255,6 @@ a {
     display: none; // TODO: revert
     border-collapse: collapse;
     width: 100%;
-    max-width: 480px;
     margin: 6px 0 18px;
 
     .is-expanded & {
@@ -264,6 +263,7 @@ a {
 
     thead {
         border-bottom: 1px solid #dcdcdc;
+        vertical-align: bottom;
     }
 
     th {
@@ -281,10 +281,6 @@ a {
     th {
         padding-left: 4px;
         padding-right: 4px;
-        @include mq(mobileLandscape) {
-            padding-left: 5px;
-            padding-right: 5px;
-        }
         &:first-child {
             padding-left: 0;
         }
@@ -296,7 +292,6 @@ a {
 
 .om-result__cat {
     text-align: center;
-    border-bottom: 1px solid #f1f1f1;
 }
 
 .om-entrant {
@@ -304,6 +299,10 @@ a {
     &:last-child {
         border-bottom: 0;
     }
+}
+
+.om-entrant__header {
+    border-left: 1px dotted #eaeaea;
 }
 
 .om-entrant__name {
@@ -321,7 +320,6 @@ a {
 .om-entrant__name__note {
     font-size: 11px;
     color: #999;
-    padding-left: 10px;
     margin: -3px 0 0;
 }
 
@@ -340,10 +338,6 @@ a {
         color: #333;
         font-weight: 500;
     }
-}
-
-.om-entrant__header {
-    border-left: 1px dotted #eaeaea;
 }
 
 .om-entrant__split {
@@ -390,8 +384,12 @@ a {
     }
 }
 
-th.om-entrant__result {
-    text-align: center;
+.om-entrant__extra {
+    border-left: 1px dotted #eaeaea;
+    display: none;
+    @include mq(tablet) {
+        display: table-cell;
+    }
 }
 
 .om-event__time {
