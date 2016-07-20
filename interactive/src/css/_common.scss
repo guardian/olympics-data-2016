@@ -264,11 +264,11 @@ a {
         font-weight: normal;
         line-height: 14px;
         color: #999;
+        padding: 1px 0;
     }
     td {
         vertical-align: middle;
-        padding-top: 3px;
-        padding-bottom: 3px;
+        padding: 3px 0;
     }
     td,
     th {
@@ -284,6 +284,11 @@ a {
         &:last-child {
             padding-right: 0;
         }
+    }
+
+    th[colspan] {
+        text-align: center;
+        border-bottom: 1px solid #f1f1f1;
     }
 }
 
@@ -319,6 +324,16 @@ a {
     &.om-entrant__round--winner {
         color: #333;
         font-weight: 500;
+    }
+
+    &.om-entrant__round--position-1 {
+        background-color: $goldLight;
+    }
+    &.om-entrant__round--position-2 {
+        background-color: $silverLight;
+    }
+    &.om-entrant__round--position-3 {
+        background-color: $bronzeLight;
     }
 }
 

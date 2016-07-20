@@ -4,13 +4,11 @@
             <th></th>
             <th></th>
             <th></th>
-            {% if result.entrants['0'].splits.length > 0 %}
-                <th colspan="{{ result.entrants['0'].splits.length }}">
-                    Splits
-                </th>
+            {% if result.splitCount > 0 %}
+                <th colspan="{{ result.splitCount }}">Splits</th>
             {% endif %}
             {% if result.roundNames %}
-                <th colspan="{{ result.roundNames.length }}"></th>
+                <th colspan="{{ result.roundNames.length }}">{{ result.roundType }}</th>
             {% endif %}
             <th></th>
         </th>
@@ -34,7 +32,7 @@
                     {% if entrant.medal %}
                         <div class="om-medal om-medal--{{ entrant.medal|lower }}"></div>
                     {% else %}
-                        {{ entrant.order }}.
+                        {{ entrant.rank || entrant.order }}.
                     {% endif %}
                 </td>
                 <td><div class="om-flag om-flag--{{ entrant.country.identifier }}"></div></td>
@@ -42,7 +40,9 @@
                     {{ entrant|entrantname }}
                 </td>
                 {% for split in entrant.splits %}
-                    <td class="om-entrant__round">{{ split }}</td>
+                    <td class="om-entrant__round om-entrant__round--position-{{ split.position }}">
+                        {{ split.str }}
+                    </td>
                 {% endfor %}
                 {% for round in entrant.rounds %}
                     <td class="om-entrant__round {% if round.winner %}om-entrant__round--winner{% endif %}">
@@ -52,8 +52,8 @@
                 <td class="om-entrant__score">
                     {% if entrant.invalidResultMark %}
                         {{ entrant.invalidResultMark }}
-                    {% elif entrant.value !== undefined %}
-                        <span>{{ entrant.value }}</span>
+                    {% elif entrant.value.str !== undefined %}
+                        <span>{{ entrant.value.str }}</span>
                     {% endif %}
                 </td>
             </tr>

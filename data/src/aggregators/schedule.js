@@ -58,6 +58,13 @@ function parseScheduledEvent(evt) {
     };
 }
 
+function parseValue(value) {
+    return {
+        'str': value,
+        'cmp': value && value.split(':').reduce((t, v) => t * 60 + parseFloat(v), 0)
+    };
+}
+
 function parseEntrant(entrant) {
     let properties = _(forceArray(entrant.property))
         .keyBy('type')
@@ -69,10 +76,11 @@ function parseEntrant(entrant) {
     return {
         'code': entrant.code,
         'order': parseInt(entrant.order),
+        'rank': parseInt(entrant.rank),
         'type': entrant.type,
         'competitors': forceArray(entrant.participant).map(p => p.competitor),
         'country': entrant.country,
-        'value': entrant.value,
+        'value': parseValue(entrant.value),
         properties,
         resultExtensions,
         'medal': properties['Medal Awarded'],
@@ -100,13 +108,16 @@ function parseResult(eventUnit) {
 
 const roundDisciplines = {
     'badminton': 'Game Scores',
-    'handball': 'Period Scores',
-    'tennis': 'Set Scores',
-    'table-tennis': 'Game Scores',
-    'football': 'Period Scores',
-    'hockey': 'Period Scores',
+    'basketball': 'Quarter Scores',
+    'beach-volleyball': 'Set Scores',
     'boxing': 'Round Scores',
-    'volleyball': 'Set Scores'
+    'football': 'Period Scores',
+    'handball': 'Period Scores',
+    'hockey': 'Period Scores',
+    'table-tennis': 'Game Scores',
+    'tennis': 'Set Scores',
+    'volleyball': 'Set Scores',
+    'water-polo': 'Quarter Scores'
 }
 
 const aspectDisciplines = [
@@ -114,26 +125,54 @@ const aspectDisciplines = [
 ];
 
 const resultReducers = [
-    // Reaction times
+    // Reaction times/wind speed
     result => {
         let entrants = result.entrants.map(entrant => {
             let reactionExtension = entrant.resultExtensions['Reaction Time'] || {};
-            return {...entrant, 'reactionTime': reactionExtension.value};
+            let windSpeedExtension = entrant.resultExtensions['Wind Speed'] || {};
+
+            return {
+                ...entrant,
+                'reactionTime': reactionExtension.value,
+                'windSpeed': windSpeedExtension.value
+            };
         });
-        return result;
+
+        return {...result, entrants};
     },
-    // Split times
+    // Split/intermediate times
     result => {
         let entrants = result.entrants.map(entrant => {
-            let splitExtension = entrant.resultExtensions['Split Times'] || {};
+            let splitExtension = entrant.resultExtensions['Split Times'] ||
+                entrant.resultExtensions['Intermediate Times'] ||
+                {};
             let splits = forceArray(splitExtension.extension)
                 .sort((a, b) => +a.position - b.position)
-                .map(extension => extension.value);
+                .map(extension => parseValue(extension.value));
 
             return {...entrant, splits};
         });
 
-        return {...result, entrants};
+        let splitCount = _(entrants).map(e => e.splits.length).max();
+        let splitTimes = _.range(0, splitCount)
+            .map(splitNo => {
+                let times = entrants
+                    .map(entrant => entrant.splits[splitNo])
+                    .filter(split => split !== undefined)
+                    .map(split => split.cmp)
+                    .sort((a, b) => a - b);
+                return times;
+            });
+
+        entrants.forEach(entrant => {
+            entrant.splits = _.range(0, splitCount).map(splitNo => {
+                let split = entrant.splits[splitNo] || {};
+                let position = splitTimes[splitNo].indexOf(split.cmp) + 1;
+                return {...split, position};
+            });
+        });
+
+        return {...result, entrants, splitCount};
     },
     // Round scores
     result => {
@@ -157,10 +196,9 @@ const resultReducers = [
         let bestRoundScores = _(roundNames)
             .map(roundName => {
                 let scores = entrants
-                    .map(entrant => {
-                        let round = entrant.rounds.find(round => round.name === roundName);
-                        return round ? round.score : 0;
-                    })
+                    .map(entrant => entrant.rounds.find(round => round.name === roundName))
+                    .filter(round => !!round)
+                    .map(round => round.score)
                     .sort((a, b) => b - a);
                 return [roundName, scores[0]];
             })
@@ -173,7 +211,9 @@ const resultReducers = [
             });
         });
 
-        return {...result, entrants, roundNames};
+        let roundType = roundExtensionType.replace(' Scores', '') + 's';
+
+        return {...result, entrants, roundNames, roundType};
     }
 ];
 
