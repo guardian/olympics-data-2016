@@ -20,6 +20,15 @@ swig.setFilter('entrantname', entrant => {
     }
 });
 
+swig.setFilter('eventname', en => {
+    let out = 'the ' + en
+    if(en.endsWith('Women') || en.endsWith('Men')){
+        out += '\'s'
+    }
+    out += ' event'
+    return out
+})
+
 swig.setFilter('countryEntrant', medal => {
 
     let entrant = medal.entrant

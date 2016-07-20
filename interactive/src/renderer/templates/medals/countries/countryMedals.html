@@ -5,7 +5,7 @@
     {% if obj.medals.length > 0 %}
         {% set recent = obj.medals[0] %}
         Most recently, {{ recent | countryEntrant }} won a {{ recent.entrant.medal | lower }} medal
-        in {{ recent.event.event.description }} in {{ recent.event.discipline.description }}.
+        in {{ recent.event.event.description | eventname }} in {{ recent.event.discipline.description }}.
     {% endif %}
 
     <ol class='om-table om-table--favourite'>
@@ -28,7 +28,7 @@
                         {{ medal.event.discipline.description }},
                         {{ medal.event.event.description }}
                     </div>
-                    <div class='om-recent-el'>
+                    <div class='om-recent-medalist'>
                         <span class='om-medalist-name'>
                             {{ medal | countryEntrant }}
                         </span>
