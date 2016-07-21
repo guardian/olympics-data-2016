@@ -24,7 +24,7 @@ const combineBlacklist = Object.keys(roundDisciplines);
 
 function canCombine(group, evt1) {
     if (group && combineBlacklist.indexOf(evt1.discipline.identifier) === -1) {
-        let evt2 = group[0];
+        let evt2 = _.last(group);
 
         return evt1.phase.identifier === evt2.phase.identifier &&
             evt1.venue.identifier === evt2.venue.identifier &&
@@ -40,17 +40,34 @@ function combineEvents(evts) {
         .reduce((groups, evt) => {
             let [group, ...otherGroups] = groups;
             return canCombine(group, evt) ?
-                [[evt, ...group], ...otherGroups] : [[evt], ...groups];
+                [[...group, evt], ...otherGroups] : [[evt], ...groups];
         }, [])
         .map(group => {
             let first = group[0];
             if (group.length === 1) {
                 return {...first, group};
             } else {
+                let statuses = _.uniq(group.map(evt => evt.status));
+                let status;
+                // Some strange guess work logic for the overall status
+                // Thinking is: only Scheduled/Finished when everything is
+                //              otherwise status of non Scheduled/Finished
+                //              or just Running
+                if (statuses.length === 1) {
+                    status = statuses[0];
+                } else {
+                    let weirdStatuses = _.difference(statuses, 'Scheduled', 'Finished');
+                    if (weirdStatuses.length === 1) {
+                        status = wierdStatuses[0];
+                    } else {
+                        status = 'Running';
+                    }
+                }
+
                 let description = `${first.event.description} ${first.phase.value}`;
                 let start = _.min(group.map(evt => evt.start));
                 let end = _.max(group.map(evt => evt.end));
-                return {...first, description, start, end, group};
+                return {...first, description, start, end, status, group};
             }
         })
         .sort((a, b) => a.start < b.start ? -1 : 1);
@@ -240,7 +257,9 @@ export default {
             },
             'process': ({dates}, dateSchedules) => {
                 let datesEvents = dateSchedules.map(ds => {
-                    return forceArray(ds.olympics.scheduledEvent).map(parseScheduledEvent);
+                    return forceArray(ds.olympics.scheduledEvent)
+                        .filter(evt => evt.discipline.event.eventUnit.unitType !== 'Not Applicable')
+                        .map(parseScheduledEvent);
                 });
 
                 return _(dates)
