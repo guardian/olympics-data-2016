@@ -29,6 +29,12 @@ swig.setFilter('eventname', en => {
     return out
 })
 
+swig.setFilter('sortEvents', events => {
+    return events.sort((a, b) => {
+        return a.end < b.end ? 1 : -1
+    })
+})
+
 swig.setFilter('countryEntrant', medal => {
 
     let entrant = medal.entrant
