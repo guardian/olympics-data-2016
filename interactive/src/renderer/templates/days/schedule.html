@@ -27,13 +27,7 @@
                 <p class="om-discipline__venue">Multiple venues</p>
             {% endif %}
             <ul class="om-events">
-                {% if view === 'results' %}
-                    {% set events = Array.from(discipline.events) | sortEvents %}
-                {% else %}
-                    {% set events = discipline.events %}
-                {% endif %}
-
-                {% for event in events %}
+                {% for event in discipline.events|sortEvents(view) %}
                     <li class="om-event {% if event.status === 'Finished' %}om-event--finished{% endif %}">
                         <time class="om-event__time" datetime="{{ event.start }}">
                             {{ event.start|datefmt('HH:mm') }}
