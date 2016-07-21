@@ -13,7 +13,7 @@
 
     {% if view === 'results' %}
         <!-- weird hack without which state-mutating reverse filter would get applied even in else case -->
-        {% set disciplines = Array.from(schedule.disciplines) | reverse %}
+        {% set disciplines = Array.from(schedule.disciplines) | sortDisciplines %}
     {% else %}
         {% set disciplines = schedule.disciplines %}
     {% endif %}
@@ -40,7 +40,13 @@
                         {% set result = results[event.unit.identifier] %}
                         <li class="om-event {% if result %}om-event--finished{% endif %}">
                             <time class="om-event__time" datetime="{{event.start}}">
+
+                            {% if view === 'results' %}
+                                {{ event.end | datefmt('HH:mm') }}
+                            {% else %}
                                 {{ event.start|datefmt('HH:mm') }}
+                            {% endif %}
+
                             </time>
                             <span class="om-event__name">{{ event.description }}</span>
                             {% if discipline.venues.length > 1 %}

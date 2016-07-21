@@ -5,6 +5,11 @@ let disciplineChoiceEl = $('.js-discipline-choice');
 let dateChoiceEl = $('.js-date-choice');
 let dateScheduleEl = $('.js-date-schedule');
 
+// to load correct subtemplates
+let view = /result/.test($('.om-header__inner').innerHTML) ? 'results' : 'schedule'
+
+console.log(view)
+
 function filterDisciplines() {
     let identifier = disciplineChoiceEl.options[disciplineChoiceEl.selectedIndex].value;
 
@@ -30,7 +35,9 @@ dateChoiceEl.disabled = false;
 dateChoiceEl.addEventListener('change', () => {
     let date = dateChoiceEl.options[dateChoiceEl.selectedIndex].value;
 
-    let promise = dateCache[date] || reqwest(`./days/schedule-${date}.html`);
+    let url = (view === 'results') ? `./days/schedule-results-${date}.html` : `./days/schedule-${date}.html` 
+
+    let promise = dateCache[date] || reqwest(url);
     promise.then(html => {
         dateScheduleEl.innerHTML = html;
         filterDisciplines();
