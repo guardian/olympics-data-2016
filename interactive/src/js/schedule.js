@@ -1,10 +1,17 @@
 import reqwest from 'reqwest'
 import { $, $$ } from './lib/selector'
 
+// reqwest promises suck, wrap them in a real one
+function reqwestP(opts) {
+    return new Promise((resolve, reject) => {
+        reqwest(opts).then(resolve).catch(reject);
+    });
+}
+
 let disciplineChoiceEl = $('.js-discipline-choice');
 let dateChoiceEl = $('.js-date-choice');
 let dateScheduleEl = $('.js-date-schedule');
-let loadingEl = $('.js-loading');
+let errorEl = $('.js-error');
 
 function filterDisciplines() {
     let identifier = disciplineChoiceEl.options[disciplineChoiceEl.selectedIndex].value;
@@ -29,14 +36,22 @@ dateCache[startDate] = Promise.resolve(dateScheduleEl.innerHTML);
 
 function changeDate(date) {
     dateScheduleEl.classList.add('is-loading');
-    dateScheduleEl.classList.remove('has-error');
+    errorEl.classList.remove('has-error');
 
-    let promise = dateCache[date] || reqwest(`./days/schedule-${date}.html`);
-    promise.then(html => {
+    let datePromise = dateCache[date] || reqwestP(`./days/schedule-${date}.html`);
+
+    datePromise.then(html => {
         dateCache[date] = Promise.resolve(html);
-
+        return html;
+    }).catch(err => {
+        dateScheduleEl.innerHTML = '';
+        errorEl.classList.add('has-error');
+        return '';
+    }).then(html => {
         dateScheduleEl.innerHTML = html;
         dateScheduleEl.classList.remove('is-loading');
+
+        window.location.hash = '#' + date;
 
         for (let i = 0; i < dateChoiceEl.options.length; i++) {
             if (dateChoiceEl.options[i].value === date) {
@@ -45,13 +60,7 @@ function changeDate(date) {
             }
         }
 
-        window.location.hash = '#' + date;
-
         filterDisciplines();
-    }).catch(err => {
-        dateScheduleEl.innerHTML = '';
-        dateScheduleEl.classList.add('has-error');
-        dateScheduleEl.classList.remove('is-loading');
     });
 }
 
@@ -70,7 +79,7 @@ dateScheduleEl.addEventListener('click', evt => {
 
 function checkHash() {
     var date = window.location.hash.substring(1);
-    if (!/\d\d\d\d-\d\d-\d\d/.test(date)) date = startDate;
+    if (!/\d{4}-\d{2}-\d{2}/.test(date)) date = startDate;
     changeDate(date);
 }
 window.addEventListener('hashchange', checkHash);

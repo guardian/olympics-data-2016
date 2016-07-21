@@ -129,6 +129,14 @@ a {
     }
 }
 
+.om-error {
+    display: none;
+
+    &.has-error {
+        display: block;
+    }
+}
+
 .om-date-schedule {
     position: relative;
     &::before {
