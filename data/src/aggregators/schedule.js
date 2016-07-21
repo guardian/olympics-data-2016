@@ -16,22 +16,26 @@ const roundDisciplines = {
     'water-polo': 'Quarter Scores'
 }
 
+const combineBlacklist = [
+    'basketball', 'beach-volleyball', 'football', 'handball', 'hockey', 'rugby-sevens',
+    'tennis', 'volleyball', 'water-polo'
+];
+
 function forceArray(arr) {
     return arr === undefined ? [] : _.isArray(arr) ? arr : [arr];
 }
 
-const combineBlacklist = Object.keys(roundDisciplines);
-
 function canCombine(group, evt1) {
-    if (group && combineBlacklist.indexOf(evt1.discipline.identifier) === -1) {
-        let evt2 = _.last(group);
+    if (combineBlacklist.indexOf(evt1.discipline.identifier) > -1) return false;
+    if (evt1.phase.value === 'Finals') return false;
+    if (!group) return false;
 
-        return evt1.phase.identifier === evt2.phase.identifier &&
-            evt1.venue.identifier === evt2.venue.identifier &&
-            evt1.start >= evt2.start &&
-            moment(evt1.start).subtract(10, 'minutes').isSameOrBefore(evt2.end)
-    }
-    return false;
+    let evt2 = _.last(group);
+
+    return evt1.phase.identifier === evt2.phase.identifier &&
+        evt1.venue.identifier === evt2.venue.identifier &&
+        evt1.start >= evt2.start &&
+        moment(evt1.start).subtract(10, 'minutes').isSameOrBefore(evt2.end);
 }
 
 function combineEvents(evts) {
