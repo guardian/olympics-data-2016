@@ -19,7 +19,11 @@
     </div>
 </div>
 <div class="om-container">
-    <div class="js-date-schedule" data-startdate="{{ scheduleToday.day.date }}">
-        {% include './days/schedule.html' {'schedule': scheduleToday, 'view' : view } %}
+    <div class="om-date-schedule js-date-schedule" data-startdate="{{ scheduleToday.day.date }}">
+        {% include './days/schedule.html' {'schedule': scheduleToday, 'view': view} %}
+    </div>
+    <div class="om-section om-error js-error">
+        <h3 class="om-section__title">Error</h3>
+        Failed to load events, check your internet connection.
     </div>
 </div>

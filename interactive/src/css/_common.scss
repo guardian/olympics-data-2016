@@ -125,6 +125,33 @@ a {
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
+        cursor: auto;
+    }
+}
+
+.om-error {
+    display: none;
+
+    &.has-error {
+        display: block;
+    }
+}
+
+.om-date-schedule {
+    position: relative;
+    &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background-color: transparent;
+        transition: background-color 0.1s linear;
+    }
+    &.is-loading::before {
+        z-index: 100;
+        background-color: transparentize(white, 0.2);
     }
 }
 
@@ -167,7 +194,8 @@ a {
     }
 }
 
-.om-medal {
+.om-medal,
+.om-qualified {
     display: inline-block;
     box-sizing: border-box;
     width: 12px;
@@ -177,10 +205,16 @@ a {
     border: 2px solid #fff;
     margin-right: 4px;
     margin-bottom: -1px;
+}
 
+.om-medal {
     &.om-medal--bronze { border-color: $bronze; }
     &.om-medal--silver { border-color: $silver; }
     &.om-medal--gold { border-color: $gold; }
+}
+
+.om-qualified {
+    border-color: #4a7801;
 }
 
 .om-schedule-date {
@@ -227,24 +261,149 @@ a {
 .om-event {
     @include fs-textSans(2);
     position: relative;
-    border-top: 1px dotted #dcdcdc;
-    padding: 3px 20px 3px 65px;
+    border-top: 1px dotted #bdbdbd;
+    padding: 5px 20px 3px 65px;
 
     @include mq(mobileLandscape) {
-        @include fs-textSans(3, $size-only: true);
         padding-left: 80px;
     }
 
     &.om-event--finished.is-expanded {
         background-color: white;
         color: #333;
+        &,
+        & + .om-event {
+            border-top-style: solid;
+        }
     }
 
 }
+
 .om-result {
+    border-spacing: 0;
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0 0 18px;
+
+    thead {
+        border-bottom: 1px solid #dcdcdc;
+        vertical-align: bottom;
+    }
+
+    th {
+        font-size: 11px;
+        font-weight: 500;
+        line-height: 14px;
+        color: #999;
+        padding: 1px 0;
+    }
+    td {
+        vertical-align: middle;
+        padding: 3px 0;
+    }
+    td,
+    th {
+        padding-left: 4px;
+        padding-right: 4px;
+        &:first-child {
+            padding-left: 0;
+        }
+        &:last-child {
+            padding-right: 0;
+        }
+    }
+}
+
+.om-result__cat {
+    text-align: center;
+}
+
+.om-entrant {
+    border-bottom: 1px solid #eaeaea;
+    &:last-child {
+        border-bottom: 0;
+    }
+}
+
+.om-entrant__header {
+    border-left: 1px dotted #eaeaea;
+}
+
+.om-entrant__name {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 0;
+    white-space: nowrap;
+}
+
+.om-entrant__name__note {
+    font-size: 11px;
+    color: #999;
+    margin: -3px 0 0;
+}
+
+.om-entrant__round {
+    width: 30px;
+    text-align: center;
+    border-left: 1px dotted #eaeaea;
+    font-size: 11px;
+    color: #999;
+
+    @include mq(mobileLandscape) {
+        font-size: 12px;
+    }
+
+    &.om-entrant__round--winner {
+        color: #333;
+        font-weight: 500;
+    }
+}
+
+.om-entrant__splits {
+    border-left: 1px dotted #eaeaea;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.om-entrant__split {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border: 2px solid white;
+    border-radius: 100px;
+    background-color: #efefef;
+    vertical-align: middle;
+
+    $positionColors: (pos-1: $gold, pos-2: $silver, pos-3: $bronze, qual: #4a7801);
+    @each $pos, $color in $positionColors {
+        &.om-entrant__split--#{$pos} {
+            background-color: transparent;
+            border-color: $color;
+        }
+    }
+}
+
+.om-entrant__result {
+    text-align: right;
+    white-space: nowrap;
+    border-left: 1px dotted #eaeaea;
+
+    & > span {
+        display: inline-block;
+        width: 100%;
+        background-color: #f1f1f1;
+        border-radius: 2px;
+        border: 1px solid #dfdfdf;
+        text-align: center;
+    }
+}
+
+.om-entrant__extra {
+    border-left: 1px dotted #eaeaea;
     display: none;
-    .is-expanded & {
-        display: block;
+    @include mq(tablet) {
+        display: table-cell;
     }
 }
 
@@ -256,11 +415,35 @@ a {
 
 .om-event__name {
     font-weight: 500;
-    margin-right: 20px;
+    padding-right: 40px;
+}
+
+.om-event__sub-name {
+}
+
+.om-event__name__events {
+    font-weight: normal;
+}
+
+.om-event__id {
+    position: relative;
+    z-index: 5;
 }
 
 .om-event__venue {
     white-space: nowrap;
+}
+
+.om-event__result {
+    margin: 12px 0 0 -65px;
+    @include mq(mobileLandscape) {
+        margin-left: 0;
+    }
+
+    display: none;
+    .is-expanded & {
+        display: block;
+    }
 }
 
 .om-event__expand {

@@ -8,9 +8,7 @@
         in {{ recent.event.event.description | eventname }} in {{ recent.event.discipline.description }}.
     {% endif %}
 
-    <ol class='om-table om-table--favourite'>
-       <!--  {% include './../../_leaderboardEntry.html' { 'entry' : entry } %} -->
-    </ol>
+    <ol class='om-table om-table--favourite'></ol>
 
     {% if obj.medals.length > 0 %}
 

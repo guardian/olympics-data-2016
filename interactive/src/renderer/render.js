@@ -11,13 +11,20 @@ import moment from 'moment'
 swig.setFilter('datefmt', (date, fmt) => moment(date).format(fmt));
 
 swig.setFilter('entrantname', entrant => {
+    if (entrant.code === 'BYE') return 'BYE';
     if (entrant.type === 'Individual') {
-        return `${entrant.competitors[0].fullName} (${entrant.countryCode})`;
+        return `${entrant.competitors[0].fullName} (${entrant.country.identifier})`;
     } else if (entrant.competitors.length > 2) {
-        return entrant.countryName;
+        return entrant.country.name;
     } else {
-        return `${entrant.competitors.map(c => c.lastName).join('/')} (${entrant.countryCode})`;
+        return `${entrant.competitors.map(c => c.lastName).join('/')} (${entrant.country.identifier})`;
     }
+});
+
+swig.setFilter('entranttype', result => {
+    let entrant = result.entrants[0];
+    if (entrant) return entrant.type === 'Individual' ? 'Athlete' : 'Team';
+    else return '';
 });
 
 swig.setFilter('eventname', en => {
@@ -99,7 +106,7 @@ async function getAllData() {
         data[path.basename(file, '.json')] = JSON.parse(fs.readFileSync(file));
     });
 
-    data.today = '2016-08-17';
+    data.today = '2016-01-15';
 
     data.scheduleToday = data.scheduleByDay.find(schedule => schedule.day.date === data.today);
 

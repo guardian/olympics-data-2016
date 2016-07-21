@@ -4,6 +4,7 @@ import { $, $$ } from './lib/selector'
 let disciplineChoiceEl = $('.js-discipline-choice');
 let dateChoiceEl = $('.js-date-choice');
 let dateScheduleEl = $('.js-date-schedule');
+let errorEl = $('.js-error');
 
 // to load correct subtemplates
 let view = /result/.test($('.om-header__inner').innerHTML) ? 'results' : 'schedule'
@@ -29,21 +30,12 @@ disciplineChoiceEl.addEventListener('change', filterDisciplines);
 
 let dateCache = {};
 let startDate = dateScheduleEl.getAttribute('data-startdate');
-dateCache[startDate] = Promise.resolve(dateScheduleEl.innerHTML);
+dateCache[startDate] = dateScheduleEl.innerHTML;
 
 dateChoiceEl.disabled = false;
 dateChoiceEl.addEventListener('change', () => {
     let date = dateChoiceEl.options[dateChoiceEl.selectedIndex].value;
-
-    let url = (view === 'results') ? `./days/schedule-results-${date}.html` : `./days/schedule-${date}.html` 
-
-    let promise = dateCache[date] || reqwest(url);
-    promise.then(html => {
-        dateScheduleEl.innerHTML = html;
-        filterDisciplines();
-
-        dateCache[date] = Promise.resolve(html);
-    });
+    window.location.hash = '#' + date;
 });
 
 dateScheduleEl.addEventListener('click', evt => {
@@ -52,3 +44,40 @@ dateScheduleEl.addEventListener('click', evt => {
         target.parentNode.classList.toggle('is-expanded');
     }
 });
+
+function changeDate() {
+    let date = window.location.hash.substring(1);
+    if (!/\d{4}-\d{2}-\d{2}/.test(date)) date = startDate;
+
+    dateScheduleEl.classList.add('is-loading');
+    errorEl.classList.remove('has-error');
+
+    function render(html) {
+        dateScheduleEl.innerHTML = html;
+        dateScheduleEl.classList.remove('is-loading');
+
+        for (let i = 0; i < dateChoiceEl.options.length; i++) {
+            if (dateChoiceEl.options[i].value === date) {
+                dateChoiceEl.selectedIndex = i;
+                break;
+            }
+        }
+
+        filterDisciplines();
+    }
+
+    if (dateCache[date]) {
+        render(dateCache[date]);
+    } else {
+        reqwest(`./days/schedule-${date}.html`).then(html => {
+            dateCache[date] = html;
+            render(html);
+        }).catch(err => {
+            errorEl.classList.add('has-error');
+            render('');
+        });
+    }
+}
+
+window.addEventListener('hashchange', changeDate);
+changeDate();
