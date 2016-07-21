@@ -38,6 +38,8 @@ function changeDate(date) {
         dateScheduleEl.innerHTML = html;
         dateScheduleEl.classList.remove('is-loading');
 
+        window.location.hash = '#' + date;
+
         filterDisciplines();
     }).catch(err => {
         dateScheduleEl.innerHTML = '';
@@ -57,4 +59,10 @@ dateScheduleEl.addEventListener('click', evt => {
     if (target.classList.contains('js-expand-results')) {
         target.parentNode.classList.toggle('is-expanded');
     }
+});
+
+window.addEventListener('hashchange', () => {
+    var date = window.location.hash.substring(1);
+    if (!/\d\d\d\d-\d\d-\d\d/.test(date)) date = startDate;
+    changeDate(date);
 });
