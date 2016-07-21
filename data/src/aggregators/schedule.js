@@ -278,7 +278,7 @@ export default {
                     return forceArray(ds.olympics.scheduledEvent)
                         .filter(evt => evt.discipline.event.eventUnit.unitType !== 'Not Applicable')
                         .map(parseScheduledEvent)
-                        .filter(evt => !!evt.start)
+                        .filter(evt => !!evt.start);
                 });
 
                 return _(dates)
