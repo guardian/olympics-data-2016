@@ -333,25 +333,24 @@ a {
     }
 }
 
-.om-entrant__split {
-    &::before {
-        content: "";
-        display: inline-block;
-        width: 6px;
-        height: 6px;
-        border: 2px solid white;
-        border-radius: 100px;
-        background-color: #efefef;
-        vertical-align: middle;
-    }
+.om-entrant__splits {
+    border-left: 1px dotted #eaeaea;
+    white-space: nowrap;
+    text-align: center;
+}
 
-    &.om-entrant__split--first {
-        border-left: 1px dotted #eaeaea;
-    }
+.om-entrant__split {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border: 2px solid white;
+    border-radius: 100px;
+    background-color: #efefef;
+    vertical-align: middle;
 
     $positionColors: (pos-1: $gold, pos-2: $silver, pos-3: $bronze, qual: #4a7801);
     @each $pos, $color in $positionColors {
-        &.om-entrant__split--#{$pos}::before {
+        &.om-entrant__split--#{$pos} {
             background-color: transparent;
             border-color: $color;
         }

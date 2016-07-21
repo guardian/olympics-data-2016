@@ -5,7 +5,7 @@ const roundDisciplines = {
     'badminton': 'Game Scores',
     'basketball': 'Quarter Scores',
     'beach-volleyball': 'Set Scores',
-    'boxing': 'Round Scores',
+    //'boxing': 'Round Scores', has strange round scoring
     'football': 'Period Scores',
     'handball': 'Period Scores',
     'hockey': 'Period Scores',
@@ -144,30 +144,32 @@ function parseResult(eventUnit) {
 }
 
 const resultReducers = [
-    // Reaction times/wind speed
+    // Reaction times/wind speed/average speeds
     result => {
         let entrants = result.entrants.map(entrant => {
             let reactionExtension = entrant.resultExtensions['Reaction Time'] || {};
             let windSpeedExtension = entrant.resultExtensions['Wind Speed'] || {};
+            let averageSpeedExtension = entrant.resultExtensions['Average Speed'] || {};
 
             return {
                 ...entrant,
                 'reactionTime': reactionExtension.value,
-                'windSpeed': forceArray(windSpeedExtension.value)[0]
+                'windSpeed': forceArray(windSpeedExtension.value)[0],
+                'averageSpeed': averageSpeedExtension.value
             };
         });
 
         let hasReactionTime = !!entrants.find(e => e.reactionTime !== undefined);
         let hasWindSpeed = !!entrants.find(e => e.windSpeed !== undefined);
+        let hasAverageSpeed = !!entrants.find(e => e.averageSpeed !== undefined);
 
-        return {...result, entrants, hasReactionTime, hasWindSpeed};
+        return {...result, entrants, hasReactionTime, hasWindSpeed, hasAverageSpeed};
     },
     // Split/intermediate times
     result => {
         let entrants = result.entrants.map(entrant => {
             let splitExtension = entrant.resultExtensions['Split Times'] ||
                 entrant.resultExtensions['Intermediate Times'] ||
-                entrant.resultExtensions['Mark Breakdown'] ||
                 {};
             let splits = forceArray(splitExtension.extension)
                 .sort((a, b) => +a.position - b.position)
@@ -197,11 +199,7 @@ const resultReducers = [
         });
 
         let splitTypes = entrants.map(e => {
-            return e.resultExtensions['Mark Breakdown'] ?
-                'Marks' :
-                e.resultExtensions['Intermediate Times'] ?
-                    'Intermediates' :
-                    'Splits';
+            return e.resultExtensions['Intermediate Times'] ? 'Intermediates' : 'Splits';
         });
 
         let splitType = _.uniq(splitTypes)[0];
