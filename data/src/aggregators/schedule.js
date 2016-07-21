@@ -80,6 +80,11 @@ function combineEvents(evts) {
 }
 
 function parseScheduledEvent(evt) {
+    // try to guard against all possible data problems
+    if (!evt.start || !evt.discipline || !evt.discipline.event || !evt.discipline.event.eventUnit) {
+        return {};
+    }
+
     return {
         'description': evt.description,
         'start': evt.start.utc,
@@ -272,7 +277,8 @@ export default {
                 let datesEvents = dateSchedules.map(ds => {
                     return forceArray(ds.olympics.scheduledEvent)
                         .filter(evt => evt.discipline.event.eventUnit.unitType !== 'Not Applicable')
-                        .map(parseScheduledEvent);
+                        .map(parseScheduledEvent)
+                        .filter(evt => !!evt.start)
                 });
 
                 return _(dates)
