@@ -10,7 +10,15 @@
             Day {{ schedule.day.dateNo + 1 }} of {{ scheduleByDay.length }}
         </p>
     </div>
-    {% for discipline in schedule.disciplines %}
+
+    {% if view === 'results' %}
+        <!-- weird hack without which state-mutating reverse filter would get applied even in else case -->
+        {% set disciplines = Array.from(schedule.disciplines) | sortDisciplines %}
+    {% else %}
+        {% set disciplines = schedule.disciplines %}
+    {% endif %}
+
+    {% for discipline in disciplines %}
         <div class="om-discipline js-discipline" data-discipline="{{ discipline.identifier }}" >
             <h4 class="om-discipline__name">{{ discipline.description }}</h4>
             {% if discipline.venues.length === 1 %}
@@ -19,7 +27,13 @@
                 <p class="om-discipline__venue">Multiple venues</p>
             {% endif %}
             <ul class="om-events">
-                {% for event in discipline.events %}
+                {% if view === 'results' %}
+                    {% set events = Array.from(discipline.events) | sortEvents %}
+                {% else %}
+                    {% set events = discipline.events %}
+                {% endif %}
+
+                {% for event in events %}
                     <li class="om-event {% if event.status === 'Finished' %}om-event--finished{% endif %}">
                         <time class="om-event__time" datetime="{{ event.start }}">
                             {{ event.start|datefmt('HH:mm') }}

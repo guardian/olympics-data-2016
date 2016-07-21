@@ -93,7 +93,7 @@ function parseScheduledEvent(evt) {
         'venue': evt.venue,
         'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
         'phase': evt.discipline.event.eventUnit.phaseDescription,
-        'event': _.pick(evt.discipline.event, ['description']),
+        'event': _.pick(evt.discipline.event, ['identifier', 'description']),
         'discipline': _.pick(evt.discipline, ['identifier', 'description']),
         'resultAvailable': evt.resultAvailable,
         'startListAvailable': evt.startListAvailable
@@ -290,7 +290,28 @@ export default {
                     .valueOf();
             }
         },
+        {
+            'name' : 'eventDetails',
+            'dependencies' : ({events}) => _.map(events, v => {
+                return `olympics/2016-summer-olympics/event/${v.event.identifier}`
+            }),
+            'process' : ({}, fullEvents) => {
+
+                let flat = _(fullEvents)
+                    .map(fe => fe.olympics.event)
+                    .map(fe => {
+                        return [ fe.identifier, {
+                            gender : fe.gender
+                        }]
+                    })
+                    .fromPairs()
+                    .valueOf()
+
+                return flat
+            }
+        },
         /*{
+        {
             'name': 'startLists',
             'dependencies': ({events}) => {
                 return _.values(events)
@@ -324,6 +345,11 @@ export default {
                     .mapValues(parseResult)
                     .valueOf();
             }
+        },
+        {
+            'name' : 'countries',
+            'dependencies' : () => ['olympics/2016-summer-olympics/country'],
+            'process' : ({}, [countries]) => countries.olympics.country
         }
     ],
     'outputs': [
@@ -341,10 +367,15 @@ export default {
                             .map(disciplineEvents => {
                                 let events = combineEvents(disciplineEvents);
                                 let venues = _(events).map('venue').uniqBy('identifier').valueOf();
+
+                                disciplineEvents.map(de => {
+                                    console.log(de)
+                                })
+
                                 return {
                                     'identifier': disciplineEvents[0].discipline.identifier,
                                     'description': disciplineEvents[0].discipline.description,
-                                    events, venues
+                                    events, venues, results : disciplineEvents.some(de => de.resultAvailable === 'Yes')
                                 };
                             })
                             .sortBy('description')
@@ -360,8 +391,8 @@ export default {
         },
         {
             'name': 'medalTable',
-            'process': ({results}) => {
-                let countries = _(results)
+            'process': ({results, countries}) => {
+                let medalCountries = _(results)
                     .flatMap('entrants')
                     .filter(entrant => !!entrant.medal)
                     .groupBy('country.identifier')
@@ -384,8 +415,26 @@ export default {
                     )
                     .valueOf();
 
-                let medalTable = countries.map(c1 => {
-                    let position = countries.findIndex(c2 => _.isEqual(c1.medals, c2.medals)) + 1;
+                let noMedalCountries = _(countries)
+                    .filter(c1 => !medalCountries.find(c2 => c2.countryCode === c1.identifier))
+                    .map(c => {
+                        return {
+                            countryCode : c.identifier,
+                            medals : {
+                                gold : 0,
+                                silver : 0,
+                                bronze : 0
+                            },
+                            total : 0
+                        }
+                    })
+                    .sortBy(c => c.countryCode)
+                    .valueOf()
+
+                let allCountries = medalCountries.concat(noMedalCountries)
+
+                let medalTable = allCountries.map(c1 => {
+                    let position = allCountries.findIndex(c2 => _.isEqual(c1.medals, c2.medals)) + 1;
                     return {...c1, position};
                 });
 
@@ -394,20 +443,40 @@ export default {
         },
         {
             'name': 'medalsByCountry',
-            'process': ({events, results}) => {
-                return _(results)
+            'process': ({events, results, countries, eventDetails}) => {
+                let medals = _(results)
                     .filter(result => result.medalEvent)
                     .flatMap(result => {
+
                         return result.entrants
                             .filter(entrant => !!entrant.medal)
                             .map(entrant => {
-                                return {entrant, 'event': events[result.identifier]};
+                                return {entrant, 'event': events[result.identifier], 'eventDetails' : eventDetails[result.identifier.slice(0,-3)]};
                             });
                     })
                     .sortBy('event.end')
                     .reverse()
                     .groupBy('entrant.countryCode')
+                    .toPairs()
+                    .map(([code, medals]) => {
+                        return [code, {
+                            country : countries.find(c => c.identifier === code),
+                            medals
+                        }]
+                    })
+                    .fromPairs()
                     .valueOf();
+
+                let noMedals = _(countries)
+                    .filter(c => !(medals)[c.identifier])
+                    .map(c => [c.identifier, {
+                        country : c,
+                        medals : []
+                    }])
+                    .fromPairs()
+                    .valueOf()
+
+                return _.merge(medals, noMedals)
             }
         }
     ],

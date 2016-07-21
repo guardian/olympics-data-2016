@@ -71,7 +71,8 @@
 	}
 }
 
-.om-recent-el {
+.om-recent-medalist {
+	float: left;
 	vertical-align: top;
 	@include fs-textSans(3);
 }
@@ -165,10 +166,6 @@
 		content: '';
 		clear: both;
 	}
-}
-
-.om-table-row--hidden {
-	display: none;
 }
 
 .om-table-el {
@@ -290,7 +287,7 @@
 	}
 }
 
-.is-hidden {
+.om-is-hidden {
 	display: none;
 }
 

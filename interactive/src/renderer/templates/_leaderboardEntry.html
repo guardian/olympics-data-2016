@@ -1,5 +1,5 @@
-<li class='om-table-row {%if entry.position > 10 %} om-table-row--hidden {% endif %}'
-data-position='{{entry.position}}' data-id='{{entry.countryCode}}'>
+<li class='om-table-row {%if entry.position > 10 || entry.total === 0 %} om-is-hidden {% endif %}'
+data-position='{{entry.position}}' data-id='{{entry.countryCode}}' data-total='{{entry.total}}'>
     <div class='om-table-el om-table-el--position'>
         {{ entry.position }}.
     </div>

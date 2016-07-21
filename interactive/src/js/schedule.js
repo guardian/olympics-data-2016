@@ -6,6 +6,11 @@ let dateChoiceEl = $('.js-date-choice');
 let dateScheduleEl = $('.js-date-schedule');
 let errorEl = $('.js-error');
 
+// to load correct subtemplates
+let view = /result/.test($('.om-header__inner').innerHTML) ? 'results' : 'schedule'
+
+console.log(view)
+
 function filterDisciplines() {
     let identifier = disciplineChoiceEl.options[disciplineChoiceEl.selectedIndex].value;
 

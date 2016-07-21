@@ -27,6 +27,72 @@ swig.setFilter('entranttype', result => {
     else return '';
 });
 
+swig.setFilter('eventname', en => {
+    let out = 'the ' + en
+    if(en.endsWith('Women') || en.endsWith('Men')){
+        out += '\'s'
+    }
+    out += ' event'
+    return out
+})
+
+swig.setFilter('sortEvents', events => {
+    return events.sort((a, b) => {
+        return a.end < b.end ? 1 : -1
+    })
+})
+
+swig.setFilter('sortDisciplines', ds => {
+
+    let max = (events) => {
+        return Math.max(...events
+            .filter(e => e.end && e.resultAvailable === 'Yes')
+            .map(e => Date.parse(e.end))
+            )
+    }
+
+    return ds.sort((a, b) => {
+
+        return max(a.events) < max(b.events) ? 1 : -1
+    })
+})
+
+swig.setFilter('countryEntrant', medal => {
+
+    let entrant = medal.entrant
+
+    if(entrant.type === 'Individual') {
+        return `${entrant.competitors[0].fullName}`
+    } else if (entrant.competitors.length === 2) {
+        return `${entrant.competitors.map(c => c.lastName).join('/')}`;
+    } else {
+        if(medal.eventDetails.gender === 'Men'){
+            return 'Men\'s team'
+        } else if(medal.eventDetails.gender === 'Women'){
+            return 'Women\'s team'
+        } else {
+            return 'Mixed team'
+        }
+    }
+
+})
+
+swig.setFilter('ordinal', num => {
+    if([11,12,13].includes(num % 100)){
+        return num + 'th'
+    }
+    else if(num % 10 === 1){
+        return num + 'st'
+    }
+    else if(num % 10 === 2){
+        return num + 'nd'
+    }
+    else if(num % 10 === 3){
+        return num + 'rd'
+    }
+    return num + 'th'
+})
+
 async function readdir(d) {
     let g = glob();
     let files = await denodeify(g.readdir.bind(g))(d);
@@ -76,14 +142,20 @@ let renderTasks = [
     {
         'srcDir': 'medals/countries',
         'arrGetter': data => _.toPairs(data.medalsByCountry),
-        'context': ([code, medals]) => { return {medals}; },
-        'suffix': ([code, medals]) => code
+        'context': ([code, obj]) => { return {obj}; },
+        'suffix': ([code, obj]) => code
     },
     {
         'srcDir' : 'days',
         'arrGetter': data => data.scheduleByDay,
         'context': schedule => { return {schedule}; },
         'suffix': schedule => schedule.day.date
+    },
+    {
+        'srcDir' : 'days',
+        'arrGetter' : data => data.scheduleByDay,
+        'context' : schedule => { return { schedule, view : 'results'} },
+        'suffix' : schedule => 'results-' + schedule.day.date
     }
 ];
 

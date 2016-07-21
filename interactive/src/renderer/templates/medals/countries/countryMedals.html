@@ -1,42 +1,43 @@
-<h3 class='om-medaltable-row'>Your favourite country's medals</h3>
+<h3 class='om-medaltable-row'>{{ obj.country.name }}'s medals</h3>
 <div class='om-recent om-country-medals'>
 
-    Currently ranked Xth, with {{ medals.length }} medal{% if medals.length !== 1 %}s{% endif %}.
-    {% if medals.length > 0 %}
-        {% set recent = medals[0] %}
-        Most recently, {{ recent.entrant|entrantname }} won a {{ recent.entrant.medal }} medal
-        in {{ recent.event.description }} in {{ recent.event.discipline.description }}.
+    Currently ranked <span class='om-position-ordinal'></span>, with {{ obj.medals.length }} medal{% if obj.medals.length !== 1 %}s{% endif %}.
+    {% if obj.medals.length > 0 %}
+        {% set recent = obj.medals[0] %}
+        Most recently, {% if recent.entrant.competitors.length > 2 %} they {% else %} {{ recent | countryEntrant }} {% endif %} won a {{ recent.entrant.medal | lower }} medal
+        in {{ recent.event.event.description | eventname }} in {{ recent.event.discipline.description }}.
     {% endif %}
 
     <ol class='om-table om-table--favourite'>
        <!--  {% include './../../_leaderboardEntry.html' { 'entry' : entry } %} -->
     </ol>
 
-    {% if medals.length > 0 %}
+    {% if obj.medals.length > 0 %}
 
         <ul class='om-recent-events'>
-            {% for medal in medals %}
-                <li class='om-country-medal-entry om-recent-event {% if loop.index > 3 %} is-hidden {% endif %}'>
+            {% for medal in obj.medals %}
 
-                    <div class='om-country-timestamp'>{{ medal.event.end }}</div>
+                <li class='om-country-medal-entry om-recent-event {% if loop.index > 5 %} om-is-hidden {% endif %}'>
+
+                    <div class='om-country-timestamp' datetime='{{ medal.event.end }}'>{{ medal.event.end }}</div>
                     <div class='om-country-medal'>
-                        <span class="om-medal om-medal--{{medal.result.medal|lower}}"></span>
-                        <span class='om-medal-type'>{{ medal.result.medal }}</span>
+                        <span class="om-medal om-medal--{{medal.entrant.medal|lower}}"></span>
+                        <span class='om-medal-type'>{{ medal.entrant.medal }}</span>
                     </div>
                     <div class='om-country-eventname'>
                         {{ medal.event.discipline.description }},
-                        {{ medal.event.description }}
+                        {{ medal.event.event.description }}
                     </div>
-                    <div class='om-recent-el'>
+                    <div class='om-recent-medalist'>
                         <span class='om-medalist-name'>
-                            {{ medal.result.names }}
+                            {{ medal | countryEntrant }}
                         </span>
                     </div>
                 </li>
             {% endfor %}
         </ul>
 
-        {% if medals.length > 3 %}  
+        {% if obj.medals.length > 5 %}  
 
             <button class="js-country-medals-button om-expand-button">All medals</button>
 
