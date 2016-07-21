@@ -153,7 +153,7 @@ const resultReducers = [
             return {
                 ...entrant,
                 'reactionTime': reactionExtension.value,
-                'windSpeed': windSpeedExtension.value
+                'windSpeed': forceArray(windSpeedExtension.value)[0]
             };
         });
 
