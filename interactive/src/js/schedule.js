@@ -6,11 +6,6 @@ let dateChoiceEl = $('.js-date-choice');
 let dateScheduleEl = $('.js-date-schedule');
 let errorEl = $('.js-error');
 
-// to load correct subtemplates
-let view = /result/.test($('.om-header__inner').innerHTML) ? 'results' : 'schedule'
-
-console.log(view)
-
 function filterDisciplines() {
     let identifier = disciplineChoiceEl.options[disciplineChoiceEl.selectedIndex].value;
 
@@ -69,7 +64,8 @@ function changeDate() {
     if (dateCache[date]) {
         render(dateCache[date]);
     } else {
-        reqwest(`./days/schedule-${date}.html`).then(html => {
+        let url = isMedalTable ? `./days/schedule-results-${date}.html` : `./days/schedule-${date}.html`;
+        reqwest(url).then(html => {
             dateCache[date] = html;
             render(html);
         }).catch(err => {

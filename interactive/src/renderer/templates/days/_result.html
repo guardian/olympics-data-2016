@@ -21,7 +21,7 @@
             {% if result.hasWindSpeed %}<th class="om-entrant__extra">Wind speed</th>{% endif %}
             {% if result.hasReactionTime %}<th class="om-entrant__extra">Reaction time</th>{% endif %}
             {% if result.splitCount > 0 && result.splitCount <= 8 %}
-                <th class="om-entrant__header">{{ result.splitType }}</th>
+                <th class="om-entrant__header">Splits</th>
             {% endif %}
             {% for roundName in result.roundNames %}
                 <th class="om-entrant__header">{{ roundName }}</th>

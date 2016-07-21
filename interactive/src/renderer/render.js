@@ -36,10 +36,11 @@ swig.setFilter('eventname', en => {
     return out
 })
 
-swig.setFilter('sortEvents', events => {
-    return events.sort((a, b) => {
-        return a.end < b.end ? 1 : -1
-    })
+swig.setFilter('sortEvents', (events, type) => {
+    let sortFn = type === 'results' ?
+        ((a, b) => a.end < b.end ? 1 : -1) :
+        ((a, b) => a.start < b.start ? -1 : 1);
+    return events.slice().sort(sortFn);
 })
 
 swig.setFilter('sortDisciplines', ds => {
@@ -154,7 +155,7 @@ let renderTasks = [
     {
         'srcDir' : 'days',
         'arrGetter' : data => data.scheduleByDay,
-        'context' : schedule => { return { schedule, view : 'results'} },
+        'context' : schedule => { return {schedule, 'view': 'results'}; },
         'suffix' : schedule => 'results-' + schedule.day.date
     }
 ];

@@ -207,13 +207,7 @@ const resultReducers = [
             });
         });
 
-        let splitTypes = entrants.map(e => {
-            return e.resultExtensions['Intermediate Times'] ? 'Intermediates' : 'Splits';
-        });
-
-        let splitType = _.uniq(splitTypes)[0];
-
-        return {...result, entrants, splitCount, splitType};
+        return {...result, entrants, splitCount};
     },
     // Round scores
     result => {
