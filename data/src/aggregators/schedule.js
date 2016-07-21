@@ -175,7 +175,7 @@ const resultReducers = [
             return {...entrant, splits};
         });
 
-        let splitCount = _(entrants).map(e => e.splits.length).max();
+        let splitCount = _(entrants).map('splits.length').max();
         let splitTimes = _.range(0, splitCount)
             .map(splitNo => {
                 let times = entrants
