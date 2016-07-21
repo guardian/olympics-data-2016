@@ -368,10 +368,6 @@ export default {
                                 let events = combineEvents(disciplineEvents);
                                 let venues = _(events).map('venue').uniqBy('identifier').valueOf();
 
-                                disciplineEvents.map(de => {
-                                    console.log(de)
-                                })
-
                                 return {
                                     'identifier': disciplineEvents[0].discipline.identifier,
                                     'description': disciplineEvents[0].discipline.description,
@@ -456,15 +452,13 @@ export default {
                     })
                     .sortBy('event.end')
                     .reverse()
-                    .groupBy('entrant.countryCode')
-                    .toPairs()
-                    .map(([code, medals]) => {
-                        return [code, {
-                            country : countries.find(c => c.identifier === code),
+                    .groupBy('entrant.country.identifier')
+                    .mapValues((medals, code) => {
+                        return {
+                            country: countries.find(c => c.identifier === code),
                             medals
-                        }]
+                        }
                     })
-                    .fromPairs()
                     .valueOf();
 
                 let noMedals = _(countries)

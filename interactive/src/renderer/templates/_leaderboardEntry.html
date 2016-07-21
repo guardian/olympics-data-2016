@@ -1,12 +1,12 @@
 <li class='om-table-row {%if entry.position > 10 || entry.total === 0 %} om-is-hidden {% endif %}'
-data-position='{{entry.position}}' data-id='{{entry.countryCode}}' data-total='{{entry.total}}'>
+data-position='{{entry.position}}' data-id='{{entry.country.identifier}}' data-total='{{entry.total}}'>
     <div class='om-table-el om-table-el--position'>
         {{ entry.position }}.
     </div>
-    <div class='om-table-el om-table-el--flag om-flag om-flag--{{ entry.countryCode }}'>
+    <div class='om-table-el om-table-el--flag om-flag om-flag--{{ entry.country.identifier }}'>
     </div>
     <div class='om-table-el om-table-el--country'>
-        <span class='om-table-country-label'>{{ entry.countryCode }}</span>
+        <span class='om-table-country-label'>{{ entry.country.identifier }}</span>
     </div>
     <div class='om-table-el om-table-el--medal'>
         <div class="om-medal-white" style="transform:scale({{ entry.medals.gold|maskScale }})"></div>
