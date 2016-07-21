@@ -4,7 +4,7 @@
     Currently ranked <span class='om-position-ordinal'></span>, with {{ obj.medals.length }} medal{% if obj.medals.length !== 1 %}s{% endif %}.
     {% if obj.medals.length > 0 %}
         {% set recent = obj.medals[0] %}
-        Most recently, {% if recent.entrant.competitors.length > 2 %} the {% endif %} {{ recent | countryEntrant }} won a {{ recent.entrant.medal | lower }} medal
+        Most recently, {% if recent.entrant.competitors.length > 2 %} they {% else %} {{ recent | countryEntrant }} {% endif %} won a {{ recent.entrant.medal | lower }} medal
         in {{ recent.event.event.description | eventname }} in {{ recent.event.discipline.description }}.
     {% endif %}
 
