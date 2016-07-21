@@ -29,6 +29,7 @@ dateCache[startDate] = Promise.resolve(dateScheduleEl.innerHTML);
 
 function changeDate(date) {
     dateScheduleEl.classList.add('is-loading');
+    dateScheduleEl.classList.remove('has-error');
 
     let promise = dateCache[date] || reqwest(`./days/schedule-${date}.html`);
     promise.then(html => {
@@ -38,6 +39,10 @@ function changeDate(date) {
         dateScheduleEl.classList.remove('is-loading');
 
         filterDisciplines();
+    }).catch(err => {
+        dateScheduleEl.innerHTML = '';
+        dateScheduleEl.classList.add('has-error');
+        dateScheduleEl.classList.remove('is-loading');
     });
 }
 
