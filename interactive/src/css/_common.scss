@@ -128,6 +128,24 @@ a {
     }
 }
 
+.om-date-schedule {
+    position: relative;
+    &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background-color: transparent;
+        transition: background-color 0.1s linear;
+    }
+    &.is-loading::before {
+        z-index: 100;
+        background-color: transparentize(white, 0.8);
+    }
+}
+
 .om-section {
     position: relative;
     max-width: 660px;

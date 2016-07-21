@@ -4,6 +4,7 @@ import { $, $$ } from './lib/selector'
 let disciplineChoiceEl = $('.js-discipline-choice');
 let dateChoiceEl = $('.js-date-choice');
 let dateScheduleEl = $('.js-date-schedule');
+let loadingEl = $('.js-loading');
 
 function filterDisciplines() {
     let identifier = disciplineChoiceEl.options[disciplineChoiceEl.selectedIndex].value;
@@ -26,17 +27,24 @@ let dateCache = {};
 let startDate = dateScheduleEl.getAttribute('data-startdate');
 dateCache[startDate] = Promise.resolve(dateScheduleEl.innerHTML);
 
-dateChoiceEl.disabled = false;
-dateChoiceEl.addEventListener('change', () => {
-    let date = dateChoiceEl.options[dateChoiceEl.selectedIndex].value;
+function changeDate(date) {
+    dateScheduleEl.classList.add('is-loading');
 
     let promise = dateCache[date] || reqwest(`./days/schedule-${date}.html`);
     promise.then(html => {
-        dateScheduleEl.innerHTML = html;
-        filterDisciplines();
-
         dateCache[date] = Promise.resolve(html);
+
+        dateScheduleEl.innerHTML = html;
+        dateScheduleEl.classList.remove('is-loading');
+
+        filterDisciplines();
     });
+}
+
+dateChoiceEl.disabled = false;
+dateChoiceEl.addEventListener('change', () => {
+    let date = dateChoiceEl.options[dateChoiceEl.selectedIndex].value;
+    changeDate(date);
 });
 
 dateScheduleEl.addEventListener('click', evt => {
