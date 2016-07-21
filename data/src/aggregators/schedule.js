@@ -341,6 +341,7 @@ export default {
                                     events, venues
                                 };
                             })
+                            .sortBy('description')
                             .valueOf();
 
                         return {day, disciplines};

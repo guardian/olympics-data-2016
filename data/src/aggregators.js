@@ -8,7 +8,9 @@ export default [
         'inputs': [{
             'name': 'disciplines',
             'dependencies': () => ['olympics/2016-summer-olympics/discipline'],
-            'process': (a, [disciplines]) => disciplines.olympics.discipline
+            'process': (a, [disciplines]) => {
+                return disciplines.olympics.discipline.sort((a, b) => a.description < b.description ? -1 : 1);
+            }
         }],
         'outputs': [],
         'cacheTime': moment.duration(14, 'days')
@@ -18,7 +20,9 @@ export default [
         'inputs': [{
             'name' : 'countries',
             'dependencies' : () => ['olympics/2016-summer-olympics/country'],
-            'process' : ({}, [countries]) => countries.olympics.country
+            'process' : ({}, [countries]) => {
+                return countries.olympics.country.sort((a, b) => a.name < b.name ? -1 : 1);
+            }
         }],
         'outputs': [],
         'cacheTime' : moment.duration(14, 'days')
