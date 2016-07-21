@@ -1,13 +1,6 @@
 import reqwest from 'reqwest'
 import { $, $$ } from './lib/selector'
 
-// reqwest promises suck, wrap them in a real one
-function reqwestP(opts) {
-    return new Promise((resolve, reject) => {
-        reqwest(opts).then(resolve).catch(reject);
-    });
-}
-
 let disciplineChoiceEl = $('.js-discipline-choice');
 let dateChoiceEl = $('.js-date-choice');
 let dateScheduleEl = $('.js-date-schedule');
@@ -32,42 +25,12 @@ disciplineChoiceEl.addEventListener('change', filterDisciplines);
 
 let dateCache = {};
 let startDate = dateScheduleEl.getAttribute('data-startdate');
-dateCache[startDate] = Promise.resolve(dateScheduleEl.innerHTML);
-
-function changeDate(date) {
-    dateScheduleEl.classList.add('is-loading');
-    errorEl.classList.remove('has-error');
-
-    let datePromise = dateCache[date] || reqwestP(`./days/schedule-${date}.html`);
-
-    datePromise.then(html => {
-        dateCache[date] = Promise.resolve(html);
-        return html;
-    }).catch(err => {
-        dateScheduleEl.innerHTML = '';
-        errorEl.classList.add('has-error');
-        return '';
-    }).then(html => {
-        dateScheduleEl.innerHTML = html;
-        dateScheduleEl.classList.remove('is-loading');
-
-        window.location.hash = '#' + date;
-
-        for (let i = 0; i < dateChoiceEl.options.length; i++) {
-            if (dateChoiceEl.options[i].value === date) {
-                dateChoiceEl.selectedIndex = i;
-                break;
-            }
-        }
-
-        filterDisciplines();
-    });
-}
+dateCache[startDate] = dateScheduleEl.innerHTML;
 
 dateChoiceEl.disabled = false;
 dateChoiceEl.addEventListener('change', () => {
     let date = dateChoiceEl.options[dateChoiceEl.selectedIndex].value;
-    changeDate(date);
+    window.location.hash = '#' + date;
 });
 
 dateScheduleEl.addEventListener('click', evt => {
@@ -77,10 +40,39 @@ dateScheduleEl.addEventListener('click', evt => {
     }
 });
 
-function checkHash() {
-    var date = window.location.hash.substring(1);
+function changeDate() {
+    let date = window.location.hash.substring(1);
     if (!/\d{4}-\d{2}-\d{2}/.test(date)) date = startDate;
-    changeDate(date);
+
+    dateScheduleEl.classList.add('is-loading');
+    errorEl.classList.remove('has-error');
+
+    function render(html) {
+        dateScheduleEl.innerHTML = html;
+        dateScheduleEl.classList.remove('is-loading');
+
+        for (let i = 0; i < dateChoiceEl.options.length; i++) {
+            if (dateChoiceEl.options[i].value === date) {
+                dateChoiceEl.selectedIndex = i;
+                break;
+            }
+        }
+
+        filterDisciplines();
+    }
+
+    if (dateCache[date]) {
+        render(dateCache[date]);
+    } else {
+        reqwest(`./days/schedule-${date}.html`).then(html => {
+            dateCache[date] = html;
+            render(html);
+        }).catch(err => {
+            errorEl.classList.add('has-error');
+            render('');
+        });
+    }
 }
-window.addEventListener('hashchange', checkHash);
-checkHash();
+
+window.addEventListener('hashchange', changeDate);
+changeDate();
