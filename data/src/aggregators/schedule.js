@@ -167,6 +167,7 @@ const resultReducers = [
         let entrants = result.entrants.map(entrant => {
             let splitExtension = entrant.resultExtensions['Split Times'] ||
                 entrant.resultExtensions['Intermediate Times'] ||
+                entrant.resultExtensions['Mark Breakdown'] ||
                 {};
             let splits = forceArray(splitExtension.extension)
                 .sort((a, b) => +a.position - b.position)
@@ -195,7 +196,17 @@ const resultReducers = [
             });
         });
 
-        return {...result, entrants, splitCount};
+        let splitTypes = entrants.map(e => {
+            return e.resultExtensions['Mark Breakdown'] ?
+                'Marks' :
+                e.resultExtensions['Intermediate Times'] ?
+                    'Intermediates' :
+                    'Splits';
+        });
+
+        let splitType = _.uniq(splitTypes)[0];
+
+        return {...result, entrants, splitCount, splitType};
     },
     // Round scores
     result => {

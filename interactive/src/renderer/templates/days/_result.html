@@ -29,7 +29,9 @@
                 <th class="om-entrant__extra">Reaction time</th>
             {% endif %}
             {% if result.splitCount > 0 %}
-                <th class="om-entrant__header" colspan="{{ result.splitCount }}">Splits</th>
+                <th class="om-entrant__header" colspan="{{ result.splitCount }}">
+                    {{ result.splitType }}
+                </th>
             {% endif %}
             {% for roundName in result.roundNames %}
                 <th class="om-entrant__header">{{ roundName }}</th>
