@@ -9,6 +9,7 @@ const roundDisciplines = {
     'football': 'Period Scores',
     'handball': 'Period Scores',
     'hockey': 'Period Scores',
+    'rugby-sevens': 'Period Scores',
     'table-tennis': 'Game Scores',
     'tennis': 'Set Scores',
     'volleyball': 'Set Scores',
