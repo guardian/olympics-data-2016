@@ -38,6 +38,13 @@ function changeDate(date) {
         dateScheduleEl.innerHTML = html;
         dateScheduleEl.classList.remove('is-loading');
 
+        for (let i = 0; i < dateChoiceEl.options.length; i++) {
+            if (dateChoiceEl.options[i].value === date) {
+                dateChoiceEl.selectedIndex = i;
+                break;
+            }
+        }
+
         window.location.hash = '#' + date;
 
         filterDisciplines();
@@ -61,8 +68,10 @@ dateScheduleEl.addEventListener('click', evt => {
     }
 });
 
-window.addEventListener('hashchange', () => {
+function checkHash() {
     var date = window.location.hash.substring(1);
     if (!/\d\d\d\d-\d\d-\d\d/.test(date)) date = startDate;
     changeDate(date);
-});
+}
+window.addEventListener('hashchange', checkHash);
+checkHash();
