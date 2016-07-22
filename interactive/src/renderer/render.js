@@ -104,7 +104,7 @@ async function getAllData() {
     let data = {};
 
     (await readdir('../data/data-out/*.json')).map(file => {
-        data[path.basename(file, '.json')] = JSON.parse(fs.readFileSync(file));
+        data[path.basename(file, '.json')] = JSON.parse(fs.readFileSync(file)).data;
     });
 
     data.today = '2016-01-15';

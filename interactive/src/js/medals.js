@@ -46,7 +46,8 @@ function ordinal(num) {
 function changeCountry() {
 
     let identifier = cSelect.options[cSelect.selectedIndex].value
-    let p = countryCache[identifier] ? Promise.resolve(countryCache[identifier]) : Promise.resolve(reqwest(`./medals/countries/countryMedals-${identifier}.html`))
+    let p = countryCache[identifier] ? Promise.resolve(countryCache[identifier]) :
+        Promise.resolve(reqwest(`./medals/countries/countryMedals-${identifier}.html`))
 
     p.then(country => {
 

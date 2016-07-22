@@ -114,6 +114,7 @@ module.exports = function(grunt) {
                         src: [
                             '*.html', '*.css', '*.js', '*.js.map',
                             '*.json', 'days/*.html', 'embed/*.html',
+                            'medals/countries/*.html',
                             'data/*.json',
                             'assets/**/*'
                         ],

@@ -33,7 +33,10 @@ async function processInputs([input, ...inputs], data) {
     let contents = await Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
 
     let inputData = input.process(data, contents);
-    await writeData(input.name, inputData);
+    await writeData(input.name, {
+        'timestamp' : (new Date).toISOString(),
+        'data' : inputData
+    });
 
     return await processInputs(inputs, {...data, [input.name]: inputData});
 }
@@ -54,7 +57,10 @@ function aggregatorFn(aggregator) {
             let data = await processInputs(aggregator.inputs, {});
 
             await Promise.all(aggregator.outputs.map(output => {
-                let outputData = output.process(data);
+                let outputData = {
+                    'timestamp' : (new Date).toISOString(),
+                    'data' : output.process(data)
+                };
                 return writeData(output.name, outputData);
             }));
         } catch (err) {
