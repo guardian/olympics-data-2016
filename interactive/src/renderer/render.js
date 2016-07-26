@@ -88,6 +88,7 @@ async function getAllData() {
     data.today = '2016-01-15';
 
     data.scheduleToday = data.scheduleByDay.find(schedule => schedule.day.date === data.today);
+    data.resultsToday = data.resultsByDay.find(results => results.day.date === data.today);
 
     let maxMedalCount = _.max(data.medalTable.map(entry => _(entry.medals).values().max()));
     let scale = d3.scaleSqrt()

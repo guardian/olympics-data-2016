@@ -38,6 +38,19 @@ function canCombine(group, evt1) {
         moment(evt1.start).subtract(10, 'minutes').isSameOrBefore(evt2.end);
 }
 
+// Some strange guess work logic for the overall status
+// Thinking is: only Scheduled/Finished when everything is
+//              otherwise status of non Scheduled/Finished
+//              or just Running
+function combineStatuses(statuses) {
+    if (statuses.length === 1) {
+        return statuses[0];
+    } else {
+        let weirdStatuses = _.difference(statuses, ['Scheduled', 'Finished']);
+        return weirdStatuses.length === 1 ? weirdStatuses[0] : 'Running';
+    }
+}
+
 function combineEvents(evts) {
     let combinedEvents = _(evts)
         .sortBy(evt => `${evt.phase.identifier}:${evt.start}`)
@@ -48,28 +61,13 @@ function combineEvents(evts) {
         }, [])
         .map(group => {
             let first = group[0];
-            if (group.length === 1) {
-                return {...first, group};
-            } else {
-                let statuses = _.uniq(group.map(evt => evt.status));
-                let status;
-                // Some strange guess work logic for the overall status
-                // Thinking is: only Scheduled/Finished when everything is
-                //              otherwise status of non Scheduled/Finished
-                //              or just Running
-                if (statuses.length === 1) {
-                    status = statuses[0];
-                } else {
-                    let weirdStatuses = _.difference(statuses, ['Scheduled', 'Finished']);
-                    status = weirdStatuses.length === 1 ? weirdStatuses[0] : 'Running';
-                }
-
-                let description = `${first.event.description} ${first.phase.value}`;
-                let resultAvailable = group.some(evt => evt.resultAvailable);
-                let start = _.min(group.map(evt => evt.start));
-                let end = _.max(group.map(evt => evt.end));
-                return {...first, description, start, end, status, resultAvailable, group};
-            }
+            let description = group.length === 1 ?
+                first.description : `${first.event.description} ${first.phase.value}`;
+            let status = combineStatuses(evt.map(evt => evt.status));
+            let resultAvailable = group.some(evt => evt.resultAvailable);
+            let start = _.min(group.map(evt => evt.start));
+            let end = _.max(group.map(evt => evt.end));
+            return {...first, description, start, end, status, resultAvailable, group};
         });
 
     return combinedEvents;
