@@ -164,6 +164,7 @@ let renderTasks = [
 async function renderAll() {
     let data = await getAllData();
 
+    // Main templates
     mkdirp.sync('build');
 
     (await readdir('./src/renderer/templates/*.html')).forEach(template => {
@@ -177,10 +178,34 @@ async function renderAll() {
         fs.writeFileSync(`build/${name}.html`, html, 'utf8');
     });
 
+    // Tasks
     for (let task of renderTasks) {
         await renderTask(task, data);
     }
 
+    // Result JSON files
+    mkdirp.sync('build/days');
+
+    data.scheduleByDay.forEach(schedule => {
+
+        console.log(`Rendering days/results-${schedule.day.date}.json`);
+
+        let events = _(schedule.disciplines)
+            .flatMap('events')
+            .flatMap('group')
+            .filter(evt => !!data.results[evt.unit.identifier])
+            .keyBy('unit.identifier')
+            .mapValues(evt => {
+                return swig.renderFile('./src/renderer/templates/_result.html', {
+                    'result': data.results[evt.unit.identifier]
+                }).replace(/\s+/g, ' ');
+            })
+            .valueOf();
+
+        fs.writeFileSync(`build/days/results-${schedule.day.date}.json`, JSON.stringify(events, null, 2));
+    });
+
+    // Embed templates
     mkdirp.sync('build/embed');
 
     let embedCSS = fs.readFileSync('build/embed.css');

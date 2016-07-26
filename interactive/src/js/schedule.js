@@ -23,22 +23,16 @@ function filterDisciplines() {
 disciplineChoiceEl.disabled = false;
 disciplineChoiceEl.addEventListener('change', filterDisciplines);
 
-let dateCache = {};
-let startDate = dateScheduleEl.getAttribute('data-startdate');
-dateCache[startDate] = dateScheduleEl.innerHTML;
-
 dateChoiceEl.disabled = false;
 dateChoiceEl.addEventListener('change', () => {
     let date = dateChoiceEl.options[dateChoiceEl.selectedIndex].value;
     window.location.hash = '#' + date;
 });
 
-dateScheduleEl.addEventListener('click', evt => {
-    let target = evt.target;
-    if (target.classList.contains('js-expand-results')) {
-        target.parentNode.classList.toggle('is-expanded');
-    }
-});
+let dateCache = {};
+let resultsCache = {};
+let startDate = dateScheduleEl.getAttribute('data-startdate');
+dateCache[startDate] = dateScheduleEl.innerHTML;
 
 function changeDate() {
     let date = window.location.hash.substring(1);
@@ -47,7 +41,7 @@ function changeDate() {
     dateScheduleEl.classList.add('is-loading');
     errorEl.classList.remove('has-error');
 
-    function render(html) {
+    function step1Schedule(html) {
         dateScheduleEl.innerHTML = html;
         dateScheduleEl.classList.remove('is-loading');
 
@@ -59,16 +53,44 @@ function changeDate() {
         }
 
         filterDisciplines();
+
+        dateScheduleEl.classList.remove('is-expandable')
+
+        if (resultsCache[date]) {
+            step2Results(resultsCache[date]);
+        } else {
+            reqwest(`./days/results-${date}.json`).then(results => {
+                console.log(results);
+                resultsCache[date] = results;
+                step2Results(results);
+            });
+        }
+    }
+
+    function step2Results(results) {
+        $$(dateScheduleEl, '.js-expand-results').forEach(expandEl => {
+            let parentEl = expandEl.parentNode;
+
+            expandEl.addEventListener('click', () => {
+                $$(parentEl, '.js-result').map(el => {
+                    return {el, 'id': el.getAttribute('data-unit-id')};
+                }).forEach(unit => {
+                    unit.el.innerHTML = results[unit.id];
+                });
+                parentEl.classList.toggle('is-expanded');
+            });
+        });
+
+       dateScheduleEl.classList.add('is-expandable');
     }
 
     if (dateCache[date]) {
-        render(dateCache[date]);
+        step1Schedule(dateCache[date]);
     } else {
-
-        let url = isMedalTable ? `./days/schedule-results-${date}.html` : `./days/schedule-${date}.html`; //`./days/schedule-${date}.html`
+        let url = isMedalTable ? `./days/schedule-results-${date}.html` : `./days/schedule-${date}.html`;
         reqwest(url).then(html => {
             dateCache[date] = html;
-            render(html);
+            step1Schedule(html);
         }).catch(err => {
             errorEl.classList.add('has-error');
             render('');

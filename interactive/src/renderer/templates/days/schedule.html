@@ -21,9 +21,8 @@
             {% endif %}
             <ul class="om-events">
                 {% for event in discipline.events|sortEvents(view) %}
-
                     <li class="om-event {% if event.status === 'Finished' %}om-event--finished{% endif %}
-                    {% if event.medalEvent === 'Yes' %}om-event-medal{% endif %}">
+                               {% if event.medalEvent %}om-event-medal{% endif %}">
                         <time class="om-event__time" datetime="{{ event.start }}">
                             {{ event.start|datefmt('HH:mm') }}
                         </time>
@@ -41,7 +40,7 @@
                                     {% if event.group.length > 1 %}
                                         <span class="om-event__sub-name">{{ subEvent.description }}</span>
                                     {% endif %}
-                                    {% include '_result.html' {'result': result} %}
+                                    <div class="js-result" data-unit-id="{{ subEvent.unit.identifier }}"></div>
                                 </div>
                             {% endif %}
                         {% endfor %}
