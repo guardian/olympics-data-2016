@@ -250,6 +250,11 @@ const resultReducers = [
         let roundType = roundExtensionType.replace(' Scores', 's');
 
         return {...result, entrants, roundNames, roundType};
+    },
+    // Must be last, removes unprocessed API data
+    result => {
+        let entrants = result.entrants.map(entrant => _.omit(entrant, ['properties', 'resultExtensions']));
+        return {...result, entrants};
     }
 ];
 
