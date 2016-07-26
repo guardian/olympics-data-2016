@@ -36,29 +36,6 @@ swig.setFilter('eventname', en => {
     return out
 })
 
-swig.setFilter('sortEvents', (events, type) => {
-    let sortFn = type === 'results' ?
-        ((a, b) => a.end < b.end ? 1 : -1) :
-        ((a, b) => a.start < b.start ? -1 : 1);
-    return events.slice().sort(sortFn);
-})
-
-swig.setFilter('sortDisciplines', (ds, type) => {
-
-    let max = (events) => {
-        return Math.max(...events
-            .filter(e => e.end && e.resultAvailable === 'Yes')
-            .map(e => Date.parse(e.end))
-            )
-    }
-
-    let sortFn = (type === 'results') ? 
-        ((a, b) => max(a.events) < max(b.events) ? 1 : -1) :
-        ((a, b) => max(a.events) < max(b.events) ? -1 : 1)
-
-    return ds.slice().sort(sortFn);
-})
-
 swig.setFilter('countryEntrant', medal => {
 
     let entrant = medal.entrant
@@ -155,8 +132,8 @@ let renderTasks = [
     },
     {
         'srcDir' : 'days',
-        'arrGetter' : data => data.scheduleByDay,
-        'context' : schedule => { return {schedule, 'view': 'results'}; },
+        'arrGetter' : data => data.resultsByDay,
+        'context' : schedule => { return {schedule}; },
         'suffix' : schedule => 'results-' + schedule.day.date
     }
 ];

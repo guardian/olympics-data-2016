@@ -11,7 +11,7 @@
         </p>
     </div>
 
-    {% for discipline in schedule.disciplines|sortDisciplines(view) %}
+    {% for discipline in schedule.disciplines %}
         <div class="om-discipline js-discipline" data-discipline="{{ discipline.identifier }}" >
             <h4 class="om-discipline__name">{{ discipline.description }}</h4>
             {% if discipline.venues.length === 1 %}
@@ -20,7 +20,7 @@
                 <p class="om-discipline__venue">Multiple venues</p>
             {% endif %}
             <ul class="om-events">
-                {% for event in discipline.events|sortEvents(view) %}
+                {% for event in discipline.events %}
                     <li class="om-event {% if event.status === 'Finished' %}om-event--finished{% endif %}
                                {% if event.medalEvent %}om-event-medal{% endif %}">
                         <time class="om-event__time" datetime="{{ event.start }}">

@@ -70,10 +70,21 @@ function combineEvents(evts) {
                 let end = _.max(group.map(evt => evt.end));
                 return {...first, description, start, end, status, resultAvailable, group};
             }
-        })
-        .sort((a, b) => a.start < b.start ? -1 : 1);
+        });
 
     return combinedEvents;
+}
+
+function formatScheduleDiscipline(events) {
+    let discipline = events[0].discipline;
+    let venues = _(events).map('venue').uniqBy('identifier').valueOf();
+    let hasResults = events.some(evt => evt.resultAvailable);
+
+    return {
+        'identifier': discipline.identifier,
+        'description': discipline.description,
+        events, venues, hasResults
+    };
 }
 
 function parseScheduledEvent(evt) {
@@ -354,19 +365,11 @@ export default {
                     .groupBy('day.date')
                     .map(dateEvents => {
                         let day = dateEvents[0].day;
-
                         let disciplines = _(dateEvents)
                             .groupBy('discipline.identifier')
                             .map(disciplineEvents => {
-                                let events = combineEvents(disciplineEvents);
-                                let venues = _(events).map('venue').uniqBy('identifier').valueOf();
-
-                                return {
-                                    'identifier': disciplineEvents[0].discipline.identifier,
-                                    'description': disciplineEvents[0].discipline.description,
-                                    'hasResults': disciplineEvents.some(de => de.resultAvailable),
-                                    events, venues
-                                };
+                                let events = combineEvents(disciplineEvents).sort((a, b) => a.start < b.start ? -1 : 1);
+                                return formatScheduleDiscipline(events);
                             })
                             .sortBy('description')
                             .valueOf();
@@ -377,6 +380,31 @@ export default {
                     .valueOf();
 
                 return scheduleByDay;
+            }
+        },
+        {
+            'name': 'resultsByDay',
+            'process': ({events}) => {
+                let resultsByDay = _(events)
+                    .filter(evt => evt.resultAvailable)
+                    .groupBy('day.date')
+                    .map(dateEvents => {
+                        let day = dateEvents[0].day;
+                        let disciplines = _(dateEvents)
+                            .groupBy('discipline.identifier')
+                            .map(disciplineEvents => {
+                                let events = combineEvents(disciplineEvents).sort((a, b) => a.end < b.end ? 1 : -1);
+                                return formatScheduleDiscipline(events);
+                            })
+                            .orderBy(discipline => _(discipline.events).map('end').max(), 'desc')
+                            .valueOf();
+
+                        return {day, disciplines};
+                    })
+                    .sortBy('day.date')
+                    .valueOf();
+
+                return resultsByDay;
             }
         },
         {
