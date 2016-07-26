@@ -21,8 +21,9 @@
             {% endif %}
             <ul class="om-events">
                 {% for event in discipline.events %}
-                    <li class="om-event {% if event.status === 'Finished' %}om-event--finished{% endif %}
-                               {% if event.medalEvent %}om-event-medal{% endif %}">
+                    <li class="om-event
+                               {% if event.status === 'Finished' %}om-event--finished{% endif %}
+                               {% if event.resultAvailable %}om-event--results{% endif %}">
                         <time class="om-event__time" datetime="{{ event.start }}">
                             {{ event.start|datefmt('HH:mm') }}
                         </time>
@@ -35,14 +36,16 @@
                         <span class="om-event__id">{{ event.unit.identifier }}</span>
                         {% if event.resultAvailable %}
                             {% for subEvent in event.group  %}
-                                {% if subEvent.resultAvailable %}
-                                    <div class="om-event__result">
-                                        {% if event.group.length > 1 %}
-                                            <span class="om-event__sub-name">{{ subEvent.description }}</span>
-                                        {% endif %}
+                                <div class="om-event__result">
+                                    {% if event.group.length > 1 %}
+                                        <div class="om-event__sub-name">{{ subEvent.description }}</div>
+                                    {% endif %}
+                                    {% if subEvent.resultAvailable %}
                                         <div class="js-result" data-unit-id="{{ subEvent.unit.identifier }}"></div>
-                                    </div>
-                                {% endif %}
+                                    {% else %}
+                                        <div>Results still to come</div>
+                                    {% endif %}
+                                </div>
                             {% endfor %}
                             <div class="om-event__clicker js-expand-results"></div>
                         {% endif %}

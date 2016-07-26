@@ -52,6 +52,8 @@ function changeDate() {
             }
         }
 
+        if (!html) return;
+
         filterDisciplines();
 
         dateScheduleEl.classList.remove('is-expandable')
@@ -92,7 +94,7 @@ function changeDate() {
             step1Schedule(html);
         }).catch(err => {
             errorEl.classList.add('has-error');
-            render('');
+            step1Schedule('');
         });
     }
 }

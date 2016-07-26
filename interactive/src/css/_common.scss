@@ -455,15 +455,20 @@ a {
     background-size: 100% 100%;
 
     display: none;
+
+    .om-event:not(.om-event--finished) & {
+        background-image: url(assets/imgs/clock.svg);
+        display: block;
+    }
+
     .is-expandable & {
         display: block;
     }
 
-    background-image: url(assets/imgs/clock.svg);
-    .om-event--finished & {
+    .om-event.om-event--results & {
         background-image: url(assets/imgs/plus.svg);
     }
-    .om-event--finished.is-expanded & {
+    .om-event.om-event--results.is-expanded & {
         background-image: url(assets/imgs/minus.svg);
     }
 }
