@@ -65,7 +65,7 @@ function changeDate() {
         render(dateCache[date]);
     } else {
 
-        let url = `./days/schedule-${date}.html` // isMedalTable ? `./days/schedule-results-${date}.html` : `./days/schedule-${date}.html`;
+        let url = isMedalTable ? `./days/schedule-results-${date}.html` : `./days/schedule-${date}.html`; //`./days/schedule-${date}.html`
         reqwest(url).then(html => {
             dateCache[date] = html;
             render(html);

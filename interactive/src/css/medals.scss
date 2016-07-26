@@ -148,6 +148,9 @@
 
 .om-table-row {
 	margin: 24px 0;
+
+	padding-left: 100px;
+	padding-right: 20px;
 	position: relative;
 
 	&:before {
@@ -168,6 +171,11 @@
 	}
 }
 
+.om-table-left-area {
+	position: absolute;
+	left: 0;
+}
+
 .om-table-el {
 	float: left;
 	position: relative;
@@ -175,8 +183,9 @@
 
 .om-table-el--position {
 	@include fs-headline(2);
+	text-align: right;
 	padding-right: 8px;
-	width: 25px;
+	width: 16px;
 	float: left;
 	background-color: white;
 }
@@ -195,17 +204,18 @@
 }
 
 .om-table-el--medal {
-	width: 22%;
+	width: 30%;
 	position: relative;
 	text-align: center;
 }
 
 .om-table-el--total {
 	@include fs-headline(2);
+	position: absolute;
+	right: 0;
 	font-weight: bold;
 	text-align: right;
-	padding: 0 8px;
-	float: right;
+	padding-left: 6px;
 	background-color: white;
 }
 

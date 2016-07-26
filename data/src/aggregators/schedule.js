@@ -96,7 +96,8 @@ function parseScheduledEvent(evt) {
         'event': _.pick(evt.discipline.event, ['identifier', 'description']),
         'discipline': _.pick(evt.discipline, ['identifier', 'description']),
         'resultAvailable': evt.resultAvailable,
-        'startListAvailable': evt.startListAvailable
+        'startListAvailable': evt.startListAvailable,
+        'medalEvent': evt.medalEvent
     };
 }
 
@@ -409,7 +410,7 @@ export default {
                     .filter(c1 => !medalCountries.find(c2 => c2.countryCode === c1.identifier))
                     .map(c => {
                         return {
-                            countryCode : c.identifier,
+                            country : c,
                             medals : {
                                 gold : 0,
                                 silver : 0,

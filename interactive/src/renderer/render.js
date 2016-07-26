@@ -43,7 +43,7 @@ swig.setFilter('sortEvents', (events, type) => {
     return events.slice().sort(sortFn);
 })
 
-swig.setFilter('sortDisciplines', ds => {
+swig.setFilter('sortDisciplines', (ds, type) => {
 
     let max = (events) => {
         return Math.max(...events
@@ -52,10 +52,11 @@ swig.setFilter('sortDisciplines', ds => {
             )
     }
 
-    return ds.sort((a, b) => {
+    let sortFn = (type === 'results') ? 
+        ((a, b) => max(a.events) < max(b.events) ? 1 : -1) :
+        ((a, b) => max(a.events) < max(b.events) ? -1 : 1)
 
-        return max(a.events) < max(b.events) ? 1 : -1
-    })
+    return ds.slice().sort(sortFn);
 })
 
 swig.setFilter('countryEntrant', medal => {
