@@ -19,8 +19,8 @@
     </div>
 </div>
 <div class="om-container">
-    <div class="om-date-schedule js-date-schedule" data-startdate="{{ today.day.date }}">
-        {% include './days/schedule.html' {'schedule': today} %}
+    <div class="om-date-schedule js-date-schedule" data-startdate="{{ eventsToday.day.date }}">
+        {% include './days/schedule.html' {'schedule': eventsToday} %}
     </div>
     <div class="om-section om-error js-error">
         <h3 class="om-section__title">Error</h3>
