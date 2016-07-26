@@ -78,12 +78,11 @@ function combineEvents(evts) {
 function formatScheduleDiscipline(events) {
     let discipline = events[0].discipline;
     let venues = _(events).map('venue').uniqBy('identifier').valueOf();
-    let hasResults = events.some(evt => evt.resultAvailable);
 
     return {
         'identifier': discipline.identifier,
         'description': discipline.description,
-        events, venues, hasResults
+        events, venues
     };
 }
 
