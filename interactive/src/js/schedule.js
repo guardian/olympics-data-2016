@@ -60,7 +60,6 @@ function changeDate() {
             step2Results(resultsCache[date]);
         } else {
             reqwest(`./days/results-${date}.json`).then(results => {
-                console.log(results);
                 resultsCache[date] = results;
                 step2Results(results);
             });

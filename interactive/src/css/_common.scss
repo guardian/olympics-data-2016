@@ -454,6 +454,11 @@ a {
     height: 16px;
     background-size: 100% 100%;
 
+    display: none;
+    .is-expandable & {
+        display: block;
+    }
+
     background-image: url(assets/imgs/clock.svg);
     .om-event--finished & {
         background-image: url(assets/imgs/plus.svg);
@@ -470,5 +475,7 @@ a {
     right: 0;
     top: 0;
     bottom: 0;
-    cursor: pointer;
+    .is-expandable & {
+        cursor: pointer;
+    }
 }
