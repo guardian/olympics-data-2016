@@ -60,12 +60,8 @@ function combineEvents(evts) {
                 if (statuses.length === 1) {
                     status = statuses[0];
                 } else {
-                    let weirdStatuses = _.difference(statuses, 'Scheduled', 'Finished');
-                    if (weirdStatuses.length === 1) {
-                        status = wierdStatuses[0];
-                    } else {
-                        status = 'Running';
-                    }
+                    let weirdStatuses = _.difference(statuses, ['Scheduled', 'Finished']);
+                    status = weirdStatuses.length === 1 ? weirdStatuses[0] : 'Running';
                 }
 
                 let description = `${first.event.description} ${first.phase.value}`;
@@ -109,11 +105,7 @@ function parseValue(value) {
 }
 
 function parseEntrant(entrant) {
-    let properties = _(forceArray(entrant.property))
-        .keyBy('type')
-        .mapValues('value')
-        .valueOf();
-
+    let properties = _(forceArray(entrant.property)).keyBy('type').mapValues('value').valueOf();
     let resultExtensions = _.keyBy(forceArray(entrant.resultExtension), 'type');
 
     return {

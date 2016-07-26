@@ -89,6 +89,7 @@ function run(aggregatorTickers) {
     });
 
     app.use('/cache', express.static(config.pa.cacheDir));
+    app.use('/logs', express.static('logs'));
 
     app.listen(3000, () => logger.info('Listening on port 3000'));
 }
