@@ -65,9 +65,10 @@ function combineEvents(evts) {
                 }
 
                 let description = `${first.event.description} ${first.phase.value}`;
+                let resultAvailable = group.some(evt => evt.resultAvailable);
                 let start = _.min(group.map(evt => evt.start));
                 let end = _.max(group.map(evt => evt.end));
-                return {...first, description, start, end, status, group};
+                return {...first, description, start, end, status, resultAvailable, group};
             }
         })
         .sort((a, b) => a.start < b.start ? -1 : 1);
@@ -91,9 +92,9 @@ function parseScheduledEvent(evt) {
         'phase': evt.discipline.event.eventUnit.phaseDescription,
         'event': _.pick(evt.discipline.event, ['identifier', 'description']),
         'discipline': _.pick(evt.discipline, ['identifier', 'description']),
-        'resultAvailable': evt.resultAvailable,
-        'startListAvailable': evt.startListAvailable,
-        'medalEvent': evt.medalEvent
+        'resultAvailable': evt.resultAvailable === 'Yes',
+        'startListAvailable': evt.startListAvailable === 'Yes',
+        'medalEvent': evt.medalEvent === 'Yes'
     };
 }
 
@@ -307,7 +308,7 @@ export default {
             'name': 'startLists',
             'dependencies': ({events}) => {
                 return _.values(events)
-                    .filter(evt => evt.startListAvailable === 'Yes')
+                    .filter(evt => evt.startListAvailable)
                     .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/start-list`);
             },
             'process': ({}, startLists) => {
@@ -327,7 +328,7 @@ export default {
             'name': 'results',
             'dependencies': ({events}) => {
                 return _.values(events)
-                    .filter(evt => evt.resultAvailable === 'Yes')
+                    .filter(evt => evt.resultAvailable)
                     .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/result`);
             },
             'process': ({}, results) => {
@@ -363,7 +364,8 @@ export default {
                                 return {
                                     'identifier': disciplineEvents[0].discipline.identifier,
                                     'description': disciplineEvents[0].discipline.description,
-                                    events, venues, results : disciplineEvents.some(de => de.resultAvailable === 'Yes')
+                                    'hasResults': disciplineEvents.some(de => de.resultAvailable),
+                                    events, venues
                                 };
                             })
                             .sortBy('description')
