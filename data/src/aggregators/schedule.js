@@ -1,8 +1,6 @@
 import _ from 'lodash'
 import moment from 'moment'
 
-import notify from '../notify'
-
 const roundDisciplines = {
     'badminton': 'Game Scores',
     'basketball': 'Quarter Scores',

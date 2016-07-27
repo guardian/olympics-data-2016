@@ -55,7 +55,7 @@ function aggregatorFn(aggregator) {
             logger[fn](`Error processing ${combiner.name} - ${err}, stack trace:`);
             logger[fn](err.stack);
             if (argv.notify) {
-                notify.send(`Error processing ${combiner.name}`, util.inspect(err));
+                notify.error(err);
             }
 
             if (combiner.required) {
