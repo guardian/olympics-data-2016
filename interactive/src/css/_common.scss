@@ -108,6 +108,17 @@ a {
     background-color: #fded80;
 }
 
+.om-filter__line {
+    display: block;
+    margin-bottom: 3px;
+    &:last-child {
+        margin-bottom: 0;
+    }
+    @include mq(mobileLandscape) {
+        display: inline;
+    }
+}
+
 .om-filter__choice {
     @include fs-header(1);
     background-color: #f7d603;
