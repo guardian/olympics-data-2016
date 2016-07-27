@@ -8,7 +8,13 @@ export default function(name) {
             new winston.transports.Console({
                 'formatter': options => {
                     let nameStr = `[${name}]`.blue;
-                    return `${moment().format()} ${`[${name}]`.blue} ${`${options.level}:`.bold} ${options.message}`;
+                    let level;
+                    switch (options.level) {
+                        case 'error': level = 'error'.red; break
+                        case 'warn': level = 'warn'.yellow; break;
+                        default: level = options.level;
+                    }
+                    return `${moment().format()} ${`[${name}]`.blue} ${`${level}:`.bold} ${options.message}`;
                 }
             }),
             new winston.transports.File({

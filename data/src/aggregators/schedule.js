@@ -1,6 +1,8 @@
 import _ from 'lodash'
 import moment from 'moment'
 
+import notify from '../notify'
+
 const roundDisciplines = {
     'badminton': 'Game Scores',
     'basketball': 'Quarter Scores',
@@ -85,25 +87,24 @@ function formatScheduleDiscipline(events) {
 }
 
 function parseScheduledEvent(evt) {
-    // try to guard against all possible data problems
-    if (!evt.start || !evt.discipline || !evt.discipline.event || !evt.discipline.event.eventUnit) {
+    try {
+        return {
+            'description': evt.description,
+            'start': evt.start.utc,
+            'end': evt.end && evt.end.utc,
+            'status': evt.status,
+            'venue': evt.venue,
+            'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
+            'phase': evt.discipline.event.eventUnit.phaseDescription,
+            'event': _.pick(evt.discipline.event, ['identifier', 'description']),
+            'discipline': _.pick(evt.discipline, ['identifier', 'description']),
+            'resultAvailable': evt.resultAvailable === 'Yes',
+            'startListAvailable': evt.startListAvailable === 'Yes',
+            'medalEvent': evt.medalEvent === 'Yes'
+        };
+    } catch (err) {
         return {};
     }
-
-    return {
-        'description': evt.description,
-        'start': evt.start.utc,
-        'end': evt.end && evt.end.utc,
-        'status': evt.status,
-        'venue': evt.venue,
-        'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
-        'phase': evt.discipline.event.eventUnit.phaseDescription,
-        'event': _.pick(evt.discipline.event, ['identifier', 'description']),
-        'discipline': _.pick(evt.discipline, ['identifier', 'description']),
-        'resultAvailable': evt.resultAvailable === 'Yes',
-        'startListAvailable': evt.startListAvailable === 'Yes',
-        'medalEvent': evt.medalEvent === 'Yes'
-    };
 }
 
 function parseValue(value) {
@@ -133,19 +134,28 @@ function parseEntrant(entrant) {
 }
 
 function parseResult(eventUnit) {
-    let entrants = forceArray(eventUnit.result.entrant)
-        .map(parseEntrant)
-        .sort((a, b) => a.order - b.order);
+    try {
+        let entrants = forceArray(eventUnit.result.entrant)
+            .map(parseEntrant)
+            .sort((a, b) => a.order - b.order);
 
-    let result = {
-        'identifier': eventUnit.identifier,
-        'discipline': eventUnit.disciplineDescription,
-        'medalEvent': eventUnit.medalEvent === 'Yes',
-        'teamEvent': eventUnit.teamEvent === 'Yes',
-        entrants
-    };
+        let result = {
+            'identifier': eventUnit.identifier,
+            'discipline': eventUnit.disciplineDescription,
+            'medalEvent': eventUnit.medalEvent === 'Yes',
+            'teamEvent': eventUnit.teamEvent === 'Yes',
+            entrants
+        };
 
-    return resultReducers.reduce((res, reducer) => reducer(res), result);
+        // Reducers are extra
+        try {
+            return resultReducers.reduce((res, reducer) => reducer(res), result);
+        } catch (err) {
+            return result;
+        }
+    } catch (err) {
+        return {};
+    }
 }
 
 const resultReducers = [
@@ -298,8 +308,9 @@ export default {
             'process': ({}, results) => {
                 return _(results)
                     .map('olympics.eventUnit')
+                    .map(parseResult)
+                    .filter(result => !!result.identifier)
                     .keyBy('identifier')
-                    .mapValues(parseResult)
                     .valueOf();
             }
         },
@@ -420,11 +431,11 @@ export default {
                     .uniq()
                     .valueOf();
             },
-            'process' : ({}, fullEvents) => {
-                return _(fullEvents)
+            'process' : ({}, eventDetails) => {
+                return _(eventDetails)
                     .map('olympics.event')
                     .keyBy('identifier')
-                    .mapValues(fe => { return {'gender': fe.gender}; })
+                    .mapValues(ed => { return {'gender': ed.gender}; })
                     .valueOf();
             }
         },
