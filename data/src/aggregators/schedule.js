@@ -63,7 +63,7 @@ function combineEvents(evts) {
             let first = group[0];
             let description = group.length === 1 ?
                 first.description : `${first.event.description} ${first.phase.value}`;
-            let status = combineStatuses(evt.map(evt => evt.status));
+            let status = combineStatuses(group.map(evt => evt.status));
             let resultAvailable = group.some(evt => evt.resultAvailable);
             let start = _.min(group.map(evt => evt.start));
             let end = _.max(group.map(evt => evt.end));
@@ -120,7 +120,6 @@ function parseEntrant(entrant) {
     return {
         'code': entrant.code,
         'order': parseInt(entrant.order),
-        'rank': parseInt(entrant.rank),
         'type': entrant.type,
         'competitors': forceArray(entrant.participant).map(p => p.competitor),
         'country': entrant.country,
@@ -129,9 +128,7 @@ function parseEntrant(entrant) {
         resultExtensions,
         'medal': properties['Medal Awarded'],
         'record': properties['Record Set'],
-        'winner': properties['Won Lost Tied'] === 'Won',
-        'invalidResultMark': properties['Invalid Result Mark'],
-        'qualified': (properties['Qualification Mark'] || '').startsWith('Qualified')
+        'invalidResultMark': properties['Invalid Result Mark']
     };
 }
 
@@ -140,15 +137,12 @@ function parseResult(eventUnit) {
         .map(parseEntrant)
         .sort((a, b) => a.order - b.order);
 
-    let qualificationSpots = entrants.filter(e => e.qualified).length;
-
     let result = {
         'identifier': eventUnit.identifier,
         'discipline': eventUnit.disciplineDescription,
         'medalEvent': eventUnit.medalEvent === 'Yes',
         'teamEvent': eventUnit.teamEvent === 'Yes',
-        entrants,
-        qualificationSpots
+        entrants
     };
 
     return resultReducers.reduce((res, reducer) => reducer(res), result);
@@ -204,8 +198,7 @@ const resultReducers = [
             entrant.splits = _.range(0, splitCount).map(splitNo => {
                 let split = entrant.splits[splitNo] || {};
                 let position = splitTimes[splitNo].indexOf(split.cmp) + 1;
-                let qualifying = position > 0 && position <= result.qualificationSpots;
-                return {...split, position, qualifying};
+                return {...split, position};
             });
         });
 
@@ -261,9 +254,11 @@ const resultReducers = [
 
 export default {
     'id': 'schedule',
-    'inputs': [
+    'cacheTime': moment.duration(5, 'minutes'),
+    'combiners': [
         {
             'name': 'dates',
+            'required': true,
             'dependencies': () => ['olympics/2016-summer-olympics/schedule'],
             'process': ({}, [schedule]) => {
                 return forceArray(schedule.olympics.schedule).map(s => s.date);
@@ -271,6 +266,7 @@ export default {
         },
         {
             'name': 'events',
+            'required': true,
             'dependencies': ({dates}) => {
                 return dates.map(date => `olympics/2016-summer-olympics/schedule/${date}`);
             },
@@ -298,20 +294,16 @@ export default {
                     .map(v => `olympics/2016-summer-olympics/event/${v.event.identifier}`)
                     .uniq()
                     .valueOf();
-            )},
+            },
             'process' : ({}, fullEvents) => {
-
-                let flat = _(fullEvents)
+                return _(fullEvents)
                     .map('olympics.event')
                     .keyBy('identifier')
-                    .mapValues(fe => { return {'gender': fe.gender}; });
-                    .valueOf()
-
-                return flat
+                    .mapValues(fe => { return {'gender': fe.gender}; })
+                    .valueOf();
             }
         },
         /*{
-        {
             'name': 'startLists',
             'dependencies': ({events}) => {
                 return _.values(events)
@@ -346,13 +338,6 @@ export default {
                     .valueOf();
             }
         },
-        {
-            'name' : 'countries',
-            'dependencies' : () => ['olympics/2016-summer-olympics/country'],
-            'process' : ({}, [countries]) => countries.olympics.country
-        }
-    ],
-    'outputs': [
         {
             'name': 'scheduleByDay',
             'process': ({events}) => {
@@ -405,12 +390,12 @@ export default {
         },
         {
             'name': 'medalTable',
-            'process': ({results, countries}) => {
+            'process': ({results}) => {
                 let medalCountries = _(results)
                     .flatMap('entrants')
                     .filter(entrant => !!entrant.medal)
                     .groupBy('country.identifier')
-                    .map((countryEntrants, countryId) => {
+                    .map(countryEntrants => {
                         let country = countryEntrants[0].country;
                         let medals = _(['gold', 'silver', 'bronze'])
                             .map(medal => {
@@ -424,36 +409,23 @@ export default {
                         return {country, medals, total};
                     })
                     .orderBy(
-                        ['medals.gold', 'medals.silver', 'medals.bronze', 'country.code'],
+                        ['medals.gold', 'medals.silver', 'medals.bronze', 'country.identifier'],
                         ['desc', 'desc', 'desc', 'asc']
                     )
                     .valueOf();
 
-                let noMedalCountries = _(countries)
-                    .filter(c1 => !medalCountries.find(c2 => c2.countryCode === c1.identifier))
-                    .map(c => {
-                        return {
-                            country : c,
-                            medals : {
-                                gold : 0,
-                                silver : 0,
-                                bronze : 0
-                            },
-                            total : 0
-                        }
-                    })
-                    .sortBy(c => c.countryCode)
-                    .valueOf()
-
-                let allCountries = medalCountries.concat(noMedalCountries)
-
-                let medalTable = allCountries.map(c1 => {
-                    let position = allCountries.findIndex(c2 => _.isEqual(c1.medals, c2.medals)) + 1;
+                let medalTable = medalCountries.map(c1 => {
+                    let position = medalCountries.findIndex(c2 => _.isEqual(c1.medals, c2.medals)) + 1;
                     return {...c1, position};
                 });
 
                 return medalTable;
             }
+        },
+        {
+            'name' : 'countries',
+            'dependencies' : () => ['olympics/2016-summer-olympics/country'],
+            'process' : ({}, [countries]) => countries.olympics.country
         },
         {
             'name': 'medalsByCountry',
@@ -490,7 +462,28 @@ export default {
 
                 return _.merge(medals, noMedals)
             }
-        }
+        },
     ],
-    'cacheTime': moment.duration(5, 'minutes')
+    'fallbackCombiners': [
+        {
+            'name': 'medalTable',
+            'dependencies': () => ['olympics/2016-summer-olympics/medal-table'],
+            'process': ({countries}, [medalTable]) => {
+                return forceArray(medalTable.olympics.games.medalTable.tableEntry)
+                    .map(entry => {
+                        let medals = _(['gold', 'silver', 'bronze'])
+                            .map(type => [type, parseInt(entry[type].value)])
+                            .fromPairs()
+                            .valueOf();
+
+                        return {
+                            'country': entry.country,
+                            'medals': medals,
+                            'total': parseInt(entry.total.value),
+                            'position': parseInt(entry.position)
+                        };
+                    });
+            }
+        }
+    ]
 };
