@@ -6,19 +6,16 @@ import './schedule'
 
 let lbButton = $('.js-leaderboard-button')
 let rButton = $('.js-recent-button')
-let countries = $$('.om-table-row')
+let tableEl = $('.js-table');
+let emptyRowEl = $('.js-row-empty');
 
 let countryCache = {}
 
 RelativeTime.setNow(Date.now())
 
 lbButton.addEventListener('click', e => {
-    countries
-    .filter(el => el.getAttribute('data-position') > 10 && parseInt(el.getAttribute('data-total')) !== 0)
-    .forEach(function(el){
-        el.classList.toggle('om-is-hidden')
-    })
     lbButton.innerHTML = (lbButton.innerHTML === 'Hide countries') ? 'All countries' : 'Hide countries'
+    tableEl.classList.toggle('is-expanded');
     lbButton.classList.toggle('hide-button')
 })
 
@@ -58,14 +55,18 @@ function changeCountry() {
             RelativeTime.processEl(el)
         })
 
-        let row = $(`.om-table-row[data-id="${identifier}"]`).cloneNode(true)
-        row.classList.remove('om-is-hidden')
+        let row = $(`.om-table-row[data-id="${identifier}"]`);
+        if (!row) {
+            row = emptyRowEl.cloneNode(true);
+            row.querySelector('.om-table-row__flag').classList.add(`om-flag--${identifier}`);
+            row.querySelector('.om-table-row__country').textContent = identifier;
+        }
 
         let posSpan = $('.om-position-ordinal')
         posSpan.innerHTML = ordinal(parseInt(row.getAttribute('data-position')))
 
         let favouriteTable = $('.om-table--favourite')
-        favouriteTable.innerHTML = row.outerHTML
+        favouriteTable.innerHTML = row.outerHTML;
 
         let cmButton = $('.js-country-medals-button')
         if(cmButton){

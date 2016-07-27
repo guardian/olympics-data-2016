@@ -81,9 +81,20 @@ async function readdir(d) {
 async function getAllData() {
     let data = {};
 
-    (await readdir('../data/data-out/*.json')).map(file => {
-        data[path.basename(file, '.json')] = JSON.parse(fs.readFileSync(file)).data;
+    (await readdir('../data/data-out/*.json')).forEach(file => {
+        let contents = JSON.parse(fs.readFileSync(file).toString());
+        let name = path.basename(file, '.json');
+
+        data[name] = contents.data;
+        data[name + 'Fallback'] = contents.fallback;
     });
+
+    data.emptyMedalTableEntry = {
+        'country': {},
+        'medals': {'gold': 0, 'silver': 0, 'bronze': 0},
+        'total': 0,
+        'position': data.medalTable.length + 1
+    };
 
     data.today = '2016-01-15';
 

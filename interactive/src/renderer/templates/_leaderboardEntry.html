@@ -1,17 +1,13 @@
-<li class='om-table-row {%if entry.position > 10 || entry.total === 0 %} om-is-hidden {% endif %}'
-data-position='{{entry.position}}' data-id='{{entry.country.identifier}}' data-total='{{entry.total}}'>
-    
+<li class='om-table-row {% if entry.position > 10 && entry.total > 0 %}om-table-row--extra{% endif %}
+          {% if entry.total == 0 %}om-table-row--empty js-row-empty{% endif %}'
+    data-id='{{entry.country.identifier}}' data-position='{{ entry.position }}'>
+
     <div class='om-table-left-area'>
-        <div class='om-table-el om-table-el--position'>
-            {{ entry.position }}.
-        </div>
-        <div class='om-table-el om-table-el--flag om-flag om-flag--{{ entry.country.identifier }}'>
-        </div>
-        <div class='om-table-el om-table-el--country'>
-            <span class='om-table-country-label'>{{ entry.country.identifier }}</span>
-        </div>
+        <span class='om-table-row__position'>{{ entry.position }}.</span>
+        <span class='om-table-row__flag om-flag om-flag--{{ entry.country.identifier }}'></span>
+        <span class='om-table-row__country'>{{ entry.country.identifier }}</span>
     </div>
-    <div class='om-table-el om-table-el--medal'>
+    <div class='om-table-row__medal'>
         <div class="om-medal-white" style="transform:scale({{ entry.medals.gold|maskScale }})"></div>
         <div class="om-medal-circle om-medal-circle--gold"
             style="transform:scale({{ entry.medals.gold|circleScale }})"></div>
@@ -19,7 +15,7 @@ data-position='{{entry.position}}' data-id='{{entry.country.identifier}}' data-t
             {{ entry.medals.gold }}
         </span>
     </div>
-    <div class='om-table-el om-table-el--medal'>
+    <div class='om-table-row__medal'>
         <div class="om-medal-white" style="transform:scale({{ entry.medals.silver|maskScale }})"></div>
         <div class="om-medal-circle om-medal-circle--silver"
             style="transform:scale({{ entry.medals.silver|circleScale }})"></div>
@@ -27,7 +23,7 @@ data-position='{{entry.position}}' data-id='{{entry.country.identifier}}' data-t
             {{ entry.medals.silver }}
         </span>
     </div>
-    <div class='om-table-el om-table-el--medal'>
+    <div class='om-table-row__medal'>
         <div class="om-medal-white" style="transform:scale({{ entry.medals.bronze|maskScale }})"></div>
         <div class="om-medal-circle om-medal-circle--bronze"
             style="transform:scale({{ entry.medals.bronze|circleScale }})"></div>
@@ -35,7 +31,5 @@ data-position='{{entry.position}}' data-id='{{entry.country.identifier}}' data-t
             {{ entry.medals.bronze }}
         </span>
     </div>
-    <div class='om-table-el om-table-el--total'>
-        {{ entry.total }}
-    </div>
+    <div class='om-table-row__total'>{{ entry.total }}</div>
 </li>
