@@ -33,7 +33,6 @@
                                 <span class="om-event__name__events">({{ event.group.length }} events)</span>
                             {% endif %}
                         </span>
-                        <span class="om-event__id">{{ event.unit.identifier }}</span>
                         {% if event.resultAvailable %}
                             {% for subEvent in event.group  %}
                                 <div class="om-event__result">
