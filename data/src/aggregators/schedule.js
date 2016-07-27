@@ -293,19 +293,18 @@ export default {
         },
         {
             'name' : 'eventDetails',
-            'dependencies' : ({events}) => _.map(events, v => {
-                return `olympics/2016-summer-olympics/event/${v.event.identifier}`
-            }),
+            'dependencies' : ({events}) => {
+                return _(events)
+                    .map(v => `olympics/2016-summer-olympics/event/${v.event.identifier}`)
+                    .uniq()
+                    .valueOf();
+            )},
             'process' : ({}, fullEvents) => {
 
                 let flat = _(fullEvents)
-                    .map(fe => fe.olympics.event)
-                    .map(fe => {
-                        return [ fe.identifier, {
-                            gender : fe.gender
-                        }]
-                    })
-                    .fromPairs()
+                    .map('olympics.event')
+                    .keyBy('identifier')
+                    .mapValues(fe => { return {'gender': fe.gender}; });
                     .valueOf()
 
                 return flat
