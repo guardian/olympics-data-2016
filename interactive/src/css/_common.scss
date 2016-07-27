@@ -274,7 +274,7 @@ a {
     @include fs-textSans(2);
     position: relative;
     border-top: 1px dotted #bdbdbd;
-    padding: 5px 20px 3px 65px;
+    padding: 5px 25px 3px 65px;
 
     @include mq(mobileLandscape) {
         padding-left: 80px;
@@ -438,7 +438,7 @@ a {
 }
 
 .om-event__result {
-    margin: 12px -17px 0 -62px;
+    margin: 12px -22px 0 -62px;
     @include mq(mobileLandscape) {
         margin-left: 0;
         margin-right: 0;
