@@ -1,3 +1,5 @@
+import './polyfill/classList.min'
+
 import { $, $$ } from './lib/selector'
 import RelativeTime from './lib/relative'
 import reqwest from 'reqwest'
@@ -25,7 +27,7 @@ let recentContainer = $('.om-recent-days')
 let countryContainer = $('.om-country')
 
 function ordinal(num) {
-    if([11,12,13].includes(num % 100)){
+    if([11,12,13].indexOf(num % 100) > -1){
         return num + 'th'
     }
     else if(num % 10 === 1){
@@ -41,13 +43,9 @@ function ordinal(num) {
 }
 
 function changeCountry() {
-
     let identifier = cSelect.options[cSelect.selectedIndex].value
-    let p = countryCache[identifier] ? Promise.resolve(countryCache[identifier]) :
-        Promise.resolve(reqwest(`./medals/countries/countryMedals-${identifier}.html`))
 
-    p.then(country => {
-
+    function render(country) {
         countryCache[identifier] = country
         countryContainer.innerHTML = country
 
@@ -76,7 +74,13 @@ function changeCountry() {
                 cmButton.innerHTML = (cmButton.innerHTML === 'All medals') ? 'Fewer medals' : 'All medals'
             })
         }
-    })
+    };
+
+    if (countryCache[identifier]) {
+        render(countryCache[identifier]);
+    } else {
+        reqwest(`./medals/countries/countryMedals-${identifier}.html`).then(render);
+    }
 }
 
 cSelect.addEventListener('change', () => {
@@ -84,5 +88,5 @@ cSelect.addEventListener('change', () => {
 })
 
 // select GBR by default
-cSelect.selectedIndex = Array.from(cSelect.options).find(o => o.value === 'GBR').index
+cSelect.selectedIndex = [].slice.apply(cSelect.options).map(o => o.value).indexOf('GBR');
 changeCountry()

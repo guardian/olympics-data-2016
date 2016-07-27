@@ -1,3 +1,5 @@
+import './polyfill/classList.min'
+
 import reqwest from 'reqwest'
 import { $, $$ } from './lib/selector'
 
