@@ -47,6 +47,7 @@ a {
 
 .om-container {
     background-color: white;
+    border-bottom: 1px solid white;
 }
 
 .om-header {
@@ -110,7 +111,7 @@ a {
 
 .om-filter__line {
     display: block;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
     &:last-child {
         margin-bottom: 0;
     }
@@ -437,7 +438,7 @@ a {
 }
 
 .om-event__result {
-    margin: 12px -20px 0 -65px;
+    margin: 12px -17px 0 -62px;
     @include mq(mobileLandscape) {
         margin-left: 0;
         margin-right: 0;
