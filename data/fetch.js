@@ -38,18 +38,28 @@ async function processCombiners([combiner, ...combiners], data, fallback=false) 
     mainLogger.info(`Requesting ${deps.length} resources for ${combiner.name}`);
     let contents = await Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
 
+    let combinerData;
+
     try {
-        let combinerData = combiner.process(data, contents);
+        combinerData = combiner.process(data, contents);
         await writeData(combiner.name, {
             'timestamp': (new Date).toISOString(),
             'data': combinerData,
             fallback
         });
-
-        return await processCombiners(combiners, {...data, [combiner.name]: combinerData}, fallback);
     } catch (err) {
-        throw err;
+        logger.error(`Error processing ${combiner.name}`, err);
+        logger.error(err.stack);
+        if (argv.notify) {
+            notify.send(`Error processing ${combiner.name}`, util.inspect(err));
+        }
+
+        if (combiner.required) {
+            throw err;
+        }
     }
+
+    return await processCombiners(combiners, {...data, [combiner.name]: combinerData}, fallback);
 }
 
 function aggregatorFn(aggregator) {
@@ -63,15 +73,10 @@ function aggregatorFn(aggregator) {
         } catch (err) {
             if (aggregator.fallbackCombiners) {
                 try {
-                    await processCombiners(aggregator.faillbackCombiners, {}, true);
+                    await processCombiners(aggregator.fallbackCombiners, {}, true);
                 } catch (err) {
-                    logger.error('Fallback failed');
+                    logger.error('Fallbacks failed');
                 }
-            }
-            logger.error(`Error processing ${aggregator.id}`, err);
-            logger.error(err.stack);
-            if (argv.notify) {
-                notify.send(`Error processing ${aggregator.id}`, util.inspect(err));
             }
         }
 
@@ -86,17 +91,12 @@ function aggregatorFn(aggregator) {
 
 mkdirp.sync('data-out');
 
-var aggregatorTickers = {};
-
 aggregators
     .filter(agg => regExps.length === 0 || regExps.some(r => r.test(agg.id)))
     .forEach(aggregator => {
-        let tickFn = aggregatorFn(aggregator);
-        aggregatorTickers[aggregator.id] = tickFn;
-
-        tickFn();
+        aggregatorFn(aggregator)();
     });
 
 if (argv.loop) {
-    www.run(aggregatorTickers);
+    www.run();
 }

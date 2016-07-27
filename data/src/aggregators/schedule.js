@@ -288,18 +288,18 @@ export default {
             }
         },
         {
-            'name' : 'eventDetails',
-            'dependencies' : ({events}) => {
-                return _(events)
-                    .map(v => `olympics/2016-summer-olympics/event/${v.event.identifier}`)
-                    .uniq()
-                    .valueOf();
+            'name': 'results',
+            'required': true,
+            'dependencies': ({events}) => {
+                return _.values(events)
+                    .filter(evt => evt.resultAvailable)
+                    .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/result`);
             },
-            'process' : ({}, fullEvents) => {
-                return _(fullEvents)
-                    .map('olympics.event')
+            'process': ({}, results) => {
+                return _(results)
+                    .map('olympics.eventUnit')
                     .keyBy('identifier')
-                    .mapValues(fe => { return {'gender': fe.gender}; })
+                    .mapValues(parseResult)
                     .valueOf();
             }
         },
@@ -323,21 +323,6 @@ export default {
                     .valueOf();
             }
         },*/
-        {
-            'name': 'results',
-            'dependencies': ({events}) => {
-                return _.values(events)
-                    .filter(evt => evt.resultAvailable)
-                    .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/result`);
-            },
-            'process': ({}, results) => {
-                return _(results)
-                    .map('olympics.eventUnit')
-                    .keyBy('identifier')
-                    .mapValues(parseResult)
-                    .valueOf();
-            }
-        },
         {
             'name': 'scheduleByDay',
             'process': ({events}) => {
@@ -428,8 +413,24 @@ export default {
             'process' : ({}, [countries]) => countries.olympics.country
         },
         {
+            'name' : 'eventDetails',
+            'dependencies' : ({events}) => {
+                return _(events)
+                    .map(v => `olympics/2016-summer-olympics/event/${v.event.identifier}`)
+                    .uniq()
+                    .valueOf();
+            },
+            'process' : ({}, fullEvents) => {
+                return _(fullEvents)
+                    .map('olympics.event')
+                    .keyBy('identifier')
+                    .mapValues(fe => { return {'gender': fe.gender}; })
+                    .valueOf();
+            }
+        },
+        {
             'name': 'medalsByCountry',
-            'process': ({events, results, countries, eventDetails}) => {
+            'process': ({events, results, countries, eventDetails = {}}) => {
                 let medals = _(results)
                     .filter(result => result.medalEvent)
                     .flatMap(result => {
@@ -437,7 +438,11 @@ export default {
                         return result.entrants
                             .filter(entrant => !!entrant.medal)
                             .map(entrant => {
-                                return {entrant, 'event': events[result.identifier], 'eventDetails' : eventDetails[result.identifier.slice(0,-3)]};
+                                return {
+                                    entrant,
+                                    'event': events[result.identifier],
+                                    'eventDetails': eventDetails[result.identifier.slice(0,-3)]
+                                };
                             });
                     })
                     .sortBy('event.end')
@@ -468,7 +473,7 @@ export default {
         {
             'name': 'medalTable',
             'dependencies': () => ['olympics/2016-summer-olympics/medal-table'],
-            'process': ({countries}, [medalTable]) => {
+            'process': ({}, [medalTable]) => {
                 return forceArray(medalTable.olympics.games.medalTable.tableEntry)
                     .map(entry => {
                         let medals = _(['gold', 'silver', 'bronze'])

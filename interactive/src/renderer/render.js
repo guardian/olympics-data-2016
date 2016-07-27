@@ -44,7 +44,7 @@ swig.setFilter('countryEntrant', medal => {
         return `${entrant.competitors[0].fullName}`
     } else if (entrant.competitors.length === 2) {
         return `${entrant.competitors.map(c => c.lastName).join('/')}`;
-    } else {
+    } else if (medal.eventDetails) {
         if(medal.eventDetails.gender === 'Men'){
             return 'Men\'s team'
         } else if(medal.eventDetails.gender === 'Women'){
@@ -52,9 +52,10 @@ swig.setFilter('countryEntrant', medal => {
         } else {
             return 'Mixed team'
         }
+    } else {
+        return '';
     }
-
-})
+});
 
 swig.setFilter('ordinal', num => {
     if([11,12,13].includes(num % 100)){
