@@ -68,7 +68,7 @@ function combineEvents(evts) {
             let first = group[0];
             let description = group.length === 1 ?
                 first.description : `${first.event.description} ${first.phase.value}`;
-            let status = combineStatuses(group.map(evt => evt.status));
+            let status = combineStatuses(_(group).map('status').uniq().valueOf());
             let resultAvailable = group.some(evt => evt.resultAvailable);
             let start = _.min(group.map(evt => evt.start));
             let end = _.max(group.map(evt => evt.end));
