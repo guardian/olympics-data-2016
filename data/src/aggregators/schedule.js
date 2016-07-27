@@ -1,6 +1,11 @@
 import _ from 'lodash'
 import moment from 'moment'
 
+import notify from '../notify'
+import log from '../log'
+
+const logger = log('schedule');
+
 const roundDisciplines = {
     'badminton': 'Game Scores',
     'basketball': 'Quarter Scores',
@@ -101,6 +106,9 @@ function parseScheduledEvent(evt) {
             'medalEvent': evt.medalEvent === 'Yes'
         };
     } catch (err) {
+        logger.error('Failed to parse scheduled event', err);
+        logger.error(err.stack);
+        notify.error(err);
         return {};
     }
 }
@@ -149,9 +157,15 @@ function parseResult(eventUnit) {
         try {
             return resultReducers.reduce((res, reducer) => reducer(res), result);
         } catch (err) {
+            logger.error('Failed to apply result reducers', err);
+            logger.error(err.stack);
+            notify.error(err);
             return result;
         }
     } catch (err) {
+        logger.error('Failed to parse result', err);
+        logger.error(err.stack);
+        notify.error(err);
         return {};
     }
 }
