@@ -7,6 +7,7 @@ import mkdirp from 'mkdirp'
 import _ from 'lodash'
 import * as d3 from 'd3'
 import moment from 'moment'
+import rp from 'request-promise-native'
 
 swig.setFilter('datefmt', (date, fmt) => moment(date).format(fmt));
 
@@ -94,6 +95,10 @@ swig.setFilter('ordinal', num => {
     return num + 'th'
 })
 
+swig.setFilter('slice', (arr, limit) => {
+  return arr.slice(0,limit);
+});
+
 async function readdir(d) {
     let g = glob();
     let files = await denodeify(g.readdir.bind(g))(d);
@@ -119,6 +124,23 @@ async function getAllData() {
     swig.setFilter('maskScale', num => 1 + (num === 0 ? scale(1) : scale(num)));
 
     return data;
+}
+
+async function getUpcomingEventsForSnap() {
+    let data = await rp('https://interactive.guim.co.uk/docsdata-test/1SMF0vtIILkfSE-TBiIpVKFSV1Tm4K9pB3fwunLdWaUE.json');
+
+    let parsedData = JSON.parse(data).sheets.Sheet1;
+
+    let currentTime = moment();
+    let eventsInTheFuture = parsedData.filter(row => {
+        var parsedDate = moment(row.date + " " + row.time + " " + row.timezone, "DD/MM/YYYY HH:mm Z");
+
+        console.log(row.discipline, parsedDate.format(), currentTime.format(), currentTime.diff(parsedDate,'seconds'));
+
+        return currentTime.diff(parsedDate,'seconds') < 0;
+    });
+
+    return eventsInTheFuture;
 }
 
 async function renderTask(task, data) {
@@ -179,6 +201,8 @@ async function renderAll() {
     for (let task of renderTasks) {
         await renderTask(task, data);
     }
+
+    data.snapSpreadsheet = await getUpcomingEventsForSnap();
 
     mkdirp.sync('build/embed');
 

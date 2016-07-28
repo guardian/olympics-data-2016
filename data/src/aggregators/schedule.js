@@ -344,6 +344,40 @@ export default {
             'name' : 'countries',
             'dependencies' : () => ['olympics/2016-summer-olympics/country'],
             'process' : ({}, [countries]) => countries.olympics.country
+        },
+        {
+            'name' : 'medalTablePA',
+            'dependencies' : () => ['olympics/2016-summer-olympics/medal-table/'],
+            'process' : ({}, [medalTable]) => forceArray(medalTable.olympics.games.medalTable.tableEntry)
+        },
+        {
+            'name' : 'latestMedals',
+            'dependencies' : () => ['olympics/2016-summer-olympics/medal-cast'],
+            'process' : ({}, [medalCast]) => {
+                let medalsGroupedByEventUnit = _(forceArray(medalCast.olympics.games.medalCast))
+                    .groupBy('event.eventUnit.identifier')
+                    .mapValues(eventUnitMedals => {
+                        return eventUnitMedals.map(medal => {
+                            let participantArr = forceArray(medal.entrant.participant);
+
+                            medal.type = medal.type.toLowerCase();
+                            medal.entrant.participant = participantArr;
+
+                            // return {...medal, 'entrant': {...medal.entrant,participantArr}};
+
+                            return medal;
+                        });
+                    });
+
+                return _.toArray(medalsGroupedByEventUnit).map(eventMedals => {
+                    let event = _.head(eventMedals).event;
+
+                    let eventName = event.description;
+                    let discipline = event.disciplineDescription.value;
+
+                    return {'eventName': eventName, 'discipline': discipline, 'medals': eventMedals}
+                });
+            }
         }
     ],
     'outputs': [
