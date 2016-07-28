@@ -9,8 +9,9 @@ let errorEl = $('.js-error');
 function filterDisciplines() {
     let identifier = disciplineChoiceEl.options[disciplineChoiceEl.selectedIndex].value;
 
+
     $$(dateScheduleEl, '.js-discipline').map(el => {
-        return {el, 'identifier': el.getAttribute('data-discipline')};
+        return { el, 'identifier': el.getAttribute('data-discipline') };
     }).forEach(discipline => {
         if (identifier === '' || identifier === discipline.identifier) {
             discipline.el.classList.remove('is-hidden');
@@ -18,6 +19,25 @@ function filterDisciplines() {
             discipline.el.classList.add('is-hidden');
         }
     });
+
+    var count = $$(dateScheduleEl, '.js-discipline').length;
+
+    var hiddencount = $$(dateScheduleEl, '.om-discipline.js-discipline.is-hidden').length;
+    console.log(hiddencount);
+
+    var emptymessage = document.createElement("div");
+
+
+    if (count - hiddencount < 1) {
+        var omsection = $('.om-section');
+        emptymessage.className = "js-discipline";
+        emptymessage.innerHTML = 'No events in this discipline today';
+        omsection.appendChild(emptymessage);
+    }
+    else {
+        emptymessage.innerHTML = '';
+    }
+
 }
 
 disciplineChoiceEl.disabled = false;
