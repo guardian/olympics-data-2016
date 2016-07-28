@@ -37,6 +37,8 @@ export default [
             'name': 'latestMedals',
             'dependencies': () => ['olympics/2016-summer-olympics/medal-cast'],
             'process': ({}, [medalCast]) => {
+                if (!medalCast.olympics.games) return [];
+
                 let medalsGroupedByEventUnit = _(forceArray(medalCast.olympics.games.medalCast))
                     .groupBy('event.eventUnit.identifier')
                     .mapValues(eventUnitMedals => {
