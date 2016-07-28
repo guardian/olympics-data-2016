@@ -17,7 +17,7 @@ module.exports = function(grunt) {
         watch: {
             data: {
                 files: ['../data/data-out/**/*'],
-                tasks: ['copy:data', 'shell:render'],
+                tasks: ['shell:render'],
             },
             js: {
                 files: ['src/js/**/*'],
@@ -37,7 +37,7 @@ module.exports = function(grunt) {
             },
             server: {
                 files: ['../data/data-out/**/*'],
-                tasks: ['copy:data', 'deploy'],
+                tasks: ['deploy'],
             }
         },
 
@@ -82,11 +82,6 @@ module.exports = function(grunt) {
         },
 
         copy: {
-            data: {
-                files: [
-                    {expand: true, cwd: '../data/data-out', src: ['*.json'], dest: 'build/data'},
-                ]
-            },
             assets: {
                 files: [
                     {expand: true, cwd: 'src/', src: ['assets/**/*'], dest: 'build'},
@@ -115,8 +110,7 @@ module.exports = function(grunt) {
                             '*.html', '*.css', '*.js', '*.js.map',
                             '*.json', 'days/*.html', 'days/*.json', 'embed/*.html',
                             'medals/countries/*.html',
-                            'data/*.json',
-                            'assets/**/*'
+                            'assets/*', '!assets/imgs/flags/*'
                         ],
                         dest: '<%= visuals.s3.path %>',
                         params: { CacheControl: 'max-age=30' }

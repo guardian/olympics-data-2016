@@ -32,21 +32,13 @@ function run(aggregatorTickers) {
 
     app.get('/aggregators.json', cors(), (req, res) => {
         var out = aggregators.map(aggregator => {
-            let cacheTime = aggregator.cacheTime.asMilliseconds();
-            let inputs = aggregator.inputs.map(input => {
-                return {
-                    'id': input.name,
-                    cacheTime
-                };
-            });
-            let outputs = aggregator.outputs.map(input => {
-                return {
-                    'id': input.name,
-                    cacheTime
-                };
-            });
-            return [...inputs, ...outputs];
-        }).reduce((a, b) => [...a, ...b]);
+            let combiners = aggregator.combiners.map(combiner => combiner.name);
+            return {
+                'id': aggregator.id,
+                'cacheTime': aggregator.cacheTime.asMilliseconds(),
+                combiners
+            };
+        });
 
         res.send(out);
     });

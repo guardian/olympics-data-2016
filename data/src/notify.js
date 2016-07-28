@@ -1,6 +1,5 @@
 import AWS from 'aws-sdk'
 import denodeify from 'denodeify'
-import moment from 'moment'
 import _ from 'lodash'
 import config from '../config'
 import log from './log'
