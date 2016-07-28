@@ -52,7 +52,7 @@
     </div>
     <div class="og-snap__upcoming">
         <div class="og-snap__title"><span class="og-snap__title--kicker">Day 5</span>What you should follow</div>
-        {% for row in snapSpreadsheet|slice(6) %}
+        {% for row in sixUpcomingEvents %}
         	<div class="og-snap__upcoming-row">{{row.time}}<span class="og-snap__upcoming-row__discipline">{{row.discipline}}</span>{{row.event}}</div>
         {% endfor %}
     </div>

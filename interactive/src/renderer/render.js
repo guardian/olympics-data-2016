@@ -95,7 +95,7 @@ async function getAllData() {
         data[name + 'Fallback'] = contents.fallback;
     });
 
-    data.snapSpreadsheet = await getUpcomingEventsForSnap();
+    data.sixUpcomingEvents = await getUpcomingEventsForSnap();
 
     data.emptyMedalTableEntry = {
         'country': {},
@@ -122,10 +122,10 @@ async function getAllData() {
 async function getUpcomingEventsForSnap() {
     let data = await rp('https://interactive.guim.co.uk/docsdata-test/1SMF0vtIILkfSE-TBiIpVKFSV1Tm4K9pB3fwunLdWaUE.json');
 
-    let parsedData = JSON.parse(data).sheets.Sheet1;
+    let upcomingEvents = JSON.parse(data).sheets.snap;
 
     let currentTime = moment();
-    let eventsInTheFuture = parsedData.filter(row => {
+    let eventsInTheFuture = upcomingEvents.filter(row => {
         var parsedDate = moment(row.date + " " + row.time + " " + row.timezone, "DD/MM/YYYY HH:mm Z");
 
         console.log(row.discipline, parsedDate.format(), currentTime.format(), currentTime.diff(parsedDate,'seconds'));
@@ -133,7 +133,7 @@ async function getUpcomingEventsForSnap() {
         return currentTime.diff(parsedDate,'seconds') < 0;
     });
 
-    return eventsInTheFuture;
+    return eventsInTheFuture.slice(0,6);
 }
 
 async function renderTask(task, data) {
