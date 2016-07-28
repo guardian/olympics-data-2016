@@ -4,6 +4,8 @@ import moment from 'moment'
 import notify from '../notify'
 import log from '../log'
 
+import { forceArray } from '../aggregators.js'
+
 const logger = log('schedule');
 
 const roundDisciplines = {
@@ -25,10 +27,6 @@ const combineBlacklist = [
     'basketball', 'beach-volleyball', 'football', 'handball', 'hockey', 'rugby-sevens',
     'tennis', 'volleyball', 'water-polo'
 ];
-
-function forceArray(arr) {
-    return arr === undefined ? [] : _.isArray(arr) ? arr : [arr];
-}
 
 function canCombine(group, evt1) {
     if (combineBlacklist.indexOf(evt1.discipline.identifier) > -1) return false;
