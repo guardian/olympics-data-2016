@@ -128,9 +128,16 @@ async function getUpcomingEventsForSnap() {
     let eventsInTheFuture = upcomingEvents.filter(row => {
         var parsedDate = moment(row.date + " " + row.time + " " + row.timezone, "DD/MM/YYYY HH:mm Z");
 
-        console.log(row.discipline, parsedDate.format(), currentTime.format(), currentTime.diff(parsedDate,'seconds'));
-
         return currentTime.diff(parsedDate,'seconds') < 0;
+    });
+
+    eventsInTheFuture.map(event => {
+        let utcDateTime = moment.utc(event.date + " " + event.time + " " + event.timezone, "DD/MM/YYYY HH:mm Z");
+
+        event.timestamp = utcDateTime.format();
+        event.time = utcDateTime.format("HH:mm");
+
+        return event;
     });
 
     return eventsInTheFuture.slice(0,6);

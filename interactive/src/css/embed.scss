@@ -1,8 +1,10 @@
 @import '../../bower_components/guss-typography/_typography.scss';
+@import "mq";
 
-$green: #1c6326;
+$green: #387e3c;
+$yellow: #fded80;
 
-$gold: rgba(250,220,2,1);
+$gold: #ffce4b;
 $silver: rgba(255,255,255,1);
 $bronze: rgba(243,111,33,1);
 
@@ -11,15 +13,24 @@ $silverLight: rgba(217,217,217,0.4);
 $bronzeLight: rgba(243,111,33,0.2);
 
 .og-snap {
-	background-color: #dcdcdc;
+	background-color: #f6f6f6;
 	width: 940px;
-	// padding: 6px 0px;
+	padding: 6px 0px;
 	overflow: hidden;
-	// border-top: 1px solid #484f53;
+    position: relative;
+	border-top: 1px solid $green;
 	// border-bottom: 1px solid #bdbdbd;
 
 	* {
 		box-sizing: border-box;
+	}
+
+	&.og-snap--medals-only {
+		width: 100%;
+	}
+
+	.fc-container--story-package & {
+		background-color: #dcdcdc;
 	}
 }
 
@@ -27,7 +38,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 	@include fs-headline(3);
 	font-weight: 500;
 	line-height: 18px; // to make sure it sits flush to the top of the middle border, make sure the line-height = the font-size
-	margin-bottom: 12px;
+	margin-bottom: 11px;
 
 	&.og-snap__title--medals {
 		margin-bottom: 14px;
@@ -50,6 +61,12 @@ $bronzeLight: rgba(243,111,33,0.2);
 	float: left;
 	padding-right: 10px;
 
+	.og-snap--medals-only & {
+		width: 100%;
+		border: 0;
+		padding-left: 5px;
+		padding-right: 5px;
+	}
 }
 
 
@@ -58,6 +75,18 @@ $bronzeLight: rgba(243,111,33,0.2);
  	float: left;
  	border-right: 1px dotted #bdbdbd;
  	padding-right: 10px;
+
+ 	.og-snap--medals-only & {
+ 		width: 100%;
+ 		float: none;
+ 		border: 0;
+
+ 		@include mq(510px, 740px) {
+ 			width: 50%;
+ 			float: left;
+ 			border-right: 1px dotted #bdbdbd;
+ 		}
+ 	}
 }
 
 .og-snap__medal-row {
@@ -78,7 +107,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 .og-snap__medals-latest-title {
 	@include fs-textSans(3);
 	line-height: 18px;
-	font-weight: 500;
+	font-weight: 700;
 	color: #000;
 	margin-bottom: 4px;
 }
@@ -118,6 +147,24 @@ $bronzeLight: rgba(243,111,33,0.2);
 		color: #767676;
 		font-weight: 300;
 	}
+
+	.og-snap--medals-only & {
+ 		width: 100%;
+ 		float: none;
+ 		border-top: 1px dotted #bdbdbd;
+ 		padding-top: 4px;
+ 		margin-top: 12px;
+ 		padding-left: 0;
+
+ 		@include mq(510px, 740px) {
+ 			width: 50%;
+ 			float: right;
+ 			border: 0;
+ 			padding-top: 0;
+ 			margin-top: 0;
+ 			padding-left: 10px;
+ 		}
+	}
 }
 
 // right side
@@ -144,12 +191,19 @@ $bronzeLight: rgba(243,111,33,0.2);
 }
 
 .og-snap__upcoming-row__discipline {
-	font-weight: 500;
+	font-weight: 700;
 	margin-left: 5px;
 	margin-right: 5px;
 	color: #000;
 }
 
+.og-snap__timezone {
+	@include fs-textSans(2);
+	color: #767676;
+	position: absolute;
+	top: 9px;
+	right: 0;
+}
 
 // medals
 

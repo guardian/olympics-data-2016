@@ -1,4 +1,4 @@
-<div class="og-snap">
+<div class="og-snap og-snap--medals-only"> 
     <div class="og-snap__medals">
         <div class="og-snap__medals-latest">
             <div class="og-snap__title og-snap__title--medals"><span class="og-snap__title--kicker">Rio</span>Latest Medals</div>
@@ -50,39 +50,4 @@
             </table>
         </div>
     </div>
-    <div class="og-snap__upcoming">
-        <div class="og-snap__title"><span class="og-snap__title--kicker">Day 5</span>What you should follow</div>
-        <div class="og-snap__timezone">
-        	All times are in UTC<span class="js-tz"></span>
-        </div>
-        {% for row in sixUpcomingEvents %}
-        	<div class="og-snap__upcoming-row"><time class="js-og-time" datetime="{{row.timestamp}}">{{row.time}}</time><span class="og-snap__upcoming-row__discipline">{{row.discipline}}</span>{{row.event}}</div>
-        {% endfor %}
-    </div>
 </div>
-<script type="text/javascript">
-	var times = document.querySelectorAll(".js-og-time");
-
-	function parseISODate(dateStr) {
-	    let parts = dateStr.split(/[^0-9]/).map(Number);
-	    let year = parts[0], month = parts[1], day = parts[2], hour = parts[3], min = parts[4], sec = parts[5];
-	    let date = new Date(Date.UTC(year, month - 1, day, hour, min, sec));
-	    return date;
-	}
-
-	function pad(n) {
-	    return (n < 10 ? '0' : '') + n;
-	}
-
-	for(var i = 0; i < times.length; i++) {
-        var date = parseISODate(times[i].getAttribute('datetime'));
-
-        times[i].textContent = pad(date.getHours()) + ":" + pad(date.getMinutes());
-	}
-
-	var tzEl = document.querySelector('.js-tz');
-    var offset = new Date().getTimezoneOffset();
-    var tzSign = offset > 0 ? '-' : '+', absOffset = Math.abs(offset);
-    var tzHour = Math.floor(absOffset / 60), tzMin = absOffset % 60;
-    tzEl.textContent = tzSign + pad(tzHour) + ":" + pad(tzMin);
-</script>
