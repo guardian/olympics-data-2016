@@ -490,3 +490,9 @@ a {
         cursor: pointer;
     }
 }
+
+.om-tz-note {
+    @include fs-textSans(3);
+    color: #767676;
+    margin: 0 0 6px;
+}

@@ -2,6 +2,7 @@ import './polyfill/classList.min'
 
 import reqwest from 'reqwest'
 import { $, $$ } from './lib/selector'
+import parseISODate from './lib/parseISODate'
 
 let disciplineChoiceEl = $('.js-discipline-choice');
 let dateChoiceEl = $('.js-date-choice');
@@ -10,7 +11,6 @@ let errorEl = $('.js-error');
 
 function filterDisciplines() {
     let identifier = disciplineChoiceEl.options[disciplineChoiceEl.selectedIndex].value;
-
 
     $$(dateScheduleEl, '.js-discipline').map(el => {
         return { el, 'identifier': el.getAttribute('data-discipline') };
@@ -49,6 +49,10 @@ let resultsCache = {};
 let startDate = dateScheduleEl.getAttribute('data-startdate');
 dateCache[startDate] = dateScheduleEl.innerHTML;
 
+function pad(n) {
+    return (n < 10 ? '0' : '') + n;
+}
+
 function changeDate() {
     let date = window.location.hash.substring(1);
     if (!/\d{4}-\d{2}-\d{2}/.test(date)) date = startDate;
@@ -56,9 +60,10 @@ function changeDate() {
     dateScheduleEl.classList.add('is-loading');
     errorEl.classList.remove('has-error');
 
-    function step1Schedule(html) {
-        dateScheduleEl.innerHTML = html;
+    function step1Schedule(schedule) {
+        dateScheduleEl.innerHTML = schedule;
         dateScheduleEl.classList.remove('is-loading');
+        dateScheduleEl.classList.remove('is-expandable')
 
         for (let i = 0; i < dateChoiceEl.options.length; i++) {
             if (dateChoiceEl.options[i].value === date) {
@@ -67,11 +72,19 @@ function changeDate() {
             }
         }
 
-        if (!html) return;
+        $$('.js-time').forEach(timeEl => {
+            let date = parseISODate(timeEl.getAttribute('datetime'));
+            timeEl.textContent = `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        });
+        let tzEl = $('.js-tz');
+        let offset = new Date().getTimezoneOffset();
+        let tzSign = offset > 0 ? '-' : '+', absOffset = Math.abs(offset);
+        let tzHour = Math.floor(absOffset / 60), tzMin = absOffset % 60;
+        tzEl.textContent = `${tzSign}${pad(tzHour)}:${pad(tzMin)}`;
+
+        if (!schedule) return;
 
         filterDisciplines();
-
-        dateScheduleEl.classList.remove('is-expandable')
 
         if (resultsCache[date]) {
             step2Results(resultsCache[date]);
@@ -104,9 +117,9 @@ function changeDate() {
         step1Schedule(dateCache[date]);
     } else {
         let url = isMedalTable ? `./days/schedule-results-${date}.html` : `./days/schedule-${date}.html`;
-        reqwest(url).then(html => {
-            dateCache[date] = html;
-            step1Schedule(html);
+        reqwest(url).then(schedule => {
+            dateCache[date] = schedule;
+            step1Schedule(schedule);
         }).catch(err => {
             errorEl.classList.add('has-error');
             step1Schedule('');

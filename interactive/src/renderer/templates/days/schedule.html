@@ -10,7 +10,11 @@
             Day {{ schedule.day.dateNo + 1 }} of {{ scheduleByDay.length }}
         </p>
     </div>
+
     <div class="empty-message is-hidden">No events in this sport today</div>
+
+    <p class="om-tz-note">All times are in UTC<span class="js-tz"></span></p>
+
     {% for discipline in schedule.disciplines %}
         <div class="om-discipline js-discipline" data-discipline="{{ discipline.identifier }}" >
             <h4 class="om-discipline__name">{{ discipline.description }}</h4>
@@ -21,10 +25,9 @@
             {% endif %}
             <ul class="om-events">
                 {% for event in discipline.events %}
-                    <li class="om-event
-                               {% if event.status === 'Finished' %}om-event--finished{% endif %}
+                    <li class="om-event {% if event.status === 'Finished' %}om-event--finished{% endif %}
                                {% if event.resultAvailable %}om-event--results{% endif %}">
-                        <time class="om-event__time" datetime="{{ event.start }}">
+                        <time class="om-event__time js-time" datetime="{{ event.start }}">
                             {{ event.start|datefmt('HH:mm') }}
                         </time>
                         <span class="om-event__name">
