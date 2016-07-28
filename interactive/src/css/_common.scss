@@ -249,6 +249,10 @@ a {
     display: none;
 }
 
+.om-no-events.is-hidden {
+    display: none;
+}
+
 .om-discipline__name {
     @include fs-header(2);
     font-weight: 500;

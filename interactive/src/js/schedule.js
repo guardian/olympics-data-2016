@@ -23,17 +23,13 @@ function filterDisciplines() {
     });
 
     var count = $$(dateScheduleEl, '.js-discipline:not(.is-hidden)').length;
-
-    var emptymessage = document.createElement("div");
+    let noEventsDiv = $('.om-no-events')
 
     if (count < 1) {
-        var omsection = $('.om-section');
-        emptymessage.className = "js-discipline";
-        emptymessage.innerHTML = 'No events in this discipline today';
-        omsection.appendChild(emptymessage);
+        noEventsDiv.classList.remove('is-hidden')
     }
     else {
-        emptymessage.innerHTML = '';
+        noEventsDiv.classList.add('is-hidden')
     }
 
 }

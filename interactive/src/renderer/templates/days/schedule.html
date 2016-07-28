@@ -1,4 +1,4 @@
-<div class="om-section om-section--divider">
+<div class="om-section om-section-schedule om-section--divider">
     <div class="om-section__title">
         <h3 class="om-schedule-date">
             <time datetime="{{ schedule.day.date }}">
@@ -54,4 +54,7 @@
             </ul>
         </div>
     {% endfor %}
+    <div class='om-no-events is-hidden'>
+        No events in this discipline today.
+    </div>
 </div>
