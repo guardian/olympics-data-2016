@@ -12,6 +12,7 @@ const re = (strings, ...values) => new RegExp(String.raw(strings, ...values), 'i
 const cacheTimes = [
     {'endpoint': re`^olympics/[^/]+/schedule/[^/]+$`, 'duration': moment.duration(5, 'minutes')},
     {'endpoint': re`^olympics/[^/]+/medal-cast$`, 'duration': moment.duration(5 'minutes')},
+    {'endpoint': re`^olympics/[^/]+/medal-table`, 'duration': moment.duration(5 'minutes')},
     {'endpoint': re`^olympics/[^/]+/event-unit/[^/]+/start-list$`, 'duration' : moment.duration(30, 'minutes')},
     {'endpoint': re`^olympics/[^/]+/event-unit/[^/]+/result$`, 'duration' : moment.duration(30, 'minutes')},
 
