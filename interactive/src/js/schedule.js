@@ -77,8 +77,7 @@ function changeDate() {
         let tzEl = $('.js-tz');
         let offset = new Date().getTimezoneOffset();
         let tzSign = offset > 0 ? '-' : '+', absOffset = Math.abs(offset);
-        let tzHour = Math.floor(absOffset / 60), tzMin = absOffset % 60;
-        tzEl.textContent = `${tzSign}${time(tzHour, tzMin)}`;
+        tzEl.textContent = tzSign + time(Math.floor(absOffset / 60), absOffset % 60);
 
         if (!schedule) return;
 
