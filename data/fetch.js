@@ -52,7 +52,7 @@ function aggregatorFn(aggregator) {
                 fallback
             });
         } catch (err) {
-            let fn = combiner.required ? 'error': 'warn';
+            let fn = combiner.required ? 'error' : 'warn';
             logger[fn](`Error processing ${combiner.name} - ${err}, stack trace:`);
             logger[fn](err.stack);
             if (argv.notify) {

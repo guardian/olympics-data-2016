@@ -53,8 +53,7 @@ function PA(logger) {
                 'headers': {
                     'Accept': 'application/json',
                     'Apikey': config.pa.apiKey
-                },
-                'success': resolve
+                }
             })
         );
     }
