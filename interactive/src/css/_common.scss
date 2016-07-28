@@ -494,3 +494,18 @@ a {
         cursor: pointer;
     }
 }
+
+.om-tz-note {
+    @include fs-textSans(3);
+    margin: 0 0 6px;
+    .has-no-events & {
+        display: none;
+    }
+}
+
+.om-empty-message {
+    display: none;
+    .has-no-events & {
+        display: block;
+    }
+}
