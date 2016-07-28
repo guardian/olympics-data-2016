@@ -46,8 +46,9 @@ let resultsCache = {};
 let startDate = dateScheduleEl.getAttribute('data-startdate');
 dateCache[startDate] = dateScheduleEl.innerHTML;
 
-function pad(n) {
-    return (n < 10 ? '0' : '') + n;
+function time(h, m) {
+    let pad = n => (n < 10 ? '0' : '') + n;
+    return `${pad(h)}:${pad(m)}`;
 }
 
 function changeDate() {
@@ -71,13 +72,13 @@ function changeDate() {
 
         $$('.js-time').forEach(timeEl => {
             let date = parseISODate(timeEl.getAttribute('datetime'));
-            timeEl.textContent = `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+            timeEl.textContent = time(date.getHours(), date.getMinutes());
         });
         let tzEl = $('.js-tz');
         let offset = new Date().getTimezoneOffset();
         let tzSign = offset > 0 ? '-' : '+', absOffset = Math.abs(offset);
         let tzHour = Math.floor(absOffset / 60), tzMin = absOffset % 60;
-        tzEl.textContent = `${tzSign}${pad(tzHour)}:${pad(tzMin)}`;
+        tzEl.textContent = `${tzSign}${time(tzHour, tzMin)}`;
 
         if (!schedule) return;
 
