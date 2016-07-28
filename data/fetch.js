@@ -6,8 +6,8 @@ import path from 'path'
 import mkdirp from 'mkdirp'
 import denodeify from 'denodeify'
 import aggregators from './src/aggregators'
-import pa from './src/pa'
-import s3 from './src/s3'
+import PA from './src/pa'
+import S3 from './src/s3'
 import notify from './src/notify'
 import log from './src/log'
 import config from './config'
@@ -16,8 +16,6 @@ import www from './www'
 
 const fsWrite = denodeify(fs.writeFile.bind(fs));
 
-const mainLogger = log('fetch');
-
 var argv = parseArgs(process.argv.slice(2), {'default': {'s3': true, 'pa': true, 'loop': true, 'notify': true}});
 if (argv.test) {
     argv.s3 = argv.pa = argv.loop = argv.notify = false;
@@ -25,20 +23,23 @@ if (argv.test) {
 
 var regExps = argv._.map(r => new RegExp(r))
 
-async function writeData(name, data) {
-    let localPath = `data-out/${name}.json`;
-    await fsWrite(localPath, JSON.stringify(data, null, 2));
-    if (argv.s3) await s3.put(name, data);
-}
-
 function aggregatorFn(aggregator) {
     let logger = log(`aggregator:${aggregator.id}`);
+    let pa = new PA(logger);
+    let s3 = new S3(logger);
+
+    async function writeData(name, data) {
+        let localPath = `data-out/${name}.json`;
+        await fsWrite(localPath, JSON.stringify(data, null, 2));
+        if (argv.s3) await s3.put(name, data);
+    }
+
 
     async function processCombiners([combiner, ...combiners], data, fallback=false) {
         if (!combiner) return data;
 
         let deps = combiner.dependencies ? combiner.dependencies(data) : [];
-        mainLogger.info(`Requesting ${deps.length} resources for ${combiner.name}`);
+        logger.info(`Requesting ${deps.length} resources for ${combiner.name}`);
         let contents = await Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
 
         let combinerData;
