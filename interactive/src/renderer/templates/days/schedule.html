@@ -11,7 +11,7 @@
         </p>
     </div>
 
-    {% for discipline in schedule.disciplines|sortDisciplines(view) %}
+    {% for discipline in schedule.disciplines %}
         <div class="om-discipline js-discipline" data-discipline="{{ discipline.identifier }}" >
             <h4 class="om-discipline__name">{{ discipline.description }}</h4>
             {% if discipline.venues.length === 1 %}
@@ -20,10 +20,10 @@
                 <p class="om-discipline__venue">Multiple venues</p>
             {% endif %}
             <ul class="om-events">
-                {% for event in discipline.events|sortEvents(view) %}
-
-                    <li class="om-event {% if event.status === 'Finished' %}om-event--finished{% endif %}
-                    {% if event.medalEvent === 'Yes' %}om-event-medal{% endif %}">
+                {% for event in discipline.events %}
+                    <li class="om-event
+                               {% if event.status === 'Finished' %}om-event--finished{% endif %}
+                               {% if event.resultAvailable %}om-event--results{% endif %}">
                         <time class="om-event__time" datetime="{{ event.start }}">
                             {{ event.start|datefmt('HH:mm') }}
                         </time>
@@ -33,19 +33,21 @@
                                 <span class="om-event__name__events">({{ event.group.length }} events)</span>
                             {% endif %}
                         </span>
-                        <span class="om-event__id">{{ event.unit.identifier }}</span>
-                        {% for subEvent in event.group  %}
-                            {% set result = results[subEvent.unit.identifier] %}
-                            {% if result %}
+                        {% if event.resultAvailable %}
+                            {% for subEvent in event.group  %}
                                 <div class="om-event__result">
                                     {% if event.group.length > 1 %}
-                                        <span class="om-event__sub-name">{{ subEvent.description }}</span>
+                                        <div class="om-event__sub-name">{{ subEvent.description }}</div>
                                     {% endif %}
-                                    {% include '_result.html' {'result': result} %}
+                                    {% if subEvent.resultAvailable %}
+                                        <div class="js-result" data-unit-id="{{ subEvent.unit.identifier }}"></div>
+                                    {% else %}
+                                        <div>Results still to come</div>
+                                    {% endif %}
                                 </div>
-                            {% endif %}
-                        {% endfor %}
-                        <div class="om-event__clicker js-expand-results"></div>
+                            {% endfor %}
+                            <div class="om-event__clicker js-expand-results"></div>
+                        {% endif %}
                         <div class="om-event__expand"></div>
                     </li>
                 {% endfor %}

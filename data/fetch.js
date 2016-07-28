@@ -25,22 +25,6 @@ if (argv.test) {
 
 var regExps = argv._.map(r => new RegExp(r))
 
-async function processInputs([input, ...inputs], data) {
-    if (!input) return data;
-
-    let deps = input.dependencies(data);
-    mainLogger.info(`Requesting ${deps.length} resources for ${input.name}`);
-    let contents = await Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
-
-    let inputData = input.process(data, contents);
-    await writeData(input.name, {
-        'timestamp' : (new Date).toISOString(),
-        'data' : inputData
-    });
-
-    return await processInputs(inputs, {...data, [input.name]: inputData});
-}
-
 async function writeData(name, data) {
     let localPath = `data-out/${name}.json`;
     await fsWrite(localPath, JSON.stringify(data, null, 2));
@@ -50,24 +34,52 @@ async function writeData(name, data) {
 function aggregatorFn(aggregator) {
     let logger = log(`aggregator:${aggregator.id}`);
 
+    async function processCombiners([combiner, ...combiners], data, fallback=false) {
+        if (!combiner) return data;
+
+        let deps = combiner.dependencies ? combiner.dependencies(data) : [];
+        mainLogger.info(`Requesting ${deps.length} resources for ${combiner.name}`);
+        let contents = await Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
+
+        let combinerData;
+
+        try {
+            combinerData = combiner.process(data, contents);
+            await writeData(combiner.name, {
+                'timestamp': (new Date).toISOString(),
+                'data': combinerData,
+                fallback
+            });
+        } catch (err) {
+            let fn = combiner.required ? 'error': 'warn';
+            logger[fn](`Error processing ${combiner.name} - ${err}, stack trace:`);
+            logger[fn](err.stack);
+            if (argv.notify) {
+                notify.error(err);
+            }
+
+            if (combiner.required) {
+                throw err;
+            }
+        }
+
+        return await processCombiners(combiners, {...data, [combiner.name]: combinerData}, fallback);
+    }
+
+
     async function process() {
         logger.info('Starting');
 
         try {
-            let data = await processInputs(aggregator.inputs, {});
-
-            await Promise.all(aggregator.outputs.map(output => {
-                let outputData = {
-                    'timestamp' : (new Date).toISOString(),
-                    'data' : output.process(data)
-                };
-                return writeData(output.name, outputData);
-            }));
+            await processCombiners(aggregator.combiners, {});
         } catch (err) {
-            logger.error(`Error processing ${aggregator.id}`, err);
-            logger.error(err.stack);
-            if (argv.notify) {
-                notify.send(`Error processing ${aggregator.id}`, util.inspect(err));
+            if (aggregator.fallbackCombiners) {
+                logger.warn('Using fallbacks');
+                try {
+                    await processCombiners(aggregator.fallbackCombiners, {}, true);
+                } catch (err) {
+                    logger.error('Fallbacks failed');
+                }
             }
         }
 
@@ -82,17 +94,12 @@ function aggregatorFn(aggregator) {
 
 mkdirp.sync('data-out');
 
-var aggregatorTickers = {};
-
 aggregators
     .filter(agg => regExps.length === 0 || regExps.some(r => r.test(agg.id)))
     .forEach(aggregator => {
-        let tickFn = aggregatorFn(aggregator);
-        aggregatorTickers[aggregator.id] = tickFn;
-
-        tickFn();
+        aggregatorFn(aggregator)();
     });
 
 if (argv.loop) {
-    www.run(aggregatorTickers);
+    www.run();
 }

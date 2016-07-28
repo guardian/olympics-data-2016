@@ -18,4 +18,10 @@ function send(subject, message) {
     });
 }
 
-export default {send};
+function error(err) {
+    let subject = `${err.name}: ${err.message}`;
+    let message = err.stack;
+    return send(subject, message);
+}
+
+export default {send, error};

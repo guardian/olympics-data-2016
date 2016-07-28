@@ -38,16 +38,17 @@
 
         <section class="om-section">
             <h3 class="om-section__title">Leaderboard</h3>
-            <ol class='om-table'>
+            <ol class='om-table js-table'>
             {% for entry in medalTable %}
                 {% include '_leaderboardEntry.html' { entry } %}
             {% endfor %}
+            {% include '_leaderboardEntry.html' {'entry': emptyMedalTableEntry} %}
             </ol>
             <button class="js-leaderboard-button om-expand-button">All countries</button>
         </section>
     </div>
 
-    {% include './_events.html' {'view' : 'results'} %}
+    {% include './_events.html' {'eventsToday': resultsToday} %}
 
     <script>var isMedalTable = true;</script>
     <script src="./medals.js"></script>

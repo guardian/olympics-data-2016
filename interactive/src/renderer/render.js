@@ -36,29 +36,6 @@ swig.setFilter('eventname', en => {
     return out
 })
 
-swig.setFilter('sortEvents', (events, type) => {
-    let sortFn = type === 'results' ?
-        ((a, b) => a.end < b.end ? 1 : -1) :
-        ((a, b) => a.start < b.start ? -1 : 1);
-    return events.slice().sort(sortFn);
-})
-
-swig.setFilter('sortDisciplines', (ds, type) => {
-
-    let max = (events) => {
-        return Math.max(...events
-            .filter(e => e.end && e.resultAvailable === 'Yes')
-            .map(e => Date.parse(e.end))
-            )
-    }
-
-    let sortFn = (type === 'results') ? 
-        ((a, b) => max(a.events) < max(b.events) ? 1 : -1) :
-        ((a, b) => max(a.events) < max(b.events) ? -1 : 1)
-
-    return ds.slice().sort(sortFn);
-})
-
 swig.setFilter('countryEntrant', medal => {
 
     let entrant = medal.entrant
@@ -67,7 +44,7 @@ swig.setFilter('countryEntrant', medal => {
         return `${entrant.competitors[0].fullName}`
     } else if (entrant.competitors.length === 2) {
         return `${entrant.competitors.map(c => c.lastName).join('/')}`;
-    } else {
+    } else if (medal.eventDetails) {
         if(medal.eventDetails.gender === 'Men'){
             return 'Men\'s team'
         } else if(medal.eventDetails.gender === 'Women'){
@@ -75,9 +52,10 @@ swig.setFilter('countryEntrant', medal => {
         } else {
             return 'Mixed team'
         }
+    } else {
+        return '';
     }
-
-})
+});
 
 swig.setFilter('ordinal', num => {
     if([11,12,13].includes(num % 100)){
@@ -104,13 +82,25 @@ async function readdir(d) {
 async function getAllData() {
     let data = {};
 
-    (await readdir('../data/data-out/*.json')).map(file => {
-        data[path.basename(file, '.json')] = JSON.parse(fs.readFileSync(file)).data;
+    (await readdir('../data/data-out/*.json')).forEach(file => {
+        let contents = JSON.parse(fs.readFileSync(file).toString());
+        let name = path.basename(file, '.json');
+
+        data[name] = contents.data;
+        data[name + 'Fallback'] = contents.fallback;
     });
+
+    data.emptyMedalTableEntry = {
+        'country': {},
+        'medals': {'gold': 0, 'silver': 0, 'bronze': 0},
+        'total': 0,
+        'position': data.medalTable.length + 1
+    };
 
     data.today = '2016-01-15';
 
     data.scheduleToday = data.scheduleByDay.find(schedule => schedule.day.date === data.today);
+    data.resultsToday = data.resultsByDay.find(results => results.day.date === data.today);
 
     let maxMedalCount = _.max(data.medalTable.map(entry => _(entry.medals).values().max()));
     let scale = d3.scaleSqrt()
@@ -155,8 +145,8 @@ let renderTasks = [
     },
     {
         'srcDir' : 'days',
-        'arrGetter' : data => data.scheduleByDay,
-        'context' : schedule => { return {schedule, 'view': 'results'}; },
+        'arrGetter' : data => data.resultsByDay,
+        'context' : schedule => { return {schedule}; },
         'suffix' : schedule => 'results-' + schedule.day.date
     }
 ];
@@ -164,6 +154,7 @@ let renderTasks = [
 async function renderAll() {
     let data = await getAllData();
 
+    // Main templates
     mkdirp.sync('build');
 
     (await readdir('./src/renderer/templates/*.html')).forEach(template => {
@@ -177,10 +168,34 @@ async function renderAll() {
         fs.writeFileSync(`build/${name}.html`, html, 'utf8');
     });
 
+    // Tasks
     for (let task of renderTasks) {
         await renderTask(task, data);
     }
 
+    // Result JSON files
+    mkdirp.sync('build/days');
+
+    data.scheduleByDay.forEach(schedule => {
+
+        console.log(`Rendering days/results-${schedule.day.date}.json`);
+
+        let events = _(schedule.disciplines)
+            .flatMap('events')
+            .flatMap('group')
+            .filter(evt => !!data.results[evt.unit.identifier])
+            .keyBy('unit.identifier')
+            .mapValues(evt => {
+                return swig.renderFile('./src/renderer/templates/_result.html', {
+                    'result': data.results[evt.unit.identifier]
+                }).replace(/\s+/g, ' ');
+            })
+            .valueOf();
+
+        fs.writeFileSync(`build/days/results-${schedule.day.date}.json`, JSON.stringify(events, null, 2));
+    });
+
+    // Embed templates
     mkdirp.sync('build/embed');
 
     let embedCSS = fs.readFileSync('build/embed.css');

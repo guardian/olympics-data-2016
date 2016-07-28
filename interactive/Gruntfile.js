@@ -113,7 +113,7 @@ module.exports = function(grunt) {
                         cwd: 'build',
                         src: [
                             '*.html', '*.css', '*.js', '*.js.map',
-                            '*.json', 'days/*.html', 'embed/*.html',
+                            '*.json', 'days/*.html', 'days/*.json', 'embed/*.html',
                             'medals/countries/*.html',
                             'data/*.json',
                             'assets/**/*'
