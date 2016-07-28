@@ -10,7 +10,7 @@
             Day {{ schedule.day.dateNo + 1 }} of {{ scheduleByDay.length }}
         </p>
     </div>
-
+    <div class="empty-message is-hidden">No events in this sport today</div>
     {% for discipline in schedule.disciplines %}
         <div class="om-discipline js-discipline" data-discipline="{{ discipline.identifier }}" >
             <h4 class="om-discipline__name">{{ discipline.description }}</h4>
