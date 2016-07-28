@@ -293,6 +293,7 @@ export default {
             'process': ({dates}, dateSchedules) => {
                 let datesEvents = dateSchedules.map(ds => {
                     return forceArray(ds.olympics.scheduledEvent)
+                        .filter(evt => evt.discipline && evt.discipline.event && evt.discipline.event.evenUnit)
                         .filter(evt => evt.discipline.event.eventUnit.unitType !== 'Not Applicable')
                         .map(parseScheduledEvent)
                         .filter(evt => !!evt.start);
