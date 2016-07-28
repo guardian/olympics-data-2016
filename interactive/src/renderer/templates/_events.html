@@ -1,26 +1,29 @@
 <div class="om-filter">
     <div class="om-filter__inner">
-        Events in
-        <select class="om-filter__choice js-discipline-choice" disabled>
-            <option value="">All sports</option>
-            {% for discipline in disciplines %}
-                <option value="{{ discipline.identifier }}">{{ discipline.description }}</option>
-            {% endfor %}
-        </select>
-        on
-        <select class="om-filter__choice js-date-choice" disabled>
-            {% for date in dates %}
-                <option value="{{ date }}" {% if date == today %}selected{% endif %}>
-                    Day {{ loop.index }} – {{ date|datefmt('ddd D') }}
-                </option>
-            {% endfor %}
-        </select>
-
+        <span class="om-filter__line">
+            Events in
+            <select class="om-filter__choice js-discipline-choice" disabled>
+                <option value="">All sports</option>
+                {% for discipline in disciplines %}
+                    <option value="{{ discipline.identifier }}">{{ discipline.description }}</option>
+                {% endfor %}
+            </select>
+        </span>
+        <span class="om-filter__line">
+            on
+            <select class="om-filter__choice js-date-choice" disabled>
+                {% for date in dates %}
+                    <option value="{{ date }}" {% if date == today %}selected{% endif %}>
+                        Day {{ loop.index }} – {{ date|datefmt('ddd D') }}
+                    </option>
+                {% endfor %}
+            </select>
+        </span>
     </div>
 </div>
 <div class="om-container">
-    <div class="om-date-schedule js-date-schedule" data-startdate="{{ scheduleToday.day.date }}">
-        {% include './days/schedule.html' {'schedule': scheduleToday, 'view': view} %}
+    <div class="om-date-schedule js-date-schedule" data-startdate="{{ eventsToday.day.date }}">
+        {% include './days/schedule.html' {'schedule': eventsToday} %}
     </div>
     <div class="om-section om-error js-error">
         <h3 class="om-section__title">Error</h3>

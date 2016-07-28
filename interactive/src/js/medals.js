@@ -1,3 +1,5 @@
+import './polyfill/classList.min'
+
 import { $, $$ } from './lib/selector'
 import RelativeTime from './lib/relative'
 import reqwest from 'reqwest'
@@ -6,19 +8,16 @@ import './schedule'
 
 let lbButton = $('.js-leaderboard-button')
 let rButton = $('.js-recent-button')
-let countries = $$('.om-table-row')
+let tableEl = $('.js-table');
+let emptyRowEl = $('.js-row-empty');
 
 let countryCache = {}
 
 RelativeTime.setNow(Date.now())
 
 lbButton.addEventListener('click', e => {
-    countries
-    .filter(el => el.getAttribute('data-position') > 10 && parseInt(el.getAttribute('data-total')) !== 0)
-    .forEach(function(el){
-        el.classList.toggle('om-is-hidden')
-    })
     lbButton.innerHTML = (lbButton.innerHTML === 'Hide countries') ? 'All countries' : 'Hide countries'
+    tableEl.classList.toggle('is-expanded');
     lbButton.classList.toggle('hide-button')
 })
 
@@ -28,7 +27,7 @@ let recentContainer = $('.om-recent-days')
 let countryContainer = $('.om-country')
 
 function ordinal(num) {
-    if([11,12,13].includes(num % 100)){
+    if([11,12,13].indexOf(num % 100) > -1){
         return num + 'th'
     }
     else if(num % 10 === 1){
@@ -44,13 +43,9 @@ function ordinal(num) {
 }
 
 function changeCountry() {
-
     let identifier = cSelect.options[cSelect.selectedIndex].value
-    let p = countryCache[identifier] ? Promise.resolve(countryCache[identifier]) :
-        Promise.resolve(reqwest(`./medals/countries/countryMedals-${identifier}.html`))
 
-    p.then(country => {
-
+    function render(country) {
         countryCache[identifier] = country
         countryContainer.innerHTML = country
 
@@ -58,14 +53,18 @@ function changeCountry() {
             RelativeTime.processEl(el)
         })
 
-        let row = $(`.om-table-row[data-id="${identifier}"]`).cloneNode(true)
-        row.classList.remove('om-is-hidden')
+        let row = $(`.om-table-row[data-id="${identifier}"]`);
+        if (!row) {
+            row = emptyRowEl.cloneNode(true);
+            row.querySelector('.om-table-row__flag').classList.add(`om-flag--${identifier}`);
+            row.querySelector('.om-table-row__country').textContent = identifier;
+        }
 
         let posSpan = $('.om-position-ordinal')
         posSpan.innerHTML = ordinal(parseInt(row.getAttribute('data-position')))
 
         let favouriteTable = $('.om-table--favourite')
-        favouriteTable.innerHTML = row.outerHTML
+        favouriteTable.innerHTML = row.outerHTML;
 
         let cmButton = $('.js-country-medals-button')
         if(cmButton){
@@ -75,7 +74,13 @@ function changeCountry() {
                 cmButton.innerHTML = (cmButton.innerHTML === 'All medals') ? 'Fewer medals' : 'All medals'
             })
         }
-    })
+    };
+
+    if (countryCache[identifier]) {
+        render(countryCache[identifier]);
+    } else {
+        reqwest(`./medals/countries/countryMedals-${identifier}.html`).then(render);
+    }
 }
 
 cSelect.addEventListener('change', () => {
@@ -83,5 +88,5 @@ cSelect.addEventListener('change', () => {
 })
 
 // select GBR by default
-cSelect.selectedIndex = Array.from(cSelect.options).find(o => o.value === 'GBR').index
+cSelect.selectedIndex = [].slice.apply(cSelect.options).map(o => o.value).indexOf('GBR');
 changeCountry()

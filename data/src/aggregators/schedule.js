@@ -1,6 +1,13 @@
 import _ from 'lodash'
 import moment from 'moment'
 
+import notify from '../notify'
+import log from '../log'
+
+import { forceArray } from '../aggregators.js'
+
+const logger = log('schedule');
+
 const roundDisciplines = {
     'badminton': 'Game Scores',
     'basketball': 'Quarter Scores',
@@ -21,10 +28,6 @@ const combineBlacklist = [
     'tennis', 'volleyball', 'water-polo'
 ];
 
-function forceArray(arr) {
-    return arr === undefined ? [] : _.isArray(arr) ? arr : [arr];
-}
-
 function canCombine(group, evt1) {
     if (combineBlacklist.indexOf(evt1.discipline.identifier) > -1) return false;
     if (evt1.phase.value === 'Finals') return false;
@@ -38,6 +41,19 @@ function canCombine(group, evt1) {
         moment(evt1.start).subtract(10, 'minutes').isSameOrBefore(evt2.end);
 }
 
+// Some strange guess work logic for the overall status
+// Thinking is: only Scheduled/Finished when everything is
+//              otherwise status of non Scheduled/Finished
+//              or just Running
+function combineStatuses(statuses) {
+    if (statuses.length === 1) {
+        return statuses[0];
+    } else {
+        let weirdStatuses = _.difference(statuses, ['Scheduled', 'Finished']);
+        return weirdStatuses.length === 1 ? weirdStatuses[0] : 'Running';
+    }
+}
+
 function combineEvents(evts) {
     let combinedEvents = _(evts)
         .sortBy(evt => `${evt.phase.identifier}:${evt.start}`)
@@ -48,56 +64,51 @@ function combineEvents(evts) {
         }, [])
         .map(group => {
             let first = group[0];
-            if (group.length === 1) {
-                return {...first, group};
-            } else {
-                let statuses = _.uniq(group.map(evt => evt.status));
-                let status;
-                // Some strange guess work logic for the overall status
-                // Thinking is: only Scheduled/Finished when everything is
-                //              otherwise status of non Scheduled/Finished
-                //              or just Running
-                if (statuses.length === 1) {
-                    status = statuses[0];
-                } else {
-                    let weirdStatuses = _.difference(statuses, 'Scheduled', 'Finished');
-                    if (weirdStatuses.length === 1) {
-                        status = wierdStatuses[0];
-                    } else {
-                        status = 'Running';
-                    }
-                }
-
-                let description = `${first.event.description} ${first.phase.value}`;
-                let start = _.min(group.map(evt => evt.start));
-                let end = _.max(group.map(evt => evt.end));
-                return {...first, description, start, end, status, group};
-            }
-        })
-        .sort((a, b) => a.start < b.start ? -1 : 1);
+            let description = group.length === 1 ?
+                first.description : `${first.event.description} ${first.phase.value}`;
+            let status = combineStatuses(_(group).map('status').uniq().valueOf());
+            let resultAvailable = group.some(evt => evt.resultAvailable);
+            let start = _.min(group.map(evt => evt.start));
+            let end = _.max(group.map(evt => evt.end));
+            return {...first, description, start, end, status, resultAvailable, group};
+        });
 
     return combinedEvents;
 }
 
-function parseScheduledEvent(evt) {
-    // try to guard against all possible data problems
-    if (!evt.start || !evt.discipline || !evt.discipline.event || !evt.discipline.event.eventUnit) {
-        return {};
-    }
+function formatScheduleDiscipline(events) {
+    let discipline = events[0].discipline;
+    let venues = _(events).map('venue').uniqBy('identifier').valueOf();
 
     return {
-        'description': evt.description,
-        'start': evt.start.utc,
-        'end': evt.end && evt.end.utc,
-        'status': evt.status,
-        'venue': evt.venue,
-        'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
-        'phase': evt.discipline.event.eventUnit.phaseDescription,
-        'event': _.pick(evt.discipline.event, ['identifier', 'description']),
-        'discipline': _.pick(evt.discipline, ['identifier', 'description']),
-        'resultAvailable': evt.resultAvailable,
-        'startListAvailable': evt.startListAvailable
+        'identifier': discipline.identifier,
+        'description': discipline.description,
+        events, venues
     };
+}
+
+function parseScheduledEvent(evt) {
+    try {
+        return {
+            'description': evt.description,
+            'start': evt.start.utc,
+            'end': evt.end && evt.end.utc,
+            'status': evt.status,
+            'venue': evt.venue,
+            'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
+            'phase': evt.discipline.event.eventUnit.phaseDescription,
+            'event': _.pick(evt.discipline.event, ['identifier', 'description']),
+            'discipline': _.pick(evt.discipline, ['identifier', 'description']),
+            'resultAvailable': evt.resultAvailable === 'Yes',
+            'startListAvailable': evt.startListAvailable === 'Yes',
+            'medalEvent': evt.medalEvent === 'Yes'
+        };
+    } catch (err) {
+        logger.error('Failed to parse scheduled event', err);
+        logger.error(err.stack);
+        notify.error(err);
+        return {};
+    }
 }
 
 function parseValue(value) {
@@ -108,17 +119,12 @@ function parseValue(value) {
 }
 
 function parseEntrant(entrant) {
-    let properties = _(forceArray(entrant.property))
-        .keyBy('type')
-        .mapValues('value')
-        .valueOf();
-
+    let properties = _(forceArray(entrant.property)).keyBy('type').mapValues('value').valueOf();
     let resultExtensions = _.keyBy(forceArray(entrant.resultExtension), 'type');
 
     return {
         'code': entrant.code,
         'order': parseInt(entrant.order),
-        'rank': parseInt(entrant.rank),
         'type': entrant.type,
         'competitors': forceArray(entrant.participant).map(p => p.competitor),
         'country': entrant.country,
@@ -127,29 +133,39 @@ function parseEntrant(entrant) {
         resultExtensions,
         'medal': properties['Medal Awarded'],
         'record': properties['Record Set'],
-        'winner': properties['Won Lost Tied'] === 'Won',
-        'invalidResultMark': properties['Invalid Result Mark'],
-        'qualified': (properties['Qualification Mark'] || '').startsWith('Qualified')
+        'invalidResultMark': properties['Invalid Result Mark']
     };
 }
 
 function parseResult(eventUnit) {
-    let entrants = forceArray(eventUnit.result.entrant)
-        .map(parseEntrant)
-        .sort((a, b) => a.order - b.order);
+    try {
+        let entrants = forceArray(eventUnit.result.entrant)
+            .map(parseEntrant)
+            .sort((a, b) => a.order - b.order);
 
-    let qualificationSpots = entrants.filter(e => e.qualified).length;
+        let result = {
+            'identifier': eventUnit.identifier,
+            'discipline': eventUnit.disciplineDescription,
+            'medalEvent': eventUnit.medalEvent === 'Yes',
+            'teamEvent': eventUnit.teamEvent === 'Yes',
+            entrants
+        };
 
-    let result = {
-        'identifier': eventUnit.identifier,
-        'discipline': eventUnit.disciplineDescription,
-        'medalEvent': eventUnit.medalEvent === 'Yes',
-        'teamEvent': eventUnit.teamEvent === 'Yes',
-        entrants,
-        qualificationSpots
-    };
-
-    return resultReducers.reduce((res, reducer) => reducer(res), result);
+        // Reducers are extra
+        try {
+            return resultReducers.reduce((res, reducer) => reducer(res), result);
+        } catch (err) {
+            logger.error('Failed to apply result reducers', err);
+            logger.error(err.stack);
+            notify.error(err);
+            return result;
+        }
+    } catch (err) {
+        logger.error('Failed to parse result', err);
+        logger.error(err.stack);
+        notify.error(err);
+        return {};
+    }
 }
 
 const resultReducers = [
@@ -202,8 +218,7 @@ const resultReducers = [
             entrant.splits = _.range(0, splitCount).map(splitNo => {
                 let split = entrant.splits[splitNo] || {};
                 let position = splitTimes[splitNo].indexOf(split.cmp) + 1;
-                let qualifying = position > 0 && position <= result.qualificationSpots;
-                return {...split, position, qualifying};
+                return {...split, position};
             });
         });
 
@@ -249,14 +264,21 @@ const resultReducers = [
         let roundType = roundExtensionType.replace(' Scores', 's');
 
         return {...result, entrants, roundNames, roundType};
+    },
+    // Must be last, removes unprocessed API data
+    result => {
+        let entrants = result.entrants.map(entrant => _.omit(entrant, ['properties', 'resultExtensions']));
+        return {...result, entrants};
     }
 ];
 
 export default {
     'id': 'schedule',
-    'inputs': [
+    'cacheTime': moment.duration(5, 'minutes'),
+    'combiners': [
         {
             'name': 'dates',
+            'required': true,
             'dependencies': () => ['olympics/2016-summer-olympics/schedule'],
             'process': ({}, [schedule]) => {
                 return forceArray(schedule.olympics.schedule).map(s => s.date);
@@ -264,6 +286,7 @@ export default {
         },
         {
             'name': 'events',
+            'required': true,
             'dependencies': ({dates}) => {
                 return dates.map(date => `olympics/2016-summer-olympics/schedule/${date}`);
             },
@@ -285,31 +308,27 @@ export default {
             }
         },
         {
-            'name' : 'eventDetails',
-            'dependencies' : ({events}) => _.map(events, v => {
-                return `olympics/2016-summer-olympics/event/${v.event.identifier}`
-            }),
-            'process' : ({}, fullEvents) => {
-
-                let flat = _(fullEvents)
-                    .map(fe => fe.olympics.event)
-                    .map(fe => {
-                        return [ fe.identifier, {
-                            gender : fe.gender
-                        }]
-                    })
-                    .fromPairs()
-                    .valueOf()
-
-                return flat
+            'name': 'results',
+            'required': true,
+            'dependencies': ({events}) => {
+                return _.values(events)
+                    .filter(evt => evt.resultAvailable)
+                    .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/result`);
+            },
+            'process': ({}, results) => {
+                return _(results)
+                    .map('olympics.eventUnit')
+                    .map(parseResult)
+                    .filter(result => !!result.identifier)
+                    .keyBy('identifier')
+                    .valueOf();
             }
         },
         /*{
-        {
             'name': 'startLists',
             'dependencies': ({events}) => {
                 return _.values(events)
-                    .filter(evt => evt.startListAvailable === 'Yes')
+                    .filter(evt => evt.startListAvailable)
                     .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/start-list`);
             },
             'process': ({}, startLists) => {
@@ -326,62 +345,6 @@ export default {
             }
         },*/
         {
-            'name': 'results',
-            'dependencies': ({events}) => {
-                return _.values(events)
-                    .filter(evt => evt.resultAvailable === 'Yes')
-                    .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/result`);
-            },
-            'process': ({}, results) => {
-                return _(results)
-                    .map('olympics.eventUnit')
-                    .keyBy('identifier')
-                    .mapValues(parseResult)
-                    .valueOf();
-            }
-        },
-        {
-            'name' : 'countries',
-            'dependencies' : () => ['olympics/2016-summer-olympics/country'],
-            'process' : ({}, [countries]) => countries.olympics.country
-        },
-        {
-            'name' : 'medalTablePA',
-            'dependencies' : () => ['olympics/2016-summer-olympics/medal-table/'],
-            'process' : ({}, [medalTable]) => forceArray(medalTable.olympics.games.medalTable.tableEntry)
-        },
-        {
-            'name' : 'latestMedals',
-            'dependencies' : () => ['olympics/2016-summer-olympics/medal-cast'],
-            'process' : ({}, [medalCast]) => {
-                let medalsGroupedByEventUnit = _(forceArray(medalCast.olympics.games.medalCast))
-                    .groupBy('event.eventUnit.identifier')
-                    .mapValues(eventUnitMedals => {
-                        return eventUnitMedals.map(medal => {
-                            let participantArr = forceArray(medal.entrant.participant);
-
-                            medal.type = medal.type.toLowerCase();
-                            medal.entrant.participant = participantArr;
-
-                            // return {...medal, 'entrant': {...medal.entrant,participantArr}};
-
-                            return medal;
-                        });
-                    });
-
-                return _.toArray(medalsGroupedByEventUnit).map(eventMedals => {
-                    let event = _.head(eventMedals).event;
-
-                    let eventName = event.description;
-                    let discipline = event.disciplineDescription.value;
-
-                    return {'eventName': eventName, 'discipline': discipline, 'medals': eventMedals}
-                });
-            }
-        }
-    ],
-    'outputs': [
-        {
             'name': 'scheduleByDay',
             'process': ({events}) => {
                 let scheduleByDay = _(events)
@@ -389,18 +352,11 @@ export default {
                     .groupBy('day.date')
                     .map(dateEvents => {
                         let day = dateEvents[0].day;
-
                         let disciplines = _(dateEvents)
                             .groupBy('discipline.identifier')
                             .map(disciplineEvents => {
-                                let events = combineEvents(disciplineEvents);
-                                let venues = _(events).map('venue').uniqBy('identifier').valueOf();
-
-                                return {
-                                    'identifier': disciplineEvents[0].discipline.identifier,
-                                    'description': disciplineEvents[0].discipline.description,
-                                    events, venues, results : disciplineEvents.some(de => de.resultAvailable === 'Yes')
-                                };
+                                let events = combineEvents(disciplineEvents).sort((a, b) => a.start < b.start ? -1 : 1);
+                                return formatScheduleDiscipline(events);
                             })
                             .sortBy('description')
                             .valueOf();
@@ -414,13 +370,38 @@ export default {
             }
         },
         {
+            'name': 'resultsByDay',
+            'process': ({events}) => {
+                let resultsByDay = _(events)
+                    .filter(evt => evt.resultAvailable)
+                    .groupBy('day.date')
+                    .map(dateEvents => {
+                        let day = dateEvents[0].day;
+                        let disciplines = _(dateEvents)
+                            .groupBy('discipline.identifier')
+                            .map(disciplineEvents => {
+                                let events = combineEvents(disciplineEvents).sort((a, b) => a.end < b.end ? 1 : -1);
+                                return formatScheduleDiscipline(events);
+                            })
+                            .orderBy(discipline => _(discipline.events).map('end').max(), 'desc')
+                            .valueOf();
+
+                        return {day, disciplines};
+                    })
+                    .sortBy('day.date')
+                    .valueOf();
+
+                return resultsByDay;
+            }
+        },
+        {
             'name': 'medalTable',
-            'process': ({results, countries}) => {
+            'process': ({results}) => {
                 let medalCountries = _(results)
                     .flatMap('entrants')
                     .filter(entrant => !!entrant.medal)
                     .groupBy('country.identifier')
-                    .map((countryEntrants, countryId) => {
+                    .map(countryEntrants => {
                         let country = countryEntrants[0].country;
                         let medals = _(['gold', 'silver', 'bronze'])
                             .map(medal => {
@@ -434,31 +415,13 @@ export default {
                         return {country, medals, total};
                     })
                     .orderBy(
-                        ['medals.gold', 'medals.silver', 'medals.bronze', 'country.code'],
+                        ['medals.gold', 'medals.silver', 'medals.bronze', 'country.identifier'],
                         ['desc', 'desc', 'desc', 'asc']
                     )
                     .valueOf();
 
-                let noMedalCountries = _(countries)
-                    .filter(c1 => !medalCountries.find(c2 => c2.countryCode === c1.identifier))
-                    .map(c => {
-                        return {
-                            countryCode : c.identifier,
-                            medals : {
-                                gold : 0,
-                                silver : 0,
-                                bronze : 0
-                            },
-                            total : 0
-                        }
-                    })
-                    .sortBy(c => c.countryCode)
-                    .valueOf()
-
-                let allCountries = medalCountries.concat(noMedalCountries)
-
-                let medalTable = allCountries.map(c1 => {
-                    let position = allCountries.findIndex(c2 => _.isEqual(c1.medals, c2.medals)) + 1;
+                let medalTable = medalCountries.map(c1 => {
+                    let position = medalCountries.findIndex(c2 => _.isEqual(c1.medals, c2.medals)) + 1;
                     return {...c1, position};
                 });
 
@@ -466,8 +429,29 @@ export default {
             }
         },
         {
+            'name' : 'countries',
+            'dependencies' : () => ['olympics/2016-summer-olympics/country'],
+            'process' : ({}, [countries]) => countries.olympics.country
+        },
+        {
+            'name' : 'eventDetails',
+            'dependencies' : ({events}) => {
+                return _(events)
+                    .map(v => `olympics/2016-summer-olympics/event/${v.event.identifier}`)
+                    .uniq()
+                    .valueOf();
+            },
+            'process' : ({}, eventDetails) => {
+                return _(eventDetails)
+                    .map('olympics.event')
+                    .keyBy('identifier')
+                    .mapValues(ed => { return {'gender': ed.gender}; })
+                    .valueOf();
+            }
+        },
+        {
             'name': 'medalsByCountry',
-            'process': ({events, results, countries, eventDetails}) => {
+            'process': ({events, results, countries, eventDetails = {}}) => {
                 let medals = _(results)
                     .filter(result => result.medalEvent)
                     .flatMap(result => {
@@ -475,7 +459,11 @@ export default {
                         return result.entrants
                             .filter(entrant => !!entrant.medal)
                             .map(entrant => {
-                                return {entrant, 'event': events[result.identifier], 'eventDetails' : eventDetails[result.identifier.slice(0,-3)]};
+                                return {
+                                    entrant,
+                                    'event': events[result.identifier],
+                                    'eventDetails': eventDetails[result.identifier.slice(0,-3)]
+                                };
                             });
                     })
                     .sortBy('event.end')
@@ -500,7 +488,28 @@ export default {
 
                 return _.merge(medals, noMedals)
             }
-        }
+        },
     ],
-    'cacheTime': moment.duration(5, 'minutes')
+    'fallbackCombiners': [
+        {
+            'name': 'medalTable',
+            'dependencies': () => ['olympics/2016-summer-olympics/medal-table'],
+            'process': ({}, [medalTable]) => {
+                return forceArray(medalTable.olympics.games.medalTable.tableEntry)
+                    .map(entry => {
+                        let medals = _(['gold', 'silver', 'bronze'])
+                            .map(type => [type, parseInt(entry[type].value)])
+                            .fromPairs()
+                            .valueOf();
+
+                        return {
+                            'country': entry.country,
+                            'medals': medals,
+                            'total': parseInt(entry.total.value),
+                            'position': parseInt(entry.position)
+                        };
+                    });
+            }
+        }
+    ]
 };

@@ -15,8 +15,9 @@
         </div>
     </h2>
 
-    {% include './_events.html' { view : 'schedule' } %}
+    {% include './_events.html' {'eventsToday': scheduleToday} %}
 
+    <script>var isMedalTable = false;</script>
     <script src="./schedule.js"></script>
 </body>
 </html>

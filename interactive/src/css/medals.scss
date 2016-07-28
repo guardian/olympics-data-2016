@@ -148,6 +148,9 @@
 
 .om-table-row {
 	margin: 24px 0;
+
+	padding-left: 100px;
+	padding-right: 20px;
 	position: relative;
 
 	&:before {
@@ -166,62 +169,76 @@
 		content: '';
 		clear: both;
 	}
+
+    &.om-table-row--empty,
+    &.om-table-row--extra {
+        display: none;
+        .om-recent & {
+            display: block;
+        }
+    }
+
+    .is-expanded &.om-table-row--extra {
+        display: block;
+    }
 }
 
-.om-table-el {
-	float: left;
-	position: relative;
+.om-table-left-area {
+	position: absolute;
+	left: 0;
+    background-color: white;
 }
 
-.om-table-el--position {
+.om-table-row__position {
 	@include fs-headline(2);
+    display: inline-block;
+	text-align: right;
 	padding-right: 8px;
-	width: 25px;
+	width: 16px;
 	float: left;
-	background-color: white;
 }
 
-.om-table-el--flag {
-	width: 20px;
-	height: 20px;
-	margin-bottom: -6px;
+.om-table-row__flag {
+    display: inline-block;
+    vertical-align: top;
 }
 
-.om-table-el--country {
+.om-table-row__country {
 	@include fs-headline(2);
-	width: 48px;
-	margin-left: 0;
-	margin-right: 0;
+    display: inline-block;
+	width: 32px;
+	padding: 0 6px 0 4px;
 }
 
-.om-table-el--medal {
-	width: 22%;
+.om-table-row__medal {
+    float: left;
+	width: 30%;
 	position: relative;
 	text-align: center;
 }
 
-.om-table-el--total {
+.om-table-row-medal__first {
+	margin-left: 5%;
+}
+
+.om-table-row__total {
 	@include fs-headline(2);
+	position: absolute;
+	right: 0;
 	font-weight: bold;
-	text-align: right;
-	padding: 0 8px;
-	float: right;
-	background-color: white;
+	padding-left: 6px;
+    background-color: white;
 }
 
-.om-table-country-label {
-	background-color: white;
-	padding: 0 8px;
-}
-
-.om-medal-circle{
-	width:8px;
-	height:8px;
-	border-radius:500px;
+.om-medal-circle {
+	width: 8px;
+	height: 8px;
+	border-radius: 500px;
 	display: block;
 	position: absolute;
-	left: calc(50% - 4px);
-	top: calc(50% - 4px);
+    margin: -4px 0 0 -4px;
+	left: 50%;
+	top: 50%;
 	z-index: 2;
 }
 
@@ -230,15 +247,14 @@
 	height:8px;
 	background-color: white;
 	z-index: 0;
-	display: block;
 	position: absolute;
-	left: calc(50% - 4px);
-	top: calc(50% - 4px);
+    margin: -4px 0 0 -4px;
+	left: 50%;
+	top: 50%;
 }
 
 .om-medal-circle--gold {
 	background-color: $goldLight;
-
 }
 
 .om-medal-circle--silver {

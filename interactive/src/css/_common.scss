@@ -47,6 +47,7 @@ a {
 
 .om-container {
     background-color: white;
+    border-bottom: 1px solid white;
 }
 
 .om-header {
@@ -106,6 +107,17 @@ a {
 .om-filter__inner {
     @include fs-bodyCopy(1);
     background-color: #fded80;
+}
+
+.om-filter__line {
+    display: block;
+    margin-bottom: 2px;
+    &:last-child {
+        margin-bottom: 0;
+    }
+    @include mq(mobileLandscape) {
+        display: inline;
+    }
 }
 
 .om-filter__choice {
@@ -262,7 +274,7 @@ a {
     @include fs-textSans(2);
     position: relative;
     border-top: 1px dotted #bdbdbd;
-    padding: 5px 20px 3px 65px;
+    padding: 5px 25px 3px 65px;
 
     @include mq(mobileLandscape) {
         padding-left: 80px;
@@ -296,6 +308,7 @@ a {
         line-height: 14px;
         color: #999;
         padding: 1px 0;
+        text-align: left;
     }
     td {
         vertical-align: middle;
@@ -409,25 +422,16 @@ a {
 
 .om-event__time {
     position: absolute;
-    width: 58px;
+    width: 56px;
     left: 3px;
 }
 
 .om-event__name {
     font-weight: 500;
-    padding-right: 40px;
-}
-
-.om-event__sub-name {
 }
 
 .om-event__name__events {
     font-weight: normal;
-}
-
-.om-event__id {
-    position: relative;
-    z-index: 5;
 }
 
 .om-event__venue {
@@ -435,9 +439,10 @@ a {
 }
 
 .om-event__result {
-    margin: 12px 0 0 -65px;
+    margin: 12px -22px 0 -62px;
     @include mq(mobileLandscape) {
         margin-left: 0;
+        margin-right: 0;
     }
 
     display: none;
@@ -454,21 +459,50 @@ a {
     height: 16px;
     background-size: 100% 100%;
 
-    background-image: url(assets/imgs/clock.svg);
-    .om-event--finished & {
+    display: none;
+
+    .om-event:not(.om-event--finished) & {
+        background-image: url(assets/imgs/clock.svg);
+        display: block;
+    }
+
+    .is-expandable & {
+        display: block;
+    }
+
+    .om-event.om-event--results & {
         background-image: url(assets/imgs/plus.svg);
     }
-    .om-event--finished.is-expanded & {
+    .om-event.om-event--results.is-expanded & {
         background-image: url(assets/imgs/minus.svg);
     }
 }
 
 .om-event__clicker {
     position: absolute;
+    background: url(#);
     z-index: 2;
     left: 0;
     right: 0;
     top: 0;
     bottom: 0;
-    cursor: pointer;
+    .is-expandable & {
+        cursor: pointer;
+    }
+}
+
+.om-tz-note {
+    @include fs-textSans(3);
+    color: #767676;
+    margin: 0 0 6px;
+    .has-no-events & {
+        display: none;
+    }
+}
+
+.om-empty-message {
+    display: none;
+    .has-no-events & {
+        display: block;
+    }
 }

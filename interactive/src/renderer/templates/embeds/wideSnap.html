@@ -28,22 +28,22 @@
                     </th>
                     <th>T</th>
                 </tr>
-                {% for row in medalTablePA|slice(6) %}
+                {% for row in medalTable|slice(6) %}
                 <tr>
                     <td style="text-align: left;">
                         {{row.country.name}}
                     </td>
                     <td class="og-snap__greyed-rows">
-                        {{row.gold.value}}
+                        {{row.medals.gold}}
                     </td>
                     <td class="og-snap__greyed-rows">
-                        {{row.silver.value}}
+                        {{row.medals.silver}}
                     </td>
                     <td class="og-snap__greyed-rows">
-                        {{row.bronze.value}}
+                        {{row.medals.bronze}}
                     </td>
                     <td>
-                        {{row.total.value}}
+                        {{row.total}}
                     </td>
                 </tr>
                 {% endfor %}
