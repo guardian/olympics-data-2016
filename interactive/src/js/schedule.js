@@ -12,25 +12,22 @@ let errorEl = $('.js-error');
 function filterDisciplines() {
     let identifier = disciplineChoiceEl.options[disciplineChoiceEl.selectedIndex].value;
 
+    let count = 0;
     $$(dateScheduleEl, '.js-discipline').map(el => {
         return { el, 'identifier': el.getAttribute('data-discipline') };
     }).forEach(discipline => {
         if (identifier === '' || identifier === discipline.identifier) {
             discipline.el.classList.remove('is-hidden');
+            count++;
         } else {
             discipline.el.classList.add('is-hidden');
         }
     });
 
-    var count = $$(dateScheduleEl, '.js-discipline:not(.is-hidden)').length;
-
-    var emptymessage = $('.empty-message');
-
     if (count < 1) {
-        emptymessage.classList.remove('is-hidden');
-    }
-    else {
-        emptymessage.classList.add('is-hidden');
+        dateScheduleEl.classList.add('has-no-events');
+    } else {
+        dateScheduleEl.classList.remove('has-no-events');
     }
 
 }

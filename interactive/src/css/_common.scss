@@ -245,7 +245,7 @@ a {
     margin: 0;
 }
 
-.om-discipline.is-hidden, .empty-message.is-hidden {
+.om-discipline.is-hidden {
     display: none;
 }
 
@@ -495,4 +495,14 @@ a {
     @include fs-textSans(3);
     color: #767676;
     margin: 0 0 6px;
+    .has-no-events & {
+        display: none;
+    }
+}
+
+.om-empty-message {
+    display: none;
+    .has-no-events & {
+        display: block;
+    }
 }
