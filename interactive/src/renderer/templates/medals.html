@@ -19,6 +19,7 @@
         <div class="om-filter__inner">
             How is 
             <select class='om-select-country om-filter__choice'>
+                    <option value=''></option>
                 {% for c in countries %}
                     <option value='{{ c.identifier }}'>{{ c.name }}</option>
                 {% endfor %}

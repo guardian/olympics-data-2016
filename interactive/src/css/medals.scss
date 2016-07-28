@@ -217,6 +217,10 @@
 	text-align: center;
 }
 
+.om-table-row-medal__first {
+	margin-left: 5%;
+}
+
 .om-table-row__total {
 	@include fs-headline(2);
 	position: absolute;

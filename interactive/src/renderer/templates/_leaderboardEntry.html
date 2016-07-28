@@ -7,7 +7,7 @@
         <span class='om-table-row__flag om-flag om-flag--{{ entry.country.identifier }}'></span>
         <span class='om-table-row__country'>{{ entry.country.identifier }}</span>
     </div>
-    <div class='om-table-row__medal'>
+    <div class='om-table-row__medal om-table-row-medal__first'>
         <div class="om-medal-white" style="transform:scale({{ entry.medals.gold|maskScale }})"></div>
         <div class="om-medal-circle om-medal-circle--gold"
             style="transform:scale({{ entry.medals.gold|circleScale }})"></div>
