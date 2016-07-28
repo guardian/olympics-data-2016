@@ -110,7 +110,7 @@ module.exports = function(grunt) {
                             '*.html', '*.css', '*.js', '*.js.map',
                             '*.json', 'days/*.html', 'days/*.json', 'embed/*.html',
                             'medals/countries/*.html',
-                            'assets/*', '!assets/imgs/flags/*'
+                            'assets/**/*', '!assets/imgs/flags/*'
                         ],
                         dest: '<%= visuals.s3.path %>',
                         params: { CacheControl: 'max-age=30' }
