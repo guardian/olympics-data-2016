@@ -25,10 +25,8 @@ function filterDisciplines() {
     var count = $$(dateScheduleEl, '.js-discipline').length;
 
     var hiddencount = $$(dateScheduleEl, '.om-discipline.js-discipline.is-hidden').length;
-    console.log(hiddencount);
 
     var emptymessage = document.createElement("div");
-
 
     if (count - hiddencount < 1) {
         var omsection = $('.om-section');
