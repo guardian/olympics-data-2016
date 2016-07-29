@@ -8,6 +8,7 @@ import denodeify from 'denodeify'
 import aggregators from './src/aggregators'
 import PA from './src/pa'
 import S3 from './src/s3'
+import Metric from './src/metric'
 import notify from './src/notify'
 import log from './src/log'
 import config from './config'
@@ -27,6 +28,7 @@ function aggregatorFn(aggregator) {
     let logger = log(`aggregator:${aggregator.id}`);
     let pa = new PA(logger);
     let s3 = new S3(logger);
+    let doneMetric = new Metric(`aggregator:${aggregator.id}`);
 
     async function writeData(name, data) {
         let localPath = `data-out/${name}.json`;
@@ -73,6 +75,7 @@ function aggregatorFn(aggregator) {
 
         try {
             await processCombiners(aggregator.combiners, {});
+            doneMetric.put();
         } catch (err) {
             if (aggregator.fallbackCombiners) {
                 logger.warn('Using fallbacks');
@@ -103,4 +106,7 @@ aggregators
 
 if (argv.loop) {
     www.run();
+
+    let aliveMetric = new Metric('alive');
+    setInterval(() => aliveMetric.put(), 30000);
 }
