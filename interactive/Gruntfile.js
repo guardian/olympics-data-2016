@@ -112,7 +112,7 @@ module.exports = function(grunt) {
                             'medals/countries/*.html',
                             'assets/**/*', '!assets/imgs/flags/*'
                         ],
-                        dest: '<%= visuals.s3.path %>',
+                        dest: '<%= visuals.s3.path %>/' + process.env.USER,
                         params: { CacheControl: 'max-age=30' }
                     }
                 ]

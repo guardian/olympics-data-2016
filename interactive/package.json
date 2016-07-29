@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "./node_modules/.bin/grunt",
     "render": "./node_modules/.bin/babel-node src/renderer/render.js",
     "postinstall": "./node_modules/.bin/bower install && ./node_modules/.bin/jspm install",
     "deploy": "./node_modules/.bin/grunt deploy",
