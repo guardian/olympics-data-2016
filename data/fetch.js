@@ -24,18 +24,18 @@ if (argv.test) {
 
 var regExps = argv._.map(r => new RegExp(r))
 
-function aggregatorFn(aggregator) {
+function Aggregator(aggregator) {
     let logger = log(`aggregator:${aggregator.id}`);
-    let pa = new PA(logger);
+    let paMetric = new Metric({'aggregator': aggregator.id, 'type': 'PA'})
+    let statusMetric = new Metric({'aggregator': aggregator.id, 'type': 'status'});
+    let pa = new PA(logger, paMetric);
     let s3 = new S3(logger);
-    let doneMetric = new Metric(`aggregator:${aggregator.id}`);
 
     async function writeData(name, data) {
         let localPath = `data-out/${name}.json`;
         await fsWrite(localPath, JSON.stringify(data, null, 2));
         if (argv.s3) await s3.put(name, data);
     }
-
 
     async function processCombiners([combiner, ...combiners], data, fallback=false) {
         if (!combiner) return data;
@@ -70,13 +70,32 @@ function aggregatorFn(aggregator) {
     }
 
 
-    async function process() {
+    let timeout;
+    let processing = false;
+    let lastSuccess;
+
+    this.process = async function process() {
+        if (processing) {
+            logger.warn('Already processing');
+            return;
+        }
+
         logger.info('Starting');
+
+        if (timeout) {
+            clearTimeout(timeout);
+            timeout = null;
+        }
+
+        processing = true;
 
         try {
             await processCombiners(aggregator.combiners, {});
-            doneMetric.put();
+            statusMetric.put('done');
+            lastSuccess = moment();
         } catch (err) {
+            statusMetric.put('failed');
+
             if (aggregator.fallbackCombiners) {
                 logger.warn('Using fallbacks');
                 try {
@@ -87,26 +106,31 @@ function aggregatorFn(aggregator) {
             }
         }
 
+
         if (argv.loop) {
             logger.info('Next tick in', aggregator.cacheTime.humanize());
-            setTimeout(process, aggregator.cacheTime.asMilliseconds());
+            timeout = setTimeout(process, aggregator.cacheTime.asMilliseconds());
         }
-    }
 
-    return process;
+        processing = false;
+    };
+
+    let healthThreshold = aggregator.cacheTime.asSeconds() * 1.5;
+    this.isHealthy = function isHealthy() {
+        return lastSuccess && moment().subtract(healthThreshold, 'seconds').isBefore(lastSuccess);
+    };
+    this.isProcessing = function isProcessing() { return processing; };
+
+    this.process();
 }
 
 mkdirp.sync('data-out');
 
+let aggregatorFns = {};
 aggregators
     .filter(agg => regExps.length === 0 || regExps.some(r => r.test(agg.id)))
-    .forEach(aggregator => {
-        aggregatorFn(aggregator)();
-    });
+    .forEach(aggregator => aggregatorFns[aggregator.id] = new Aggregator(aggregator));
 
 if (argv.loop) {
-    www.run();
-
-    let aliveMetric = new Metric('alive');
-    setInterval(() => aliveMetric.put(), 30000);
+    www.run(aggregatorFns);
 }

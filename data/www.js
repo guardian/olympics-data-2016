@@ -26,9 +26,17 @@ function paCacheStats(file) {
 }
 
 
-function run(aggregatorTickers) {
+function run(aggregators) {
 
     var app = express();
+
+    app.get('/health', (req, res) => {
+        if (Object.keys(aggregators).every(id => aggregators[id].isHealthy())) {
+            res.send('Healthy');
+        } else {
+            res.status(404).send('Unhealthy');
+        }
+    });
 
     app.get('/aggregators.json', cors(), (req, res) => {
         var out = aggregators.map(aggregator => {
@@ -71,8 +79,8 @@ function run(aggregatorTickers) {
             } else {
                 res.status(404).send();
             }
-        } else if (type === 'aggregator' && aggregatorTickers[id] !== undefined) {
-            aggregatorTickers[id]()
+        } else if (type === 'aggregator' && aggregators[id] !== undefined) {
+            aggregators[id].process()
                 .then(() => res.status(204).send())
                 .catch(err => res.status(500).send(err));
         } else {

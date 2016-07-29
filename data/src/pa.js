@@ -38,15 +38,17 @@ async function writeCache(endpoint, content) {
     await fsWriteFile(file, JSON.stringify(content, null, 2));
 }
 
-function PA(logger) {
+function PA(logger, metric) {
 
     async function requestCache(endpoint) {
+        metric.put('cache');
         logger.info('Requesting cache', endpoint);
         let content = await fsReadFile(cacheFile(endpoint));
         return JSON.parse(content);
     }
 
     function newRequest(endpoint) {
+        metric.put('request');
         // wrap in a real promise
         return Promise.resolve(
             reqwest({
