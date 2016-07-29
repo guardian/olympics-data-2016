@@ -14,7 +14,7 @@ var s3PutObject = denodeify(s3.putObject.bind(s3));
 
 function S3(logger) {
     this.put = function put(id, content) {
-        var key = path.join(config.aws.s3.dir, id) + '.json';
+        var key = path.join(config.aws.s3.dir, process.env.USER, id) + '.json';
 
         return limiter.schedule(() => {
             logger.info('Putting', key);
