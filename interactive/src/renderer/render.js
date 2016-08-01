@@ -244,14 +244,16 @@ async function renderAll() {
     // Embed templates
     mkdirp.sync('build/embed');
 
-    let embedCSS = fs.readFileSync('build/embed.css');
     (await readdir('./src/renderer/templates/embeds/*.html')).forEach(template => {
         let name = path.basename(template, '.html');
         console.log(`Rendering embeds/${name}.html`);
+        let css = ['wideSnap', 'upcoming', 'medals'].indexOf(name) > -1 ?
+            fs.readFileSync('build/embed.css') :
+            fs.readFileSync('build/other.css');
 
         let html = swig.renderFile(template, data);
         let source = {
-            'html': `<style>${embedCSS}</style>${html}`,
+            'html': `<style>${css}</style>${html}`,
             'previous': '',
             'refreshStatus': true,
             'url': 'http://gu.com/', // TODO
@@ -260,7 +262,7 @@ async function renderAll() {
         };
         fs.writeFileSync(`build/${name}.json`, JSON.stringify(source), 'utf8');
 
-        let embedHTML = swig.renderFile('./src/renderer/templates/embeds/_base.html', {html, 'css': embedCSS});
+        let embedHTML = swig.renderFile('./src/renderer/templates/embeds/_base.html', {html, css});
         fs.writeFileSync(`build/embed/${name}.html`, embedHTML, 'utf8');
     });
 }

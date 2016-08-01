@@ -3,6 +3,7 @@ import './polyfill/classList.min'
 import iframeMessenger from 'guardian/iframe-messenger'
 import reqwest from 'reqwest'
 import { $, $$ } from './lib/selector'
+import formatTime from './lib/formatTime'
 import parseISODate from './lib/parseISODate'
 
 let disciplineChoiceEl = $('.js-discipline-choice');
@@ -47,11 +48,6 @@ let resultsCache = {};
 let startDate = dateScheduleEl.getAttribute('data-startdate');
 dateCache[startDate] = dateScheduleEl.innerHTML;
 
-function time(h, m) {
-    let pad = n => (n < 10 ? '0' : '') + n;
-    return `${pad(h)}:${pad(m)}`;
-}
-
 function changeDate() {
     let date = window.location.hash.substring(1);
     if (!/\d{4}-\d{2}-\d{2}/.test(date)) date = startDate;
@@ -71,13 +67,8 @@ function changeDate() {
             }
         }
 
-        $$('.js-time').forEach(timeEl => {
-            let date = parseISODate(timeEl.getAttribute('datetime'));
-            timeEl.textContent = time(date.getHours(), date.getMinutes());
-        });
-        let tzEl = $('.js-tz');
-        let offset = new Date().getTimezoneOffset();
-        let tzSign = offset > 0 ? '-' : '+', absOffset = Math.abs(offset);
+        formatTime($$('.js-time'), $('.js-tz'));
+
         tzEl.textContent = tzSign + time(Math.floor(absOffset / 60), absOffset % 60);
 
         if (!schedule) return;

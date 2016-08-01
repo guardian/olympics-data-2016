@@ -1,0 +1,20 @@
+@import '../../bower_components/guss-typography/_typography.scss';
+@import "mq";
+
+@import "common";
+
+body {
+    background-color: white;
+}
+
+.om-event__expand {
+    .om-event:not(.om-event--finished) & {
+        background-image: url(../assets/imgs/clock.svg);
+    }
+    .om-event.om-event--results & {
+        background-image: url(../assets/imgs/plus.svg);
+    }
+    .om-event.om-event--results.is-expanded & {
+        background-image: url(../assets/imgs/minus.svg);
+    }
+}
