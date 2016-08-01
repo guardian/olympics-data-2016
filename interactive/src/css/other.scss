@@ -7,6 +7,11 @@ body {
     background-color: white;
 }
 
+.om-section {
+    padding: 0;
+    margin: 0;
+}
+
 .om-event__expand {
     .om-event:not(.om-event--finished) & {
         background-image: url(../assets/imgs/clock.svg);
