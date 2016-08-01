@@ -46,6 +46,7 @@
   "jspm": {
     "configFile": "src/js/config.js",
     "dependencies": {
+      "guardian/iframe-messenger": "github:guardian/iframe-messenger@master",
       "reqwest": "github:ded/reqwest@^2.0.5",
       "topojson": "npm:topojson@^1.6.26"
     },
