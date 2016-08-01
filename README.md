@@ -30,7 +30,7 @@ https://developer.github.com/guides/managing-deploy-keys/#deploy-keys
 
 ### Install olympics-data-2016
 
-Get a copy of `config.js` (available here: https://zerobin.gutools.co.uk/?169a6da8a20c1aa3#L6EZM5In4H6+oNv/KFAPAkgbt/7PfPK/5f+P7flFks0=)
+Get a copy of `config.json` (available here: https://zerobin.gutools.co.uk/?a07a114114d3bef2#DTNqhOvJ9sf1P9pdwZhn1ynPRFdM7CIZ14qJZ97cgrs=)
 
 ```
 git clone git@github.com:guardian/olympics-data-2016.git
@@ -40,7 +40,7 @@ cd olympics-data-2016
 screen
 
 cd data
-mv <path to config.js> config.js
+mv <path to config.json> config.json
 npm install
 
 ctrl-a + c
@@ -113,7 +113,7 @@ Aggregators define which PA endpoints they need to consume and a transformation 
 ### Install
 
 - `npm install`
-- Copy `config.example.js` to `config.js` and fill in the values
+- Copy `config.example.json` to `config.json` and fill in the values
 
 ### Run
 
@@ -133,7 +133,7 @@ Options:
 ### Files
 - `fetch.js`: Entry point, processes the aggregators
 - `www.js`: Web API for querying state of aggregators
-- `config.js`: Configuration settings, you must set these
+- `config.json`: Configuration settings, you must set these
 - `src/aggregators.js`: List of aggregators
 - `src/queue.js`: Queue which runs all aggregations on given event loop.
 - `src/pa.js`: PA data (and handles caching PA endpoints)

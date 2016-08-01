@@ -1,5 +1,6 @@
 import './polyfill/classList.min'
 
+import iframeMessenger from 'guardian/iframe-messenger'
 import reqwest from 'reqwest'
 import { $, $$ } from './lib/selector'
 import parseISODate from './lib/parseISODate'
@@ -126,3 +127,5 @@ function changeDate() {
 
 window.addEventListener('hashchange', changeDate);
 changeDate();
+
+iframeMessenger.enableAutoResize();

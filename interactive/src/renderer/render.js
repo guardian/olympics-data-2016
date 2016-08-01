@@ -9,6 +9,8 @@ import * as d3 from 'd3'
 import moment from 'moment'
 import rp from 'request-promise-native'
 
+import s3cfg from '../../cfg/s3.json'
+
 swig.setFilter('datefmt', (date, fmt) => moment(date).format(fmt));
 
 swig.setFilter('entrantname', entrant => {
@@ -195,6 +197,8 @@ async function renderAll() {
     // Main templates
     mkdirp.sync('build');
 
+    let uploadPath = `${s3cfg.domain}${s3cfg.path}/${process.env.USER}`;
+
     (await readdir('./src/renderer/templates/*.html')).forEach(template => {
         let name = path.basename(template, '.html');
 
@@ -202,8 +206,12 @@ async function renderAll() {
 
         let css = fs.readFileSync(`build/${name}.css`).toString();
         let html = swig.renderFile(template, {...data, css});
+        let boot = swig.renderFile('./src/renderer/templates/_boot.js', {'url': `${uploadPath}/${name}.html`});
+
+        mkdirp.sync(`build/${name}`);
 
         fs.writeFileSync(`build/${name}.html`, html, 'utf8');
+        fs.writeFileSync(`build/${name}/boot.js`, boot, 'utf8');
     });
 
     // Tasks
