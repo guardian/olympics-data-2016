@@ -109,7 +109,6 @@ async function getAllData() {
     if (today < _.first(data.dates)) today = _.first(data.dates);
     if (today > _.last(data.dates)) today = _.last(data.dates);
 
-    console.log(today);
     data.today = today;
 
     data.scheduleToday = data.scheduleByDay.find(schedule => schedule.day.date === data.today);
