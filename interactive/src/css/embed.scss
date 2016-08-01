@@ -93,7 +93,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 
 	.og-snap__upcoming {
 		margin-top: 12px;
-		border-top: 1px dotted #bdbdbd;
+		border-top: 1px solid #387e3c;
 		padding-top: 6px;
 
 		@include mq(tablet) {
@@ -141,13 +141,27 @@ $bronzeLight: rgba(243,111,33,0.2);
 	}
 }
 
+.og-snap.og-snap--upcoming-only {
+	width: 100%;
+
+	.og-snap__upcoming-row {
+		width: 100%;
+	}
+}
+
 .og-snap__title {
 	@include fs-headline(3);
 	font-weight: 500;
 	line-height: 18px; // to make sure it sits flush to the top of the middle border, make sure the line-height = the font-size
 	margin-bottom: 11px;
 
-	@include mq($until: tablet) {
+	.og-snap--both & {
+		@include mq($until: tablet) {
+			margin-bottom: 6px;
+		}
+	}
+
+	.og-snap--upcoming-only & {
 		margin-bottom: 6px;
 	}
 
@@ -229,10 +243,12 @@ $bronzeLight: rgba(243,111,33,0.2);
 	@include fs-textSans(3);
 	color: #333;
 
-	@include mq(tablet) {
-		width: 50%;
-		padding: 2px 0;
-		border-bottom: 1px dotted #bdbdbd;
+	.og-snap--both {
+		@include mq(tablet) {
+			width: 50%;
+			padding: 2px 0;
+			border-bottom: 1px dotted #bdbdbd;
+		}
 	}
 
 	&:first-of-type {
@@ -241,6 +257,10 @@ $bronzeLight: rgba(243,111,33,0.2);
 
 	&:last-of-type {
 		border-bottom: 0;
+	}
+
+	.og-snap--upcoming-only & {
+		border: 0;
 	}
 }
 
@@ -256,10 +276,12 @@ $bronzeLight: rgba(243,111,33,0.2);
 	color: #767676;
 	padding-bottom: 4px;
 
-	@include mq(tablet) {
-		position: absolute;
-		top: 9px;
-		right: 0;
+	.og-snap--both & {
+		@include mq(tablet) {
+			position: absolute;
+			top: 9px;
+			right: 0;
+		}
 	}
 }
 
