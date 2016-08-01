@@ -143,22 +143,23 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('urls', function() {
-        grunt.log.write('\nMAIN URL: '['green'].bold)
-        grunt.log.writeln(grunt.template.process('<%= visuals.s3.domain %><%= visuals.s3.path %>/main.html'))
+        var path = grunt.template.process('<%= visuals.s3.domain %><%= visuals.s3.path %>/') + process.env.USER;
+        grunt.log.writeln('\nMain URLs: '['green'].bold);
+        ['schedule.html', 'medals.html'].forEach(t => grunt.log.writeln(`${path}/${t}`));
 
         var baseUrl = 'http://gu.com/'; // TODO
 
         embeds.forEach(embed => {
             grunt.log.writeln(`\n${embed}: `['green'].bold);
 
-            var snapUri = grunt.template.process(`<%= visuals.s3.domain %><%= visuals.s3.path %>/${embed}.json`);
+            var snapUri = `${path}/${embed}.json`;
             var params = [
                 ['gu-snapType', 'json.html'],
                 ['gu-snapUri', snapUri]
             ];
             grunt.log.writeln(baseUrl + '?' + params.map(p => `${p[0]}=${encodeURIComponent(p[1])}`).join('&'));
 
-            var embedUri = grunt.template.process(`<%= visuals.s3.domain %><%= visuals.s3.path %>/embed/${embed}.html`);
+            var embedUri = `${path}/embed/${embed}.html`;
             grunt.log.writeln(embedUri);
         });
     })
