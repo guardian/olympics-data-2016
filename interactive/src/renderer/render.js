@@ -111,6 +111,8 @@ async function getAllData() {
 
     data.today = today;
 
+    data.olympicsDay = data.dates.indexOf(today) + 1;
+
     data.scheduleToday = data.scheduleByDay.find(schedule => schedule.day.date === data.today);
     data.resultsToday = data.resultsByDay.find(results => results.day.date === data.today);
 
