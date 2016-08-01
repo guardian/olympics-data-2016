@@ -1,0 +1,75 @@
+.om-header {
+    @include f-headline;
+    margin: 0;
+    color: white;
+
+    &.om-header--primary {
+        background-color: #198cbf;
+    }
+    &.om-header--secondary {
+        background-color: #1a93c7;
+    }
+}
+
+.om-header__logo {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSI2MzYuNXB4IiBoZWlnaHQ9IjM1NS41cHgiIHZpZXdCb3g9IjAgMCA2MzYuNSAzNTUuNSIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgNjM2LjUgMzU1LjUiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxwb2x5Z29uIGZpbGw9IiNFQTNFNTkiIHBvaW50cz0iNDE5LjIwNiwyNDguMzk3IDI0Mi41MzgsMTI1LjM0NSA0MTkuMjA2LDIuMjkyIDU5NS44NzIsMTI1LjM0NSAiLz48cG9seWdvbiBmaWxsPSIjMjY5NDQ4IiBwb2ludHM9IjM2NS42NywyNDguMzk3IDE4OS4wMDUsMTI1LjM0NSAzNjUuNjcsMi4yOTIgNTQyLjMzOCwxMjUuMzQ1ICIvPjxwb2x5Z29uIGZpbGw9IiMzMzMzMzMiIHBvaW50cz0iMzE1LjkxNywyNDguMzk3IDEzOS4yNSwxMjUuMzQ1IDMxNS45MTcsMi4yOTIgNDkyLjU4NSwxMjUuMzQ1ICIvPjxwb2x5Z29uIGZpbGw9IiNGOEI4NDciIHBvaW50cz0iMjc0LjAzNCwyNDguMzk3IDk3LjM3LDEyNS4zNDUgMjc0LjAzNCwyLjI5MiA0NTAuNzAzLDEyNS4zNDUgIi8+PHBvbHlnb24gZmlsbD0iIzE5OTFDNiIgcG9pbnRzPSIyMzIuMTUxLDI0OC4zOTcgNTUuNDg3LDEyNS4zNDUgMjMyLjE1MSwyLjI5MiA0MDguODIsMTI1LjM0NSAiLz48Zz48cGF0aCBkPSJNMjI2LjU1MiwyNjEuMTE5aDI1LjE2MmMyMC4wNzcsMCwyOC44MTIsOS42NDgsMjguODEyLDI0LjUxYzAsMTIuOTA3LTYuMTI3LDIwLjk5LTE5LjE2NSwyMy45ODh2MC4zOTJsMjUuMTYyLDQxLjQ1OGgtOC4yMTNsLTI0LjI0OS00MC4xNTRoLTIwLjIwOHY0MC4xNTRoLTcuMzAxVjI2MS4xMTl6IE0yNTEuNDUzLDMwNS40NDVjMTYuMDM2LDAsMjEuMzgxLTcuOTUyLDIxLjM4MS0xOS41NTVjMC0xMS43MzQtNS43MzYtMTguNTE0LTIxLjY0Mi0xOC41MTRoLTE3LjMzOXYzOC4wNjhIMjUxLjQ1M3oiLz48cGF0aCBkPSJNMjk0LjM0MiwyNjIuOTQ1aDcuMTd2OC4yMTNoLTcuMTdWMjYyLjk0NXogTTI5NC4zNDIsMjg1LjM2OWg3LjE3djY2LjA5OGgtNy4xN1YyODUuMzY5eiIvPjxwYXRoIGQ9Ik0zMTAuNTA4LDMxOS41MjV2LTEuNjk0YzAtMjEuNjQyLDEyLjUxNi0zMy42MzYsMjkuNTk0LTMzLjYzNmMxNy44NjEsMCwyOS41OTUsMTEuNDczLDI5LjU5NSwzMy4xMTR2MS41NjRjMCwyMS43NzItMTIuNTE2LDMzLjc2Ny0yOS43MjUsMzMuNzY3QzMyMi4xMTEsMzUyLjY0MSwzMTAuNTA4LDM0MS4xNjgsMzEwLjUwOCwzMTkuNTI1eiBNMzYyLjM5NiwzMTkuNjU2di0yLjQ3N2MwLTE5LjY4Ny05LjY0Ny0yNy4xMTctMjIuNDI0LTI3LjExN2MtMTMuMjk4LDAtMjIuMTYzLDkuMzg3LTIyLjE2MywyNy4xMTd2Mi40NzdjMCwxOS40MjYsOS42NDcsMjcuMTE3LDIyLjI5MywyNy4xMTdDMzUzLjQsMzQ2Ljc3MywzNjIuMzk2LDMzNy41MTgsMzYyLjM5NiwzMTkuNjU2eiIvPjxwYXRoIGQ9Ik0zOTUuMzc1LDM0NS45OTFsMjIuMTYzLTIyLjE2M2MxMy40MjktMTMuNDI4LDIzLjQ2Ny0yNC4xMTksMjMuNDY3LTM4LjQ1OWMwLTEyLjkwNy03LjE3MS0xOS4xNjUtMjAuOTg5LTE5LjE2NWMtOS4yNTcsMC0xNi4wMzYsMi4yMTYtMjIuNDI0LDUuNDc2di01Ljg2N2M2Ljc3OS0zLjY1LDEzLjgxOC01Ljk5NiwyNC4xMTgtNS45OTZjMTcuNDcsMCwyNi45ODcsOS4xMjUsMjYuOTg3LDI1LjAzMWMwLDE2LjAzNS0xMC45NTEsMjcuNzY5LTI2LjIwNSw0Mi42MzFsLTE3Ljg2MSwxNy40N3YwLjI2MWg0Ni4yODJ2Ni4yNThoLTU1LjUzOFYzNDUuOTkxeiIvPjxwYXRoIGQ9Ik00NTcuNjkxLDMwOC43MDV2LTQuMTcyYzAtMzAuMjQ2LDE0LjYwMi00NC43MTcsMzUuMTk5LTQ0LjcxN2MyMC40NjksMCwzNC42OCwxNC4yMSwzNC42OCw0NC4zMjZ2NC4xNzJjMCwzMC4xMTUtMTMuNjg5LDQ0LjQ1Ni0zNC44MSw0NC40NTZDNDcxLjc3MSwzNTIuNzcxLDQ1Ny42OTEsMzM4LjE2OSw0NTcuNjkxLDMwOC43MDV6IE01MjAuMDA4LDMwOS4yMjd2LTUuMjE1YzAtMjQuMTE5LTguNjA0LTM4LjA2OC0yNy4xMTctMzguMDY4Yy0xOC41MTIsMC0yNy4zNzcsMTMuNTU5LTI3LjM3NywzNy41NDd2NS4zNDZjMCwyMy45ODgsOC44NjUsMzcuODA3LDI3LjI0NywzNy44MDdDNTExLjI3MywzNDYuNjQzLDUyMC4wMDgsMzMzLjczNiw1MjAuMDA4LDMwOS4yMjd6Ii8+PHBhdGggZD0iTTU0OC42ODgsMjY4LjY4MmwtMTcuMzM5LDMuMjU5di00LjQzM2wyMS43NzItNy4xN2gyLjg2N3Y5MS4xMjloLTcuMzAxVjI2OC42ODJ6Ii8+PHBhdGggZD0iTTU3MS4zNzEsMzEyLjM1NXYtMy45MTFjMC0zNi4xMTIsMTcuNzMtNDguNjI4LDM5LjM3My00OC42MjhjNy41NjEsMCwxMy44MTgsMS4zMDMsMTcuNzMsMy4zODl2NS44NjdjLTMuOTEyLTEuNTY0LTEwLjAzOS0yLjg2OC0xNi41NTgtMi44NjhjLTE3Ljk5MSwwLTMxLjgxMSw3Ljk1Mi0zMi43MjQsMzkuMTExYzUuNDc3LTQuNDMzLDE0LjYwMi04LjQ3NCwyNi4yMDUtOC40NzRjMTYuMjk3LDAsMjguNTUxLDguMjEzLDI4LjU1MSwyNi40NjVjMCwxNy43My0xMS4wODEsMjkuNDY0LTI5LjU5NCwyOS40NjRDNTgyLjU4NCwzNTIuNzcxLDU3MS4zNzEsMzM2LjA4Myw1NzEuMzcxLDMxMi4zNTV6IE02MjYuMjU4LDMyMy45NTljMC0xNi4wMzYtOS41MTgtMjAuOTktMjIuODE0LTIwLjk5Yy0xMC42OTEsMC0xOC41MTQsMy42NS0yNC4yNSw3Ljk1M3YxLjU2NGMwLDE5LjU1NSw3LjA0MSwzNC4xNTYsMjUuMDMxLDM0LjE1NkM2MTcuOTE0LDM0Ni42NDMsNjI2LjI1OCwzMzguOTUxLDYyNi4yNTgsMzIzLjk1OXoiLz48L2c+PHBvbHlnb24gZmlsbD0iI0ZCRTQwMCIgcG9pbnRzPSIxODAuNjE5LDI1MC41MzUgMy41OTYsMTI3LjIzNCAxODAuNjE5LDMuOTM0IDM1Ny42NDMsMTI3LjIzNCAiLz48Zz48Y2lyY2xlIGZpbGw9IiMyMTQ0OUIiIGN4PSIxNzkuODQzIiBjeT0iMTI1LjQyNyIgcj0iNTQuNjQiLz48L2c+PC9zdmc+);
+    width: 72px;
+    height: 48px;
+
+    @include mq(leftCol) {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        width: 120px;
+        height: 80px;
+    }
+}
+
+.om-header__background {
+    @include mq(leftCol) {
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMjUzIC0xMzUgNTQxLjggMjkxIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDI1MyAtMTM1IDU0MS44IDI5MSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBvbHlnb24gZmlsbD0iI0Y4RDgzNiIgcG9pbnRzPSI1ODkuMSwtMjcuMiA0MjEuNiw4MC42IDQyMC41LDc5LjggMjUzLC0yNy4yIDQyMS42LC0xMzUgIi8+PHBvbHlnb24gZmlsbD0iI0M0Q0NDQyIgcG9pbnRzPSI3MDUuNiw4MC41IDU4OC40LDE1NiA1ODcuNiwxNTUuNCA0NzAuNCw4MC41IDU4OC40LDUuMSAiLz48cG9seWdvbiBmaWxsPSIjRDY4MTQyIiBwb2ludHM9Ijc5NC44LC0yLjEgNzEyLjcsNTAuOCA3MTIuMSw1MC40IDYzMC4xLC0yLjEgNzEyLjcsLTU0LjkgIi8+PC9zdmc+);
+        background-repeat: no-repeat;
+        background-size: 40%;
+        background-position: right center;
+    }
+
+}
+
+.om-header__inner {
+    .om-header--primary > & {
+        padding-top: 15px;
+        padding-bottom: 15px;
+        background-color: #1991c6;
+        min-height: 120px;
+
+        @include mq(leftCol) {
+            padding-left: 180px;
+        }
+        @include mq(wide) {
+            padding-left: 260px;
+        }
+
+
+        h1{
+            @include fs-headline(6);
+            font-weight: 500;
+            margin: 0;
+
+            @include mq(leftCol) {
+                font-size: 48px;
+                line-height: 48px;
+            }
+        }
+        h2 {
+            @include fs-headline(2);
+            margin: 0;
+
+            @include mq(leftCol) {
+                @include fs-headline(4);   
+            }
+        }
+
+    }
+}
