@@ -110,7 +110,7 @@ module.exports = function(grunt) {
                         expand: true,
                         cwd: 'build',
                         src: [
-                            '*.html', '*.css', '*.js', '*.js.map',
+                            '**/boot.js', '*.html', '*.css', '*.js', '*.js.map',
                             '*.json', 'days/*.html', 'days/*.json', 'embed/*.html',
                             'medals/countries/*.html',
                             'assets/**/*', '!assets/imgs/flags/*'
@@ -145,7 +145,7 @@ module.exports = function(grunt) {
     grunt.registerTask('urls', function() {
         var path = grunt.template.process('<%= visuals.s3.domain %><%= visuals.s3.path %>/') + process.env.USER;
         grunt.log.writeln('\nMain URLs: '['green'].bold);
-        ['schedule.js', 'medals.js'].forEach(t => grunt.log.writeln(`${path}/${t}`));
+        ['schedule', 'medals'].forEach(t => grunt.log.writeln(`${path}/${t}/boot.js`));
 
         var baseUrl = 'http://gu.com/'; // TODO
 
