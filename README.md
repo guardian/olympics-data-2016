@@ -1,15 +1,89 @@
 # Olympics 2016 data
 
-## Monitor
+## Creating an EC2 instance
 
---
+NOTE: Everything is in `us-east-1`
+
+You will probably never need to do this
+
+### Install NodeJS, git and AWS CLI
+
+```
+wget https://nodejs.org/dist/v4.4.7/node-v4.4.7-linux-x64.tar.xz
+tar xvf node-v4.4.7-linux-x64.tar.xz
+sudo ln -s ~/node-v4.4.7-linux-x64/bin/node /usr/bin/node
+sudo ln -s ~/node-v4.4.7-linux-x64/bin/npm /usr/bin/npm
+sudo apt-get install git awscli
+```
+
+### Authenticate with AWS
+```
+aws configure --profile visuals
+
+```
+Region is us-east-1
+Use your AWS credentials for access key/secret token
+
+### Authenticate with git
+
+https://developer.github.com/guides/managing-deploy-keys/#deploy-keys
+
+### Install olympics-data-2016
+
+Get a copy of `config.js` (available here: https://zerobin.gutools.co.uk/?169a6da8a20c1aa3#L6EZM5In4H6+oNv/KFAPAkgbt/7PfPK/5f+P7flFks0=)
+
+```
+git clone git@github.com:guardian/olympics-data-2016.git
+
+cd olympics-data-2016
+
+screen
+
+cd data
+mv <path to config.js> config.js
+npm install
+
+ctrl-a + c
+cd interactive
+npm install
+
+ctrl-a + c
+
+ctrl-a + 0
+npm run fetch
+
+ctrl-a + 1
+npm run server
+```
+
+If you follow these instructions:
+- ctrl-a + 0 will be the PA data fetcher
+- ctrl-a + 1 will be the interactive renderer
+- ctrl-a + 2 will be a bash terminal
 
 
-## Interactive
+Updating
+====
+```
+screen -x
 
---
+ctrl-a + 2
+git pull
+```
 
-## Data
+Any changes to interactive/src/** will automatically trigger a rerender. You should never
+have to restart the interactive renderer.
+
+Any changes to data/** will need to restart the data fetcher
+```
+ctrl-a + 0
+ctrl-c
+npm run fetch
+```
+
+## Developing
+
+### About
 
 Ingests the Press Association Olympics API v2 and outputs aggregations to S3 for interactives to consume.
 
