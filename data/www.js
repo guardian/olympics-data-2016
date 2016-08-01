@@ -7,7 +7,7 @@ import glob from 'glob-fs'
 import denodeify from 'denodeify'
 import aggregators from './src/aggregators'
 import log from './src/log'
-import config from './config'
+import config from './config.json'
 
 const fsStat = denodeify(fs.stat);
 const fsUnlink = denodeify(fs.unlink);

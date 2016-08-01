@@ -5,7 +5,7 @@ import moment from 'moment'
 import denodeify from 'denodeify'
 import reqwest from 'reqwest'
 import Bottleneck from 'bottleneck'
-import config from '../config'
+import config from '../config.json'
 
 const re = (strings, ...values) => new RegExp(String.raw(strings, ...values), 'i');
 

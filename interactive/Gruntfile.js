@@ -14,9 +14,11 @@ module.exports = function(grunt) {
     grunt.initConfig({
         visuals: {'s3': grunt.file.readJSON('./cfg/s3.json')},
 
+        dataCfg: grunt.file.readJSON('../data/config.json'),
+
         watch: {
             data: {
-                files: ['../data/data-out/**/*'],
+                files: ['../data/data-out/**/*', 'src/**'],
                 tasks: ['shell:render'],
             },
             js: {
@@ -91,7 +93,8 @@ module.exports = function(grunt) {
         aws_s3: {
             options: {
                 region: 'us-east-1',
-                awsProfile: 'visuals',
+                accessKeyId: '<%= dataCfg.aws.accessKeyId %>',
+                secretAccessKey: '<%= dataCfg.aws.secretAccessKey %>',
                 debug: grunt.option('dry'),
                 bucket: '<%= visuals.s3.bucket %>',
                 uploadConcurrency: 10,

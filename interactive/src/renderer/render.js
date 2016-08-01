@@ -104,7 +104,12 @@ async function getAllData() {
         'position': data.medalTable.length + 1
     };
 
-    data.today = '2016-01-15';
+    // switch at 06:00 UTC
+    let today = moment.utc().subtract(6, 'hours').format('YYYY-MM-DD');
+    if (today < _.first(data.dates)) today = _.first(data.dates);
+    if (today > _.last(data.dates)) today = _.last(data.dates);
+
+    data.today = today;
 
     data.scheduleToday = data.scheduleByDay.find(schedule => schedule.day.date === data.today);
     data.resultsToday = data.resultsByDay.find(results => results.day.date === data.today);
