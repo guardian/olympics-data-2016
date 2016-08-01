@@ -14,6 +14,8 @@ module.exports = function(grunt) {
     grunt.initConfig({
         visuals: {'s3': grunt.file.readJSON('./cfg/s3.json')},
 
+        dataCfg: grunt.file.readJSON('../data/config.json'),
+
         watch: {
             data: {
                 files: ['../data/data-out/**/*'],
@@ -36,7 +38,7 @@ module.exports = function(grunt) {
                 tasks: ['shell:render']
             },
             server: {
-                files: ['../data/data-out/**/*'],
+                files: ['../data/data-out/**/*', 'src/**'],
                 tasks: ['deploy'],
             }
         },
@@ -91,7 +93,8 @@ module.exports = function(grunt) {
         aws_s3: {
             options: {
                 region: 'us-east-1',
-                awsProfile: 'visuals',
+                accessKeyId: '<%= dataCfg.aws.auth.accessKeyId %>',
+                secretAccessKey: '<%= dataCfg.aws.auth.secretAccessKey %>',
                 debug: grunt.option('dry'),
                 bucket: '<%= visuals.s3.bucket %>',
                 uploadConcurrency: 10,
@@ -107,7 +110,7 @@ module.exports = function(grunt) {
                         expand: true,
                         cwd: 'build',
                         src: [
-                            '*.html', '*.css', '*.js', '*.js.map',
+                            '**/boot.js', '*.html', '*.css', '*.js', '*.js.map',
                             '*.json', 'days/*.html', 'days/*.json', 'embed/*.html',
                             'medals/countries/*.html',
                             'assets/**/*', '!assets/imgs/flags/*'
@@ -140,22 +143,23 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('urls', function() {
-        grunt.log.write('\nMAIN URL: '['green'].bold)
-        grunt.log.writeln(grunt.template.process('<%= visuals.s3.domain %><%= visuals.s3.path %>/main.html'))
+        var path = grunt.template.process('<%= visuals.s3.domain %><%= visuals.s3.path %>/') + process.env.USER;
+        grunt.log.writeln('\nMain URLs: '['green'].bold);
+        ['schedule', 'medals'].forEach(t => grunt.log.writeln(`${path}/${t}/boot.js`));
 
         var baseUrl = 'http://gu.com/'; // TODO
 
         embeds.forEach(embed => {
             grunt.log.writeln(`\n${embed}: `['green'].bold);
 
-            var snapUri = grunt.template.process(`<%= visuals.s3.domain %><%= visuals.s3.path %>/${embed}.json`);
+            var snapUri = `${path}/${embed}.json`;
             var params = [
                 ['gu-snapType', 'json.html'],
                 ['gu-snapUri', snapUri]
             ];
             grunt.log.writeln(baseUrl + '?' + params.map(p => `${p[0]}=${encodeURIComponent(p[1])}`).join('&'));
 
-            var embedUri = grunt.template.process(`<%= visuals.s3.domain %><%= visuals.s3.path %>/embed/${embed}.html`);
+            var embedUri = `${path}/embed/${embed}.html`;
             grunt.log.writeln(embedUri);
         });
     })

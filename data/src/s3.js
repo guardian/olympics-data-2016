@@ -3,7 +3,7 @@ import AWS from 'aws-sdk'
 import denodeify from 'denodeify'
 import Bottleneck from 'bottleneck'
 import log from './log'
-import config from '../config'
+import config from '../config.json'
 
 const limiter = new Bottleneck(0, 100);
 

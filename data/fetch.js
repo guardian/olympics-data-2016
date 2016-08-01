@@ -11,7 +11,7 @@ import S3 from './src/s3'
 import Metric from './src/metric'
 import notify from './src/notify'
 import log from './src/log'
-import config from './config'
+import config from './config.json'
 
 import www from './www'
 
