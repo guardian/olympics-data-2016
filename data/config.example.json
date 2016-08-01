@@ -1,8 +1,10 @@
 {
     "pa": {
         "apiKey": "",
-        "cacheDir": "",
+        "cacheDir": "data-in/",
+        "uatCacheDir": "data-in-uat/",
         "baseUrl": "",
+        "uatBaseUrl": "",
         "rateLimit": 10
     },
     "aws": {

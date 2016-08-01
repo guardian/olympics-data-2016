@@ -50,7 +50,7 @@ npm install
 ctrl-a + c
 
 ctrl-a + 0
-npm run fetch
+npm run fetch -- --no-uat
 
 ctrl-a + 1
 npm run server
@@ -127,6 +127,7 @@ Options:
 - `--no-loop`: run each aggregator only once
 - `--no-notify`: don't notify on error
 - `--test`: set all of the above
+- `--no-uat`: run against the live PA API
 
 `[aggregator, ...]`: run specific aggregators (not all)
 
