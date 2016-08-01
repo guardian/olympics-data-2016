@@ -3,7 +3,7 @@ import path from 'path'
 import mkdirp from 'mkdirp'
 import moment from 'moment'
 import denodeify from 'denodeify'
-import reqwest from 'reqwest'
+import rp from 'request-promise-native'
 import Bottleneck from 'bottleneck'
 import config from '../config.json'
 
@@ -47,42 +47,31 @@ function PA(logger, metric) {
         return JSON.parse(content);
     }
 
-    function newRequest(endpoint) {
-        metric.put('request');
-        // wrap in a real promise
-        return Promise.resolve(
-            reqwest({
-                'url': `${config.pa.baseUrl}/${endpoint}`,
-                'type': 'json',
-                'headers': {
-                    'Accept': 'application/json',
-                    'Apikey': config.pa.apiKey
-                }
-            })
-        );
-    }
-
-    let rpCache = {};
     async function requestUrl(endpoint) {
         await limiter.schedule(() => Promise.resolve());
 
-        if (rpCache[endpoint]) {
-            logger.info('Reusing request for URL', endpoint);
-        } else {
-            logger.info('Requesting URL', endpoint);
-            rpCache[endpoint] = newRequest(endpoint);
+        logger.info('Requesting URL', endpoint);
+        metric.put('request');
+
+        let _resp = await rp({
+            'uri': `${config.pa.baseUrl}/${endpoint}`,
+            'headers': {
+                'Accept': 'application/json',
+                'Apikey': config.pa.apiKey
+            }
+        });
+
+        if (_resp && _resp.length > 0) {
+            let resp = JSON.parse(_resp);
+
+            if (resp.olympics) {
+                await writeCache(endpoint, resp);
+                return resp;
+            }
         }
 
-        let resp = await rpCache[endpoint];
-        rpCache[endpoint] = null;
-
-        if (resp.olympics) {
-            await writeCache(endpoint, resp);
-            return resp;
-        } else {
-            logger.warn('Empty response for URL', endpoint);
-            return {'olympics': {}};
-        }
+        logger.warn('Empty response for URL', endpoint);
+        return {'olympics': {}};
     }
 
     this.request = async function request(endpoint, forceCache=false) {
