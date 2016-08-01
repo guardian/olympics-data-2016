@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk'
 import _ from 'lodash'
 import Bottleneck from 'bottleneck'
-import config from '../config.json'
+import { config } from './config'
 
 AWS.config.update(config.aws.auth);
 

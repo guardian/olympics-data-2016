@@ -5,21 +5,33 @@ import fs from 'fs'
 import path from 'path'
 import mkdirp from 'mkdirp'
 import denodeify from 'denodeify'
+import colors from 'colors'
 import aggregators from './src/aggregators'
 import PA from './src/pa'
 import S3 from './src/s3'
 import Metric from './src/metric'
 import notify from './src/notify'
 import log from './src/log'
-import config from './config.json'
+
+import { set as setConfig, config } from './src/config'
 
 import www from './www'
 
 const fsWrite = denodeify(fs.writeFile.bind(fs));
 
-var argv = parseArgs(process.argv.slice(2), {'default': {'s3': true, 'pa': true, 'loop': true, 'notify': true}});
+var argv = parseArgs(process.argv.slice(2), {'default': {
+    's3': true, 'pa': true, 'loop': true, 'notify': true, 'uat': true
+}});
+
 if (argv.test) {
     argv.s3 = argv.pa = argv.loop = argv.notify = false;
+}
+
+if (argv.uat) {
+    setConfig('pa.cacheDir', config.pa.uatCacheDir);
+    setConfig('pa.baseUrl', config.pa.uatBaseUrl);
+} else {
+    for (let i = 0; i < 100; i++) console.log('USING LIVE DATA'.red);
 }
 
 var regExps = argv._.map(r => new RegExp(r))
