@@ -93,8 +93,8 @@ module.exports = function(grunt) {
         aws_s3: {
             options: {
                 region: 'us-east-1',
-                accessKeyId: '<%= dataCfg.aws.accessKeyId %>',
-                secretAccessKey: '<%= dataCfg.aws.secretAccessKey %>',
+                accessKeyId: '<%= dataCfg.aws.auth.accessKeyId %>',
+                secretAccessKey: '<%= dataCfg.aws.auth.secretAccessKey %>',
                 debug: grunt.option('dry'),
                 bucket: '<%= visuals.s3.bucket %>',
                 uploadConcurrency: 10,
