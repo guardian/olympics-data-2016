@@ -145,7 +145,7 @@ module.exports = function(grunt) {
     grunt.registerTask('urls', function() {
         var path = grunt.template.process('<%= visuals.s3.domain %><%= visuals.s3.path %>/') + process.env.USER;
         grunt.log.writeln('\nMain URLs: '['green'].bold);
-        ['schedule.html', 'medals.html'].forEach(t => grunt.log.writeln(`${path}/${t}`));
+        ['schedule.js', 'medals.js'].forEach(t => grunt.log.writeln(`${path}/${t}`));
 
         var baseUrl = 'http://gu.com/'; // TODO
 

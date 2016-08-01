@@ -208,8 +208,10 @@ async function renderAll() {
         let html = swig.renderFile(template, {...data, css});
         let boot = swig.renderFile('./src/renderer/templates/_boot.js', {'url': `${uploadPath}/${name}.html`});
 
+        mkdirp.sync(`build/${name}`);
+
         fs.writeFileSync(`build/${name}.html`, html, 'utf8');
-        fs.writeFileSync(`build/${name}.js`, boot, 'utf8');
+        fs.writeFileSync(`build/${name}/boot.js`, boot, 'utf8');
     });
 
     // Tasks
