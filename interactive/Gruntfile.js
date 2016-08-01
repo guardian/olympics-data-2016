@@ -18,7 +18,7 @@ module.exports = function(grunt) {
 
         watch: {
             data: {
-                files: ['../data/data-out/**/*', 'src/**'],
+                files: ['../data/data-out/**/*'],
                 tasks: ['shell:render'],
             },
             js: {
@@ -38,7 +38,7 @@ module.exports = function(grunt) {
                 tasks: ['shell:render']
             },
             server: {
-                files: ['../data/data-out/**/*'],
+                files: ['../data/data-out/**/*', 'src/**'],
                 tasks: ['deploy'],
             }
         },
