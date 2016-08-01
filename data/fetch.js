@@ -40,13 +40,14 @@ function Aggregator(aggregator) {
     async function processCombiners([combiner, ...combiners], data, fallback=false) {
         if (!combiner) return data;
 
-        let deps = combiner.dependencies ? combiner.dependencies(data) : [];
-        logger.info(`Requesting ${deps.length} resources for ${combiner.name}`);
-        let contents = await Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
-
         let combinerData;
 
         try {
+            let deps = combiner.dependencies ? combiner.dependencies(data) : [];
+            logger.info(`Requesting ${deps.length} resources for ${combiner.name}`);
+
+            let contents = await Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
+
             combinerData = combiner.process(data, contents);
             await writeData(combiner.name, {
                 'timestamp': (new Date).toISOString(),

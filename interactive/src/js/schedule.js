@@ -69,8 +69,6 @@ function changeDate() {
 
         formatTime($$('.js-time'), $('.js-tz'));
 
-        tzEl.textContent = tzSign + time(Math.floor(absOffset / 60), absOffset % 60);
-
         if (!schedule) return;
 
         filterDisciplines();
