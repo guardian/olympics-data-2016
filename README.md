@@ -1,5 +1,20 @@
 # Olympics 2016 data
 
+## Debugging problems
+
+Fetch the latest data
+```
+cd data
+rsync -avzhe ssh ubuntu@54.152.97.91:olympics-data-2016/data/data-in .
+```
+
+Run locally against new data
+```
+npm run fetch -- --test --no-uat
+```
+
+Find problem!
+
 ## Creating an EC2 instance
 
 NOTE: Everything is in `us-east-1`
