@@ -147,6 +147,11 @@ $bronzeLight: rgba(243,111,33,0.2);
 	.og-snap__upcoming-row {
 		width: 100%;
 	}
+
+	.og-snap__upcoming {
+		padding-left: 5px;
+		padding-right: 5px;
+	}
 }
 
 .og-snap__title {
@@ -243,7 +248,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 	@include fs-textSans(3);
 	color: #333;
 
-	.og-snap--both {
+	.og-snap--both & {
 		@include mq(tablet) {
 			width: 50%;
 			padding: 2px 0;
