@@ -106,10 +106,10 @@ async function getAllData() {
 
     // switch at 06:00 UTC
     let today = moment.utc().subtract(6, 'hours').format('YYYY-MM-DD');
-    console.log(today);
     if (today < _.first(data.dates)) today = _.first(data.dates);
     if (today > _.last(data.dates)) today = _.last(data.dates);
 
+    console.log(today);
     data.today = today;
 
     data.scheduleToday = data.scheduleByDay.find(schedule => schedule.day.date === data.today);
