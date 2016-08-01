@@ -1,8 +1,8 @@
 import AWS from 'aws-sdk'
 import denodeify from 'denodeify'
 import _ from 'lodash'
-import config from '../config'
 import log from './log'
+import config from '../config.json'
 
 const logger = log('notify');
 

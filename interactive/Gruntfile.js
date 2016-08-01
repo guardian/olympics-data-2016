@@ -14,7 +14,7 @@ module.exports = function(grunt) {
     grunt.initConfig({
         visuals: {'s3': grunt.file.readJSON('./cfg/s3.json')},
 
-        dataCfg: grunt.file.readJSON('../data/config.js'),
+        dataCfg: grunt.file.readJSON('../data/config.json'),
 
         watch: {
             data: {
