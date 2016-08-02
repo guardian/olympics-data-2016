@@ -15,11 +15,14 @@ let countryCache = {}
 
 RelativeTime.setNow(Date.now())
 
-lbButton.addEventListener('click', e => {
-    lbButton.innerHTML = (lbButton.innerHTML === 'Hide countries') ? 'All countries' : 'Hide countries'
-    tableEl.classList.toggle('is-expanded');
-    lbButton.classList.toggle('hide-button')
-})
+
+if(lbButton){
+    lbButton.addEventListener('click', e => {
+        lbButton.innerHTML = (lbButton.innerHTML === 'Hide countries') ? 'All countries' : 'Hide countries'
+        tableEl.classList.toggle('is-expanded');
+        lbButton.classList.toggle('hide-button')
+    })
+}
 
 let dSelect = $('.om-select-discipline')
 let cSelect = $('.om-select-country')
@@ -58,10 +61,21 @@ function changeCountry() {
             row = emptyRowEl.cloneNode(true);
             row.querySelector('.om-table-row__flag').classList.add(`om-flag--${identifier}`);
             row.querySelector('.om-table-row__country').textContent = identifier;
+
+            $('.om-country-p--unranked').classList.remove('om-is-hidden')
+            $('.om-country-p--ranked').classList.add('om-is-hidden')
+
         }
 
-        let posSpan = $('.om-position-ordinal')
-        posSpan.innerHTML = ordinal(parseInt(row.getAttribute('data-position')))
+        else {
+
+            $('.om-country-p--ranked').classList.remove('om-is-hidden')
+            $('.om-country-p--unranked').classList.add('om-is-hidden')
+
+            let posSpan = $('.om-position-ordinal')
+            posSpan.innerHTML = ordinal(parseInt(row.getAttribute('data-position')))
+
+        }
 
         let favouriteTable = $('.om-table--favourite')
         favouriteTable.innerHTML = row.outerHTML;

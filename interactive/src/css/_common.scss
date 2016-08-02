@@ -142,6 +142,8 @@ a {
 }
 
 .om-error {
+
+    @include fs-textSans(3);
     display: none;
 
     &.has-error {
@@ -251,6 +253,10 @@ a {
 
 .om-no-events.is-hidden {
     display: none;
+}
+
+.om-no-events {
+    @include fs-textSans(3);
 }
 
 .om-discipline__name {

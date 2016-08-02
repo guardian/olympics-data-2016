@@ -8,7 +8,19 @@ import _ from 'lodash'
 import * as d3 from 'd3'
 import moment from 'moment'
 
-swig.setFilter('datefmt', (date, fmt) => moment(date).format(fmt));
+swig.setFilter('datefmt', (date, fmt, i) => {
+
+    let str = moment(date).format(fmt)
+
+    if(i === 3){
+        str = 'Opening day - ' + str
+    }
+
+    if(i > 3){
+        str = `Day ${i-3} - ` + str
+    }
+    return str
+});
 
 swig.setFilter('entrantname', entrant => {
     if (entrant.code === 'BYE') return 'BYE';

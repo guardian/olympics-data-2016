@@ -312,3 +312,11 @@
         display: block;
     }
 }
+
+.om-table-empty {
+	@include fs-textSans(3);
+}
+
+.om-country-p {
+	@include fs-textSans(3);
+}

@@ -39,13 +39,24 @@
 
         <section class="om-section">
             <h3 class="om-section__title">Leaderboard</h3>
+
+            {% if !medalTable[0] %}
+                <div class='om-table-empty'>
+                    No medals have been awarded yet.
+                </div>
+            {% endif %}
+
             <ol class='om-table js-table'>
             {% for entry in medalTable %}
                 {% include '_leaderboardEntry.html' { entry } %}
             {% endfor %}
             {% include '_leaderboardEntry.html' {'entry': emptyMedalTableEntry} %}
             </ol>
-            <button class="js-leaderboard-button om-expand-button">All countries</button>
+
+            {% if medalTable && medalTable.length > 10 %}
+                <button class="js-leaderboard-button om-expand-button">All countries</button>
+            {% endif %}
+
         </section>
     </div>
 

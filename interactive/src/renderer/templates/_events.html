@@ -14,7 +14,7 @@
             <select class="om-filter__choice js-date-choice" disabled>
                 {% for date in dates %}
                     <option value="{{ date }}" {% if date == today %}selected{% endif %}>
-                        Day {{ loop.index }} – {{ date|datefmt('ddd D') }}
+                    {{ date|datefmt('ddd D', loop.index) }}
                     </option>
                 {% endfor %}
             </select>
