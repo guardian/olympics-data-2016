@@ -26,7 +26,7 @@ function Metric(dimensions) {
             }],
             'Namespace': 'Olympics'
         }, function (err) {
-            logger.warn('Failed to put metric', err);
+            if (err) logger.warn('Failed to put metric', err);
         });
     };
 }
