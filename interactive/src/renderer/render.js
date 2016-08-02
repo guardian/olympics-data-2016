@@ -130,18 +130,17 @@ async function getAllData() {
 
 async function getUpcomingEventsForSnap() {
     let data = await rp('https://interactive.guim.co.uk/docsdata-test/1SMF0vtIILkfSE-TBiIpVKFSV1Tm4K9pB3fwunLdWaUE.json');
-
-    let upcomingEvents = JSON.parse(data).sheets.snap;
+    let upcomingEvents = JSON.parse(data).sheets.events;
 
     let currentTime = moment();
     let eventsInTheFuture = upcomingEvents.filter(row => {
-        var parsedDate = moment(row.date + " " + row.time + " " + row.timezone, "DD/MM/YYYY HH:mm Z");
+        var parsedDate = moment(row.start);
 
         return currentTime.diff(parsedDate,'seconds') < 0;
     });
 
     eventsInTheFuture.map(event => {
-        let utcDateTime = moment.utc(event.date + " " + event.time + " " + event.timezone, "DD/MM/YYYY HH:mm Z");
+        let utcDateTime = moment.utc(event.start);
 
         event.timestamp = utcDateTime.format();
         event.time = utcDateTime.format("HH:mm");

@@ -12,7 +12,7 @@
                 {% endfor %}
             </div>
             {% endfor %}
-            <a href="#" class="og-snap__link og-snap__link--medals" target="_parent">Latest medals »</a> 
+            <a href="#" class="og-snap__link og-snap__link--medals" target="_parent">Full results »</a> 
         </div>
         <div class="og-snap__medals-table">
             <table cellspacing="0" border="0">
@@ -58,41 +58,43 @@
         </div>
         {% for row in sixUpcomingEvents %}
         <div class="og-snap__upcoming-row">
-            <time class="js-og-time" datetime="{{row.timestamp}}">{{row.time}}</time><span class="og-snap__upcoming-row__discipline">{{row.discipline}}</span>{{row.event}}</div>
+            <time class="js-og-time" datetime="{{row.timestamp}}">{{row.time}}</time><span class="og-snap__upcoming-row__discipline">{{row.discipline}}</span>{{row.description}}</div>
         {% endfor %}
-        <a href="#" class="og-snap__link" target="_parent">Latest schedule »</a>
+        <a href="#" class="og-snap__link" target="_parent">Full schedule »</a>
     </div>
 </div>
 <script type="text/javascript">
-	var base = document.querySelector(".og-snap--both");
-	var times = base.querySelectorAll(".js-og-time");
+    if(document['querySelector']&&document['querySelectorAll']) {
+    	var base = document.querySelector(".og-snap--both");
+    	var times = base.querySelectorAll(".js-og-time");
 
-	function parseISODate(dateStr) {
-	    var parts = dateStr.split(/[^0-9]/).map(Number);
-	    var year = parts[0],
-	        month = parts[1],
-	        day = parts[2],
-	        hour = parts[3],
-	        min = parts[4],
-	        sec = parts[5];
-	    var date = new Date(Date.UTC(year, month - 1, day, hour, min, sec));
-	    return date;
-	}
+    	function parseISODate(dateStr) {
+    	    var parts = dateStr.split(/[^0-9]/).map(Number);
+    	    var year = parts[0],
+    	        month = parts[1],
+    	        day = parts[2],
+    	        hour = parts[3],
+    	        min = parts[4],
+    	        sec = parts[5];
+    	    var date = new Date(Date.UTC(year, month - 1, day, hour, min, sec));
+    	    return date;
+    	}
 
-	function pad(n) {
-	    return (n < 10 ? '0' : '') + n;
-	}
+    	function pad(n) {
+    	    return (n < 10 ? '0' : '') + n;
+    	}
 
-	for (var i = 0; i < times.length; i++) {
-	    var date = parseISODate(times[i].getAttribute('datetime'));
-	    times[i].textContent = pad(date.getHours()) + ":" + pad(date.getMinutes());
-	}
+    	for (var i = 0; i < times.length; i++) {
+    	    var date = parseISODate(times[i].getAttribute('datetime'));
+    	    times[i].textContent = pad(date.getHours()) + ":" + pad(date.getMinutes());
+    	}
 
-	var tzEl = base.querySelector('.js-tz');
-	var offset = new Date().getTimezoneOffset();
-	var tzSign = offset > 0 ? '-' : '+',
-	    absOffset = Math.abs(offset);
-	var tzHour = Math.floor(absOffset / 60),
-	    tzMin = absOffset % 60;
-	tzEl.textContent = tzSign + pad(tzHour) + ":" + pad(tzMin);
+    	var tzEl = base.querySelector('.js-tz');
+    	var offset = new Date().getTimezoneOffset();
+    	var tzSign = offset > 0 ? '-' : '+',
+    	    absOffset = Math.abs(offset);
+    	var tzHour = Math.floor(absOffset / 60),
+    	    tzMin = absOffset % 60;
+    	tzEl.textContent = tzSign + pad(tzHour) + ":" + pad(tzMin);
+    }
 </script>
