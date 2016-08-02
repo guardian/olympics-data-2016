@@ -2,12 +2,14 @@
 
 The basic server commands:
 
+The fetcher:
 ```
 npm run fetch -- --no-uat
 ```
 
 <b>NOTE:</b> `--no-uat` tells the fetcher use the live PA data feed
 
+The renderer:
 ```
 npm run server
 ```
