@@ -16,7 +16,8 @@ export default function(name) {
                         default: level = options.level;
                     }
                     return `${moment().format()} ${`[${name}]`.blue} ${`${level}:`.bold} ${options.message}`;
-                }
+                },
+                'level': process.env.LOGLEVEL || 'info'
             }),
             new DailyRotateFile({
                 'filename': `logs/${name}`,
