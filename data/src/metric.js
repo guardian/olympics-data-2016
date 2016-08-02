@@ -1,6 +1,7 @@
 import AWS from 'aws-sdk'
 import _ from 'lodash'
 import Bottleneck from 'bottleneck'
+import log from './log'
 import { config } from './config'
 
 AWS.config.update(config.aws.auth);
@@ -8,6 +9,7 @@ AWS.config.update(config.aws.auth);
 var cloudwatch = new AWS.CloudWatch();
 
 var limiter = new Bottleneck(0, 10);
+var logger = log('metric');
 
 function Metric(dimensions) {
     dimensions['user'] = process.env.USER;
@@ -22,9 +24,7 @@ function Metric(dimensions) {
             }],
             'Namespace': 'Olympics'
         }, function (err) {
-            if (err) {
-                console.log(err);
-            }
+            logger.warn('Failed to put metric', err);
         });
     };
 }
