@@ -106,7 +106,7 @@ function run(aggregators) {
     app.use('/cache', express.static(config.pa.cacheDir));
     app.get('/logs/:log', (req, res) => {
         let name = req.params.log;
-        let mins = req.query.mins === undefined ? 10 : parseInt(req.query.mins, 10);
+        let mins = req.query.mins === undefined ? 10 : parseFloat(req.query.mins);
         let minDate = moment(req.query.date).subtract(mins, 'minutes');
         let maxDate = moment(req.query.date).add(mins, 'minutes');
 
