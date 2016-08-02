@@ -1,6 +1,7 @@
 import winston from 'winston'
 import colors from 'colors'
 import moment from 'moment'
+import DailyRotateFile from 'winston-daily-rotate-file'
 
 export default function(name) {
     return new winston.Logger({
@@ -17,8 +18,9 @@ export default function(name) {
                     return `${moment().format()} ${`[${name}]`.blue} ${`${level}:`.bold} ${options.message}`;
                 }
             }),
-            new winston.transports.File({
-                'filename': `logs/${name}.log`
+            new DailyRotateFile({
+                'filename': `logs/${name}`,
+                'datePattern': '-yyyy-MM-dd.log'
             })
         ],
     });
