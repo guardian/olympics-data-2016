@@ -16,6 +16,8 @@ function Metric(dimensions) {
     let dims = _.map(dimensions, (value, name) => { return {'Name': name, 'Value': value}; });
 
     this.put = function put(name) {
+        if (!config.argv.metric) return;
+
         limiter.submit(cloudwatch.putMetricData.bind(cloudwatch), {
             'MetricData': [{
                 'MetricName': name,
