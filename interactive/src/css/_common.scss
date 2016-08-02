@@ -500,3 +500,9 @@ a {
         display: block;
     }
 }
+
+@include mq($from: leftCol) {
+    .om-section {
+        margin-bottom: 0;
+    }
+}

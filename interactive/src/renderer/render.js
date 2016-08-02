@@ -26,7 +26,7 @@ swig.setFilter('dayfmt', (date, fmt, i) => {
 
 swig.setFilter('fmtDayOfDays', i => {
     if(i < 2){
-        return 'pre-opening'
+        return 'Pre-opening'
     }
     if(i === 2) {
         return 'Opening day'
