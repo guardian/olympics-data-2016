@@ -1,5 +1,17 @@
 # Olympics 2016 data
 
+The basic server commands:
+
+```
+npm run fetch -- --no-uat
+```
+
+<b>NOTE:</b> `--no-uat` tells the fetcher use the live PA data feed
+
+```
+npm run server
+```
+
 ## Debugging problems
 
 Fetch the latest data
@@ -14,6 +26,24 @@ npm run fetch -- --test --no-uat
 ```
 
 Find problem!
+
+## Updating the EC2 instance
+```
+screen -x
+
+ctrl-a + 2
+git pull
+```
+
+Any changes to `interactive/src/**` will automatically trigger a rerender. You should never
+have to restart the interactive renderer.
+
+Any changes to `data/**` will need to restart the data fetcher
+```
+ctrl-a + 0
+ctrl-c
+npm run fetch -- --no-uat
+```
 
 ## Creating an EC2 instance
 
@@ -76,25 +106,6 @@ If you follow these instructions:
 - ctrl-a + 1 will be the interactive renderer
 - ctrl-a + 2 will be a bash terminal
 
-
-Updating
-====
-```
-screen -x
-
-ctrl-a + 2
-git pull
-```
-
-Any changes to interactive/src/** will automatically trigger a rerender. You should never
-have to restart the interactive renderer.
-
-Any changes to data/** will need to restart the data fetcher
-```
-ctrl-a + 0
-ctrl-c
-npm run fetch
-```
 
 ## Developing
 
