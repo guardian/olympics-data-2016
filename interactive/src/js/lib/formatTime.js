@@ -8,6 +8,8 @@ function fmt(h, m) {
 export default function formatTime(today, timeEls, tzEl) {
     let todayDate = parseInt(today.split('-')[2], 10);
 
+    if (!tzEl) return;
+
     timeEls.map(timeEl => {
         let date = parseISODate(timeEl.getAttribute('datetime'));
         let time = fmt(date.getHours(), date.getMinutes());
