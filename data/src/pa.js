@@ -83,15 +83,15 @@ function PA(logger, metric) {
         return {'olympics': {}};
     }
 
-    this.request = async function request(endpoint, forceCache=false) {
+    this.request = async function request(endpoint) {
         try {
             let stat = await fsStat(cacheFile(endpoint));
             var cacheTime = cacheTimes.find(ct => ct.endpoint.test(endpoint)).duration;
             var expiryTime = moment(stat.mtime).add(cacheTime);
 
-            return await (forceCache || moment().isBefore(expiryTime) ? requestCache(endpoint) : requestUrl(endpoint));
+            return await (!config.argv.pa || moment().isBefore(expiryTime) ? requestCache(endpoint) : requestUrl(endpoint));
         } catch (err) {
-            if (err.code && err.code === 'ENOENT') {
+            if (err.code && err.code === 'ENOENT' && config.argv.pa) {
                 return await requestUrl(endpoint);
             } else {
                 throw err;

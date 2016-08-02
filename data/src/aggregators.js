@@ -14,6 +14,8 @@ import scheduleAggregator from './aggregators/schedule'
 
 const fsWrite = denodeify(fs.writeFile.bind(fs));
 
+const retryTime = moment.duration(5, 'minutes');
+
 export function forceArray(arr) {
     return arr === undefined ? [] : _.isArray(arr) ? arr : [arr];
 }
@@ -42,7 +44,7 @@ function Aggregator(opts) {
             let deps = combiner.dependencies ? combiner.dependencies(data) : [];
             logger.info(`Requesting ${deps.length} resources for ${combiner.name}`);
 
-            let contents = await Promise.all(deps.map(dep => pa.request(dep, !config.argv.pa)));
+            let contents = await Promise.all(deps.map(pa.request));
 
             combinerData = combiner.process(data, contents);
             await writeData(combiner.name, {
@@ -51,7 +53,7 @@ function Aggregator(opts) {
                 fallback
             });
         } catch (err) {
-            logger.error(`Error processing ${combiner.name} - ${err}, stack trace:`);
+            logger.error(`Error processing ${combiner.name}`);
             logger.error(err.stack);
             notify.error(err);
 
@@ -85,8 +87,13 @@ function Aggregator(opts) {
 
         try {
             await processCombiners(opts.combiners, {});
+
             statusMetric.put('done');
             lastSuccess = moment();
+            if (config.argv.loop) {
+                logger.info('Next tick in', opts.cacheTime.humanize());
+                timeout = setTimeout(process, opts.cacheTime.asMilliseconds());
+            }
         } catch (err) {
             statusMetric.put('failed');
 
@@ -98,11 +105,11 @@ function Aggregator(opts) {
                     logger.error('Fallbacks failed');
                 }
             }
-        }
 
-        if (config.argv.loop) {
-            logger.info('Next tick in', opts.cacheTime.humanize());
-            timeout = setTimeout(process, opts.cacheTime.asMilliseconds());
+            if (config.argv.loop) {
+                logger.info('Retrying in', retryTime.humanize());
+                timeout = setTimeout(process, retryTime.asMilliseconds());
+            }
         }
 
         processing = false;
