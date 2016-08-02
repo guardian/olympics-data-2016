@@ -41,9 +41,9 @@ function run(aggregators) {
         }).join('<br />');
 
         if (aggregators.every(agg => agg.isHealthy())) {
-            res.send('HEALTHY<br />' + msg);
+            res.send('<h1>HEALTHY</h1><br />' + msg);
         } else {
-            res.status(404).send('UNHEALTHY<br />' + msg);
+            res.status(404).send('<h1>UNHEALTHY</h1><br />' + msg);
         }
     });
 
