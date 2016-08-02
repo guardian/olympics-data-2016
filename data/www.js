@@ -106,8 +106,9 @@ function run(aggregators) {
     app.use('/cache', express.static(config.pa.cacheDir));
     app.get('/logs/:log', (req, res) => {
         let name = req.params.log;
-        let minDate = moment(req.query.date).subtract(30, 'minutes');
-        let maxDate = moment(req.query.date).add(30, 'minutes');
+        let mins = parseInt(req.query.mins, 10) || 10;
+        let minDate = moment(req.query.date).subtract(mins, 'minutes');
+        let maxDate = moment(req.query.date).add(mins, 'minutes');
 
         fs.readdir('logs', (err, logs) => {
             let latestLog = logs.filter(l => l.startsWith(name)).sort((a, b) => a < b ? 1 : -1)[0];
