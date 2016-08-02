@@ -53,24 +53,33 @@ function PA(logger, metric) {
         logger.info('Requesting URL', endpoint);
         metric.put('request');
 
-        let _resp = await rp({
-            'uri': `${config.pa.baseUrl}/${endpoint}`,
-            'headers': {
-                'Accept': 'application/json',
-                'Apikey': config.pa.apiKey
+        try {
+            let _resp = await rp({
+                'uri': `${config.pa.baseUrl}/${endpoint}`,
+                'headers': {
+                    'Accept': 'application/json',
+                    'Apikey': config.pa.apiKey
+                }
+            });
+
+            if (_resp && _resp.length > 0) {
+                let resp = JSON.parse(_resp);
+
+                if (resp.olympics) {
+                    await writeCache(endpoint, resp);
+                    return resp;
+                }
             }
-        });
 
-        if (_resp && _resp.length > 0) {
-            let resp = JSON.parse(_resp);
-
-            if (resp.olympics) {
-                await writeCache(endpoint, resp);
-                return resp;
+            logger.warn('Empty response for URL', endpoint);
+        } catch (err) {
+            logger.error('Error requesting', endpoint, err);
+            logger.error(err.stack);
+            if (config.argv.notify) {
+                notify.error(err);
             }
         }
 
-        logger.warn('Empty response for URL', endpoint);
         return {'olympics': {}};
     }
 

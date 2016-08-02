@@ -115,7 +115,7 @@ function Aggregator(opts) {
         return lastSuccess && moment().subtract(healthThreshold, 'seconds').isBefore(lastSuccess);
     };
 
-    this.getLastSuccess = () => lastSuccess.format();
+    this.getLastSuccess = () => lastSuccess ? lastSuccess.format() : 'never';
     this.isProcessing = () => processing;
 }
 
