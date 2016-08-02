@@ -7,8 +7,10 @@ import mkdirp from 'mkdirp'
 import _ from 'lodash'
 import * as d3 from 'd3'
 import moment from 'moment'
+import rp from 'request-promise-native'
+import s3cfg from '../../cfg/s3.json'
 
-swig.setFilter('datefmt', (date, fmt, i) => {
+swig.setFilter('dayfmt', (date, fmt, i) => {
 
     let str = moment(date).format(fmt)
 
@@ -21,6 +23,9 @@ swig.setFilter('datefmt', (date, fmt, i) => {
     }
     return str
 });
+
+swig.setFilter('datefmt', (date, fmt) => moment.utc(date).format(fmt));
+swig.setFilter('dateeq', (date1, date2, type) => moment.utc(date1).isSame(moment.utc(date2), type));
 
 swig.setFilter('entrantname', entrant => {
     if (entrant.code === 'BYE') return 'BYE';
@@ -85,6 +90,10 @@ swig.setFilter('ordinal', num => {
     return num + 'th'
 })
 
+swig.setFilter('slice', (arr, limit) => {
+  return arr.slice(0,limit);
+});
+
 async function readdir(d) {
     let g = glob();
     let files = await denodeify(g.readdir.bind(g))(d);
@@ -102,6 +111,8 @@ async function getAllData() {
         data[name + 'Fallback'] = contents.fallback;
     });
 
+    data.sixUpcomingEvents = await getUpcomingEventsForSnap();
+
     data.emptyMedalTableEntry = {
         'country': {},
         'medals': {'gold': 0, 'silver': 0, 'bronze': 0},
@@ -109,7 +120,14 @@ async function getAllData() {
         'position': data.medalTable.length + 1
     };
 
-    data.today = '2016-01-15';
+    // switch at 06:00 UTC
+    let today = moment.utc().subtract(6, 'hours').format('YYYY-MM-DD');
+    if (today < _.first(data.dates)) today = _.first(data.dates);
+    if (today > _.last(data.dates)) today = _.last(data.dates);
+
+    data.today = today;
+
+    data.olympicsDay = data.dates.indexOf(today) + 1;
 
     data.scheduleToday = data.scheduleByDay.find(schedule => schedule.day.date === data.today);
     data.resultsToday = data.resultsByDay.find(results => results.day.date === data.today);
@@ -122,6 +140,29 @@ async function getAllData() {
     swig.setFilter('maskScale', num => 1 + (num === 0 ? scale(1) : scale(num)));
 
     return data;
+}
+
+async function getUpcomingEventsForSnap() {
+    let data = await rp('https://interactive.guim.co.uk/docsdata-test/1SMF0vtIILkfSE-TBiIpVKFSV1Tm4K9pB3fwunLdWaUE.json');
+    let upcomingEvents = JSON.parse(data).sheets.events;
+
+    let currentTime = moment();
+    let eventsInTheFuture = upcomingEvents.filter(row => {
+        var parsedDate = moment(row.start);
+
+        return currentTime.diff(parsedDate,'seconds') < 0;
+    });
+
+    eventsInTheFuture.map(event => {
+        let utcDateTime = moment.utc(event.start);
+
+        event.timestamp = utcDateTime.format();
+        event.time = utcDateTime.format("HH:mm");
+
+        return event;
+    });
+
+    return eventsInTheFuture.slice(0,6);
 }
 
 async function renderTask(task, data) {
@@ -169,6 +210,8 @@ async function renderAll() {
     // Main templates
     mkdirp.sync('build');
 
+    let uploadPath = `${s3cfg.domain}${s3cfg.path}/${process.env.USER}`;
+
     (await readdir('./src/renderer/templates/*.html')).forEach(template => {
         let name = path.basename(template, '.html');
 
@@ -176,8 +219,12 @@ async function renderAll() {
 
         let css = fs.readFileSync(`build/${name}.css`).toString();
         let html = swig.renderFile(template, {...data, css});
+        let boot = swig.renderFile('./src/renderer/templates/_boot.js', {'url': `${uploadPath}/${name}.html`});
+
+        mkdirp.sync(`build/${name}`);
 
         fs.writeFileSync(`build/${name}.html`, html, 'utf8');
+        fs.writeFileSync(`build/${name}/boot.js`, boot, 'utf8');
     });
 
     // Tasks
@@ -210,14 +257,16 @@ async function renderAll() {
     // Embed templates
     mkdirp.sync('build/embed');
 
-    let embedCSS = fs.readFileSync('build/embed.css');
     (await readdir('./src/renderer/templates/embeds/*.html')).forEach(template => {
         let name = path.basename(template, '.html');
         console.log(`Rendering embeds/${name}.html`);
+        let css = ['wideSnap', 'upcoming', 'medals'].indexOf(name) > -1 ?
+            fs.readFileSync('build/embed.css') :
+            fs.readFileSync('build/other.css');
 
         let html = swig.renderFile(template, data);
         let source = {
-            'html': `<style>${embedCSS}</style>${html}`,
+            'html': `<style>${css}</style>${html}`,
             'previous': '',
             'refreshStatus': true,
             'url': 'http://gu.com/', // TODO
@@ -226,7 +275,7 @@ async function renderAll() {
         };
         fs.writeFileSync(`build/${name}.json`, JSON.stringify(source), 'utf8');
 
-        let embedHTML = swig.renderFile('./src/renderer/templates/embeds/_base.html', {html, 'css': embedCSS});
+        let embedHTML = swig.renderFile('./src/renderer/templates/embeds/_base.html', {html, css});
         fs.writeFileSync(`build/embed/${name}.html`, embedHTML, 'utf8');
     });
 }

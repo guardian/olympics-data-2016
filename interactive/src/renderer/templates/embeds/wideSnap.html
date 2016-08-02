@@ -1,0 +1,100 @@
+<div class="og-snap og-snap--both">
+    <div class="og-snap__medals">
+        <div class="og-snap__medals-latest">
+            <div class="og-snap__title og-snap__title--medals"><span class="og-snap__title--kicker">Rio</span>Latest Medals</div>
+            {% for event in latestMedals|slice(2) %}
+            <div class="og-snap__medals-latest-title">{{event.discipline}}<span class="og-snap__medals-latest-title--grey">{{event.eventName}}</span></div>
+            <div class="og-snap__medal-row">
+                {% for medal in event.medals %}
+                <div class="og-snap__medal">
+                    <div class="om-medal om-medal--{{medal.type}}"></div> {{medal.entrant.country.name}}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <a href="#" class="og-snap__link og-snap__link--medals" target="_parent">Full results »</a> 
+        </div>
+        <div class="og-snap__medals-table">
+            <table cellspacing="0" border="0">
+                <tr>
+                    <th></th>
+                    <th>
+                        <div class="om-medal om-medal--gold"></div>
+                    </th>
+                    <th>
+                        <div class="om-medal om-medal--silver"></div>
+                    </th>
+                    <th>
+                        <div class="om-medal om-medal--bronze"></div>
+                    </th>
+                    <th>T</th>
+                </tr>
+                {% for row in medalTable|slice(6) %}
+                <tr>
+                    <td style="text-align: left;">
+                        {{row.country.name}}
+                    </td>
+                    <td class="og-snap__greyed-rows">
+                        {{row.medals.gold}}
+                    </td>
+                    <td class="og-snap__greyed-rows">
+                        {{row.medals.silver}}
+                    </td>
+                    <td class="og-snap__greyed-rows">
+                        {{row.medals.bronze}}
+                    </td>
+                    <td>
+                        {{row.total}}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <div class="og-snap__upcoming">
+        <div class="og-snap__title"><span class="og-snap__title--kicker">Day {{olympicsDay}}</span>What you should follow</div>
+        <div class="og-snap__timezone">
+            All times are in UTC<span class="js-tz"></span>
+        </div>
+        {% for row in sixUpcomingEvents %}
+        <div class="og-snap__upcoming-row">
+            <time class="js-og-time" datetime="{{row.timestamp}}">{{row.time}}</time><span class="og-snap__upcoming-row__discipline">{{row.discipline}}</span>{{row.description}}</div>
+        {% endfor %}
+        <a href="#" class="og-snap__link" target="_parent">Full schedule »</a>
+    </div>
+</div>
+<script type="text/javascript">
+    if(document['querySelector']&&document['querySelectorAll']) {
+    	var base = document.querySelector(".og-snap--both");
+    	var times = base.querySelectorAll(".js-og-time");
+
+    	function parseISODate(dateStr) {
+    	    var parts = dateStr.split(/[^0-9]/).map(Number);
+    	    var year = parts[0],
+    	        month = parts[1],
+    	        day = parts[2],
+    	        hour = parts[3],
+    	        min = parts[4],
+    	        sec = parts[5];
+    	    var date = new Date(Date.UTC(year, month - 1, day, hour, min, sec));
+    	    return date;
+    	}
+
+    	function pad(n) {
+    	    return (n < 10 ? '0' : '') + n;
+    	}
+
+    	for (var i = 0; i < times.length; i++) {
+    	    var date = parseISODate(times[i].getAttribute('datetime'));
+    	    times[i].textContent = pad(date.getHours()) + ":" + pad(date.getMinutes());
+    	}
+
+    	var tzEl = base.querySelector('.js-tz');
+    	var offset = new Date().getTimezoneOffset();
+    	var tzSign = offset > 0 ? '-' : '+',
+    	    absOffset = Math.abs(offset);
+    	var tzHour = Math.floor(absOffset / 60),
+    	    tzMin = absOffset % 60;
+    	tzEl.textContent = tzSign + pad(tzHour) + ":" + pad(tzMin);
+    }
+</script>

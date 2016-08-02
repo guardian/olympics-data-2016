@@ -1,0 +1,38 @@
+@import '../../bower_components/guss-typography/_typography.scss';
+@import "mq";
+
+@import "common";
+@import "medals";
+@import "flags";
+
+body {
+    background-color: white;
+}
+
+.om-section {
+    padding: 0;
+    margin: 0;
+    max-width: 100%;
+}
+
+.om-section__title {
+    position: relative;
+    left: 0;
+    width: auto;
+}
+
+.om-event__expand {
+    .om-event:not(.om-event--finished) & {
+        background-image: url(../assets/imgs/clock.svg);
+    }
+    .om-event.om-event--results & {
+        background-image: url(../assets/imgs/plus.svg);
+    }
+    .om-event.om-event--results.is-expanded & {
+        background-image: url(../assets/imgs/minus.svg);
+    }
+}
+
+.om-flag {
+    background-image: url(../assets/imgs/flags.png);
+}

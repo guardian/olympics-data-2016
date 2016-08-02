@@ -4,6 +4,8 @@ import moment from 'moment'
 import notify from '../notify'
 import log from '../log'
 
+import { forceArray } from '../aggregators.js'
+
 const logger = log('schedule');
 
 const roundDisciplines = {
@@ -25,10 +27,6 @@ const combineBlacklist = [
     'basketball', 'beach-volleyball', 'football', 'handball', 'hockey', 'rugby-sevens',
     'tennis', 'volleyball', 'water-polo'
 ];
-
-function forceArray(arr) {
-    return arr === undefined ? [] : _.isArray(arr) ? arr : [arr];
-}
 
 function canCombine(group, evt1) {
     if (combineBlacklist.indexOf(evt1.discipline.identifier) > -1) return false;
@@ -295,6 +293,7 @@ export default {
             'process': ({dates}, dateSchedules) => {
                 let datesEvents = dateSchedules.map(ds => {
                     return forceArray(ds.olympics.scheduledEvent)
+                        .filter(evt => evt.discipline && evt.discipline.event && evt.discipline.event.eventUnit)
                         .filter(evt => evt.discipline.event.eventUnit.unitType !== 'Not Applicable')
                         .map(parseScheduledEvent)
                         .filter(evt => !!evt.start);
@@ -431,9 +430,24 @@ export default {
             }
         },
         {
-            'name' : 'countries',
+            'name' : 'countries2',
             'dependencies' : () => ['olympics/2016-summer-olympics/country'],
-            'process' : ({}, [countries]) => countries.olympics.country
+            'process' : ({}, [countries]) => {
+                return countries.olympics.country.map(function(c) {
+                    if (c.identifier === 'MKD') {c.name = 'Macedonia'};
+                    if (c.identifier === 'TPE') {c.name = 'Taiwan'};
+                    if (c.identifier === 'CIV') {c.name = 'Ivory Coast'};
+                    if (c.identifier === 'PRK') {c.name = 'North Korea'};
+                    if (c.identifier === 'HKG') {c.name = 'Hong Kong'};
+                    if (c.identifier === 'LAO') {c.name = 'Laos'};    
+                    if (c.identifier === 'KOR') {c.name = 'South Korea'};    
+                    if (c.identifier === 'MDA') {c.name = 'Moldova'};    
+                    if (c.identifier === 'RUS') {c.name = 'Russia'};    
+                    if (c.identifier === 'SKN') {c.name = 'St Kitts & Nevis'};    
+                    if (c.identifier === 'LCA') {c.name = 'St Lucia'};    
+                    if (c.identifier === 'VIN') {c.name = 'St Vincent & the Grenadines'};  
+                    return c;})
+                }
         },
         {
             'name' : 'eventDetails',
@@ -453,7 +467,7 @@ export default {
         },
         {
             'name': 'medalsByCountry',
-            'process': ({events, results, countries, eventDetails = {}}) => {
+            'process': ({events, results, countries2, eventDetails = {}}) => {
                 let medals = _(results)
                     .filter(result => result.medalEvent)
                     .flatMap(result => {
@@ -473,13 +487,13 @@ export default {
                     .groupBy('entrant.country.identifier')
                     .mapValues((medals, code) => {
                         return {
-                            country: countries.find(c => c.identifier === code),
+                            country: countries2.find(c => c.identifier === code),
                             medals
                         }
                     })
                     .valueOf();
 
-                let noMedals = _(countries)
+                let noMedals = _(countries2)
                     .filter(c => !(medals)[c.identifier])
                     .map(c => [c.identifier, {
                         country : c,

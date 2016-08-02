@@ -1,7 +1,10 @@
 import './polyfill/classList.min'
 
+import iframeMessenger from 'guardian/iframe-messenger'
 import reqwest from 'reqwest'
 import { $, $$ } from './lib/selector'
+import formatTime from './lib/formatTime'
+import parseISODate from './lib/parseISODate'
 
 let disciplineChoiceEl = $('.js-discipline-choice');
 let dateChoiceEl = $('.js-date-choice');
@@ -11,25 +14,22 @@ let errorEl = $('.js-error');
 function filterDisciplines() {
     let identifier = disciplineChoiceEl.options[disciplineChoiceEl.selectedIndex].value;
 
-
+    let count = 0;
     $$(dateScheduleEl, '.js-discipline').map(el => {
         return { el, 'identifier': el.getAttribute('data-discipline') };
     }).forEach(discipline => {
         if (identifier === '' || identifier === discipline.identifier) {
             discipline.el.classList.remove('is-hidden');
+            count++;
         } else {
             discipline.el.classList.add('is-hidden');
         }
     });
 
-    var count = $$(dateScheduleEl, '.js-discipline:not(.is-hidden)').length;
-    let noEventsDiv = $('.om-no-events')
-
     if (count < 1) {
-        noEventsDiv.classList.remove('is-hidden')
-    }
-    else {
-        noEventsDiv.classList.add('is-hidden')
+        dateScheduleEl.classList.add('has-no-events');
+    } else {
+        dateScheduleEl.classList.remove('has-no-events');
     }
 
 }
@@ -55,9 +55,10 @@ function changeDate() {
     dateScheduleEl.classList.add('is-loading');
     errorEl.classList.remove('has-error');
 
-    function step1Schedule(html) {
-        dateScheduleEl.innerHTML = html;
+    function step1Schedule(schedule) {
+        dateScheduleEl.innerHTML = schedule;
         dateScheduleEl.classList.remove('is-loading');
+        dateScheduleEl.classList.remove('is-expandable')
 
         for (let i = 0; i < dateChoiceEl.options.length; i++) {
             if (dateChoiceEl.options[i].value === date) {
@@ -66,11 +67,11 @@ function changeDate() {
             }
         }
 
-        if (!html) return;
+        formatTime(date, $$('.js-time'), $('.js-tz'));
+
+        if (!schedule) return;
 
         filterDisciplines();
-
-        dateScheduleEl.classList.remove('is-expandable')
 
         if (resultsCache[date]) {
             step2Results(resultsCache[date]);
@@ -103,9 +104,9 @@ function changeDate() {
         step1Schedule(dateCache[date]);
     } else {
         let url = isMedalTable ? `./days/schedule-results-${date}.html` : `./days/schedule-${date}.html`;
-        reqwest(url).then(html => {
-            dateCache[date] = html;
-            step1Schedule(html);
+        reqwest(url).then(schedule => {
+            dateCache[date] = schedule;
+            step1Schedule(schedule);
         }).catch(err => {
             errorEl.classList.add('has-error');
             step1Schedule('');
@@ -115,3 +116,5 @@ function changeDate() {
 
 window.addEventListener('hashchange', changeDate);
 changeDate();
+
+iframeMessenger.enableAutoResize();

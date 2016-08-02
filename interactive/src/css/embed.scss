@@ -1,4 +1,361 @@
-@import "fonts";
+@import '../../bower_components/guss-typography/_typography.scss';
+@import "mq";
 
-.blah {
+$green: #387e3c;
+$yellow: #fded80;
+
+$gold: rgba(250,220,2,1);
+$silver: rgba(217,217,217,1);
+$bronze: rgba(243,111,33,1);
+
+$goldDynamo: #ffce4b;
+$silverDynamo: rgba(255,255,255,1);
+$bronzeDynamo: rgba(243,111,33,1);
+
+$goldLight: rgba(250,220,2,0.2);
+$silverLight: rgba(217,217,217,0.4);
+$bronzeLight: rgba(243,111,33,0.2);
+
+
+
+.og-snap {
+	background-color: #f6f6f6;
+	width: 100%;
+	padding: 3px 0px;
+	overflow: hidden;
+    position: relative;
+	border-top: 1px solid $green;
+	// border-bottom: 1px solid #bdbdbd;
+
+	* {
+		box-sizing: border-box;
+	}
+
+	.fc-container--story-package & {
+		background-color: #dcdcdc;
+	}
+
+}
+
+.og-snap.og-snap--both {
+	width: 100%;
+
+	@include mq(tablet) {
+		width: 700px;
+	}
+
+	@include mq(desktop) {
+		width: 940px;
+	}
+
+	@include mq(tablet) {
+		display: -webkit-box;  display: -ms-flexbox; display: -webkit-flex; display: flex;
+	}
+
+	.og-snap__medals {
+		width: 50%;
+		border-right: 1px dotted #bdbdbd;
+		overflow: hidden;
+		
+		@include mq(mobileLandscape) {
+			display: -webkit-box;  display: -ms-flexbox; display: -webkit-flex; display: flex;
+		}
+
+		@include mq(tablet) {
+			float: left;
+			padding-right: 10px;
+		}
+
+		@include mq($until: tablet) {
+			width: 100%;
+			border: 0;
+		}
+	}
+
+	.og-snap__link {
+		padding: 0 !important;
+	}
+
+	.og-snap__medals-latest {
+		@include mq(mobileLandscape) {
+			width: 50%;
+		 	float: left;
+		 	border-right: 1px dotted #bdbdbd;
+		 	padding-right: 10px;
+		}
+	}
+
+	.og-snap__medals-table {
+		border-top: 1px dotted #bdbdbd;
+		padding-top: 6px;
+		margin-top: 2px;
+
+		@include mq(mobileLandscape) {
+			margin: 0;
+			padding: 0;
+			border: 0;
+			width: 50%;
+			float: right;
+			padding-left: 10px;
+			margin-top: 3px;
+		}
+	}
+
+	.og-snap__upcoming {
+		margin-top: 4px;
+		border-top: 1px solid #387e3c;
+		padding-top: 6px;
+
+		@include mq(tablet) {
+			padding-top: 0;
+			border: 0;
+			margin: 0;
+			padding-left: 10px;
+			width: 50%;
+			float: right;
+		}
+	}
+}
+
+.og-snap.og-snap--medals-only {
+	width: 100%;
+
+	.og-snap__medals {
+		width: 100%;
+		padding-left: 5px;
+		padding-right: 5px;
+
+		@include mq(510px, 740px) {
+ 			display: -webkit-box;  display: -ms-flexbox; display: -webkit-flex; display: flex;
+ 		}
+	}
+
+	.og-snap__medals-latest {
+ 		@include mq(510px, 740px) {
+ 			width: 50%;
+ 			float: left;
+ 			border-right: 1px dotted #bdbdbd;
+ 		}
+	}
+
+	.og-snap__medals-table {
+		border-top: 1px dotted #bdbdbd;
+ 		padding-top: 4px;
+ 		margin-top: 2px;
+ 		padding-left: 0;
+
+ 		@include mq(510px, 740px) {
+ 			width: 50%;
+ 			float: right;
+ 			border: 0;
+ 			padding-top: 0;
+ 			margin-top: 0;
+ 			padding-left: 10px;
+ 		}
+	}
+}
+
+.og-snap.og-snap--upcoming-only {
+	width: 100%;
+
+	.og-snap__upcoming-row {
+		width: 100%;
+	}
+
+	.og-snap__upcoming {
+		padding-left: 5px;
+		padding-right: 5px;
+	}
+}
+
+.og-snap__link {
+	@include fs-textSans(3);
+	color: #005689 !important;
+	font-weight: 700;
+	text-decoration: none;
+	display: inline-block;
+	margin-top: 12px;
+
+	@include mq(tablet) {
+		position: absolute !important;
+		bottom: 0px;
+	}
+
+	&:hover {
+		text-decoration: underline;
+	}
+
+	&.og-snap__link--medals {
+		@include mq(510px, 740px) {
+			position: absolute !important;
+			bottom: 3px;
+		}	
+	}
+}
+
+.og-snap__title {
+	@include fs-headline(3);
+	font-weight: 500;
+	margin-bottom: 11px;
+
+	.og-snap--both & {
+		@include mq($until: tablet) {
+			margin-bottom: 6px;
+		}
+	}
+
+	.og-snap--upcoming-only & {
+		margin-bottom: 6px;
+	}
+
+	&.og-snap__title--medals {
+		margin-bottom: 14px;
+	}
+}
+
+.og-snap__title--kicker {
+	color: $green;
+
+	&:after {
+		content: ' / ';
+		color: #bdbdbd;
+	}
+}
+
+// left side
+.og-snap__medals-latest,
+.og-snap__upcoming {
+	@include mq(tablet) {
+		padding-bottom: 24px;
+	}
+	position: relative;
+}
+
+.og-snap__medal-row {
+	@include fs-textSans(3);
+	color: #333;
+	margin-bottom: 12px;
+
+	&:last-of-type {
+		margin-bottom: 0;
+	}
+}
+
+.og-snap__medal {
+	margin-right: 5px;
+	display: inline-block;
+}
+
+.og-snap__medals-latest-title {
+	@include fs-textSans(3);
+	line-height: 18px;
+	font-weight: 700;
+	color: #000;
+	margin-bottom: 4px;
+}
+
+.og-snap__medals-latest-title--grey {
+	color: #333;
+	font-weight: 300;
+
+	&:before {
+		content: ' ';
+	}
+}
+
+.og-snap__medals-table {
+	@include fs-textSans(3);
+	text-align: center;
+
+	table {
+		width: 100%;
+
+		th {
+			padding-bottom: 12px;
+		}
+
+		td {
+			padding: 0;
+			padding-bottom: 3px;
+			padding-top: 2px;
+		}
+	}
+
+	.og-snap__greyed-rows {
+		color: #767676;
+		font-weight: 300;
+	}
+}
+
+// right side
+.og-snap__upcoming-row {
+	@include fs-textSans(3);
+	color: #333;
+
+	.og-snap--both & {
+		@include mq(tablet) {
+			padding: 2px 0;
+			border-bottom: 1px dotted #bdbdbd;
+		}
+	}
+
+	.og-snap--upcoming-only & {
+		padding: 2px 0;
+		border-bottom: 1px dotted #bdbdbd;
+	}
+
+	&:first-of-type {
+		padding-top: 1px;
+	}
+
+	&:last-of-type {
+		border-bottom: 0;
+	}
+
+	time {
+		display: inline-block;
+    	min-width: 40px;
+	}
+}
+
+.og-snap__upcoming-row__discipline {
+	font-weight: 700;
+	margin-left: 5px;
+	margin-right: 5px;
+	color: #000;
+}
+
+.og-snap__timezone {
+	@include fs-textSans(2);
+	color: #767676;
+	padding-bottom: 4px;
+
+	.og-snap--both & {
+		@include mq(tablet) {
+			position: absolute;
+			top: 6px;
+			right: 0;
+		}
+	}
+}
+
+// medals
+
+.om-medal,
+.om-qualified {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 12px;
+    height: 12px;
+    border-radius: 10px;
+    background: transparent;
+    border: 2px solid #fff;
+    margin-right: 2px;
+    margin-bottom: -1px;
+}
+
+.om-medal {
+    &.om-medal--bronze { border-color: $bronze; .fc-container--story-package & { border-color: $bronzeDynamo; } }
+    &.om-medal--silver { border-color: $silver; .fc-container--story-package & { border-color: $silverDynamo; } }
+    &.om-medal--gold { border-color: $gold; .fc-container--story-package & { border-color: $goldDynamo; } }
 }

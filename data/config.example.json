@@ -1,0 +1,24 @@
+{
+    "pa": {
+        "apiKey": "",
+        "cacheDir": "data-in/",
+        "uatCacheDir": "data-in-uat/",
+        "baseUrl": "",
+        "uatBaseUrl": "",
+        "rateLimit": 10
+    },
+    "aws": {
+        "sns": {
+            "topic": ""
+        },
+        "s3": {
+            "bucket": "",
+            "dir": ""
+        },
+        "auth": {
+            "accessKeyId": "",
+            "secretAccessKey": "",
+            "region": ""
+        }
+    }
+}

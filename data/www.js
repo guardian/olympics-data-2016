@@ -7,7 +7,7 @@ import glob from 'glob-fs'
 import denodeify from 'denodeify'
 import aggregators from './src/aggregators'
 import log from './src/log'
-import config from './config'
+import { config } from './src/config'
 
 const fsStat = denodeify(fs.stat);
 const fsUnlink = denodeify(fs.unlink);
@@ -26,27 +26,36 @@ function paCacheStats(file) {
 }
 
 
-function run(aggregatorTickers) {
+function run(aggregators) {
 
     var app = express();
 
+    app.get('/health', (req, res) => {
+        let msg = aggregators.map(agg => {
+            return [
+                agg.id,
+                agg.isHealthy() ? 'healthy' : 'unhealthy',
+                agg.isProcessing() ? 'processing' : 'not processing',
+                'last success was ' + agg.getLastSuccess()
+            ].join(', ');
+        }).join('<br />');
+
+        if (aggregators.every(agg => agg.isHealthy())) {
+            res.send('HEALTHY<br />' + msg);
+        } else {
+            res.status(404).send('UNHEALTHY<br />' + msg);
+        }
+    });
+
     app.get('/aggregators.json', cors(), (req, res) => {
         var out = aggregators.map(aggregator => {
-            let cacheTime = aggregator.cacheTime.asMilliseconds();
-            let inputs = aggregator.inputs.map(input => {
-                return {
-                    'id': input.name,
-                    cacheTime
-                };
-            });
-            let outputs = aggregator.outputs.map(input => {
-                return {
-                    'id': input.name,
-                    cacheTime
-                };
-            });
-            return [...inputs, ...outputs];
-        }).reduce((a, b) => [...a, ...b]);
+            let combiners = aggregator.combiners.map(combiner => combiner.name);
+            return {
+                'id': aggregator.id,
+                'cacheTime': aggregator.cacheTime.asMilliseconds(),
+                combiners
+            };
+        });
 
         res.send(out);
     });
@@ -79,10 +88,15 @@ function run(aggregatorTickers) {
             } else {
                 res.status(404).send();
             }
-        } else if (type === 'aggregator' && aggregatorTickers[id] !== undefined) {
-            aggregatorTickers[id]()
-                .then(() => res.status(204).send())
-                .catch(err => res.status(500).send(err));
+        } else if (type === 'aggregator') {
+            let aggregator = aggregators.find(agg => agg.id === id);
+            if (aggregator) {
+                aggregator.process()
+                    .then(() => res.status(204).send())
+                    .catch(err => res.status(500).send(err));
+            } else {
+                res.status(404).send();
+            }
         } else {
             res.status(404).send();
         }

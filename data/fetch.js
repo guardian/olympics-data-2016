@@ -1,105 +1,50 @@
-import util from 'util'
 import parseArgs from 'minimist'
-import moment from 'moment'
-import fs from 'fs'
-import path from 'path'
 import mkdirp from 'mkdirp'
-import denodeify from 'denodeify'
+import colors from 'colors'
+import prompt from 'prompt'
 import aggregators from './src/aggregators'
-import pa from './src/pa'
-import s3 from './src/s3'
-import notify from './src/notify'
-import log from './src/log'
-import config from './config'
+
+import { set as setConfig, config } from './src/config'
 
 import www from './www'
 
-const fsWrite = denodeify(fs.writeFile.bind(fs));
+var argv = parseArgs(process.argv.slice(2), {'default': {
+    's3': true, 'pa': true, 'loop': true, 'notify': true, 'metric': true, 'test': false, 'uat': true
+}});
 
-const mainLogger = log('fetch');
-
-var argv = parseArgs(process.argv.slice(2), {'default': {'s3': true, 'pa': true, 'loop': true, 'notify': true}});
 if (argv.test) {
-    argv.s3 = argv.pa = argv.loop = argv.notify = false;
+    argv.s3 = argv.pa = argv.loop = argv.notify = argv.metric = false;
 }
 
-var regExps = argv._.map(r => new RegExp(r))
+// Write args to config
+Object.keys(argv).forEach(key => setConfig(`argv.${key}`, argv[key]));
 
-async function writeData(name, data) {
-    let localPath = `data-out/${name}.json`;
-    await fsWrite(localPath, JSON.stringify(data, null, 2));
-    if (argv.s3) await s3.put(name, data);
+if (argv.uat) {
+    setConfig('pa.cacheDir', config.pa.uatCacheDir);
+    setConfig('pa.baseUrl', config.pa.uatBaseUrl);
 }
 
-function aggregatorFn(aggregator) {
-    let logger = log(`aggregator:${aggregator.id}`);
+if (argv.pa && !argv.uat) {
+    console.log('YOU ARE ABOUT TO USE THE LIVE PA DATA FEED'.red.bold);
+    console.log('This could interfere with the live Olympics parser');
+    console.log('Are you sure you want to do this? Type "Yes" to continue');
 
-    async function processCombiners([combiner, ...combiners], data, fallback=false) {
-        if (!combiner) return data;
+    prompt.get(['confirm'], (err, result) => {
+        if (!err && result.confirm === 'Yes') run();
+    })
+} else {
+    run();
+}
 
-        let deps = combiner.dependencies ? combiner.dependencies(data) : [];
-        mainLogger.info(`Requesting ${deps.length} resources for ${combiner.name}`);
-        let contents = await Promise.all(deps.map(dep => pa.request(dep, !argv.pa)));
+function run() {
+    mkdirp.sync('data-out');
 
-        let combinerData;
+    var idWhitelist = argv._;
+    aggregators
+        .filter(agg => idWhitelist.length === 0 || idWhitelist.indexOf(agg.id) > -1)
+        .forEach(aggregator => aggregator.process());
 
-        try {
-            combinerData = combiner.process(data, contents);
-            await writeData(combiner.name, {
-                'timestamp': (new Date).toISOString(),
-                'data': combinerData,
-                fallback
-            });
-        } catch (err) {
-            let fn = combiner.required ? 'error': 'warn';
-            logger[fn](`Error processing ${combiner.name} - ${err}, stack trace:`);
-            logger[fn](err.stack);
-            if (argv.notify) {
-                notify.error(err);
-            }
-
-            if (combiner.required) {
-                throw err;
-            }
-        }
-
-        return await processCombiners(combiners, {...data, [combiner.name]: combinerData}, fallback);
+    if (argv.loop) {
+        www.run(aggregators);
     }
-
-
-    async function process() {
-        logger.info('Starting');
-
-        try {
-            await processCombiners(aggregator.combiners, {});
-        } catch (err) {
-            if (aggregator.fallbackCombiners) {
-                logger.warn('Using fallbacks');
-                try {
-                    await processCombiners(aggregator.fallbackCombiners, {}, true);
-                } catch (err) {
-                    logger.error('Fallbacks failed');
-                }
-            }
-        }
-
-        if (argv.loop) {
-            logger.info('Next tick in', aggregator.cacheTime.humanize());
-            setTimeout(process, aggregator.cacheTime.asMilliseconds());
-        }
-    }
-
-    return process;
-}
-
-mkdirp.sync('data-out');
-
-aggregators
-    .filter(agg => regExps.length === 0 || regExps.some(r => r.test(agg.id)))
-    .forEach(aggregator => {
-        aggregatorFn(aggregator)();
-    });
-
-if (argv.loop) {
-    www.run();
 }
