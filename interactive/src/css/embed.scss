@@ -17,6 +17,17 @@ $silverLight: rgba(217,217,217,0.4);
 $bronzeLight: rgba(243,111,33,0.2);
 
 
+.olym-embed {
+	@include mq($until: 660px) {
+		padding-left: 20px;
+    	padding-right: 20px;
+	}
+
+	@include mq($until: mobileLandscape) {
+		padding-left: 10px;
+    	padding-right: 10px;
+	}
+}
 
 .og-snap {
 	background-color: #f6f6f6;
@@ -35,6 +46,9 @@ $bronzeLight: rgba(243,111,33,0.2);
 		background-color: #dcdcdc;
 	}
 
+	.olym-embed & {
+		background-color: transparent;
+	}	
 }
 
 .og-snap.og-snap--both {
@@ -104,7 +118,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 	.og-snap__upcoming {
 		margin-top: 4px;
 		border-top: 1px solid #387e3c;
-		padding-top: 6px;
+		padding-top: 2px;
 
 		@include mq(tablet) {
 			padding-top: 0;
@@ -125,13 +139,18 @@ $bronzeLight: rgba(243,111,33,0.2);
 		padding-left: 5px;
 		padding-right: 5px;
 
-		@include mq(510px, 740px) {
+		.olym-embed & {
+			padding-left: 0;
+			padding-right: 0;
+		}
+
+		@include mq(510px, 780px) {
  			display: -webkit-box;  display: -ms-flexbox; display: -webkit-flex; display: flex;
  		}
 	}
 
 	.og-snap__medals-latest {
- 		@include mq(510px, 740px) {
+ 		@include mq(510px, 780px) {
  			width: 50%;
  			float: left;
  			border-right: 1px dotted #bdbdbd;
@@ -144,7 +163,7 @@ $bronzeLight: rgba(243,111,33,0.2);
  		margin-top: 2px;
  		padding-left: 0;
 
- 		@include mq(510px, 740px) {
+ 		@include mq(510px, 780px) {
  			width: 50%;
  			float: right;
  			border: 0;
@@ -186,7 +205,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 	}
 
 	&.og-snap__link--medals {
-		@include mq(510px, 740px) {
+		@include mq(510px, 780px) {
 			position: absolute !important;
 			bottom: 3px;
 		}	
@@ -292,12 +311,8 @@ $bronzeLight: rgba(243,111,33,0.2);
 	@include fs-textSans(3);
 	color: #333;
 
-	.og-snap--both & {
-		@include mq(tablet) {
-			padding: 2px 0;
-			border-bottom: 1px dotted #bdbdbd;
-		}
-	}
+	padding: 2px 0;
+	border-bottom: 1px dotted #bdbdbd;
 
 	.og-snap--upcoming-only & {
 		padding: 2px 0;
