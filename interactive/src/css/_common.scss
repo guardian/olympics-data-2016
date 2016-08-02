@@ -242,12 +242,13 @@ a {
 }
 
 .om-event {
-    @include fs-textSans(2);
+    @include fs-textSans(1);
     position: relative;
     border-top: 1px dotted #bdbdbd;
     padding: 5px 25px 3px 65px;
 
     @include mq(mobileLandscape) {
+        @include fs-textSans(2, $size-only: true);
         padding-left: 80px;
     }
 
@@ -393,8 +394,15 @@ a {
 
 .om-event__time {
     position: absolute;
-    width: 56px;
+    min-width: 33px;
+    @include mq(mobileLandscape) {
+        min-width: 35px;
+    }
     left: 3px;
+    & > time.is-next-day {
+        &::before { content: "("; }
+        &::after { content: ")"; }
+    }
 }
 
 .om-event__name {

@@ -13,7 +13,7 @@
 
     <div class="om-empty-message">No events in this sport today</div>
 
-    <p class="om-tz-note">All times are in UTC<span class="js-tz"></span></p>
+    <p class="om-tz-note">All times are in <span class="js-tz">UTC</span></p>
 
     {% for discipline in schedule.disciplines %}
         <div class="om-discipline js-discipline" data-discipline="{{ discipline.identifier }}" >
@@ -27,9 +27,10 @@
                 {% for event in discipline.events %}
                     <li class="om-event {% if event.status === 'Finished' %}om-event--finished{% endif %}
                                {% if event.resultAvailable %}om-event--results{% endif %}">
-                        <time class="om-event__time js-time" datetime="{{ event.start }}">
-                            {{ event.start|datefmt('HH:mm') }}
-                        </time>
+                        <div class="om-event__time">
+                            <time class="js-time {% if !event.start|dateeq(schedule.day.date, 'day') %}is-next-day{% endif %}"
+                                  datetime="{{ event.start }}">{{ event.start|datefmt('HH:mm') }}</time>
+                        </div>
                         <span class="om-event__name">
                             {{ event.description }}
                             {% if event.group.length > 1 %}

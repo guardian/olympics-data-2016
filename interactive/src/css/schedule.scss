@@ -3,23 +3,24 @@
 @import "header";
 @import "flags";
 
-.om-event {
-    &.om-event--finished {
-        background-color: #f1f1f1;
-        color: #767676;
-    }
+.om-event.om-event--finished {
+    background-color: #f1f1f1;
+    color: #767676;
 
-}
-
-.om-event__time {
-    .om-event--finished &::after {
+    .om-event__time::after {
         content: "";
         position: absolute;
         top: 1px;
-        right: 0;
-        width: 16px;
-        height: 14px;
+        left: 100%;
+        width: 14px;
+        height: 12px;
+        margin-left: 4px;
         background-image: url(assets/imgs/tick.svg);
         background-size: 100% 100%;
+        @include mq(mobileLandscape) {
+            top: 0;
+            width: 16px;
+            height: 14px;
+        }
     }
 }

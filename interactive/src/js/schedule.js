@@ -67,7 +67,7 @@ function changeDate() {
             }
         }
 
-        formatTime($$('.js-time'), $('.js-tz'));
+        formatTime(date, $$('.js-time'), $('.js-tz'));
 
         if (!schedule) return;
 

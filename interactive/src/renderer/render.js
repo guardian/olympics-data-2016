@@ -11,7 +11,8 @@ import rp from 'request-promise-native'
 
 import s3cfg from '../../cfg/s3.json'
 
-swig.setFilter('datefmt', (date, fmt) => moment(date).format(fmt));
+swig.setFilter('datefmt', (date, fmt) => moment.utc(date).format(fmt));
+swig.setFilter('dateeq', (date1, date2, type) => moment.utc(date1).isSame(moment.utc(date2), type));
 
 swig.setFilter('entrantname', entrant => {
     if (entrant.code === 'BYE') return 'BYE';
