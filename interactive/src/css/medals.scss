@@ -301,6 +301,10 @@
 		border-color:#767676;
 		color:#333;
 	}
+
+    &.om-expand-button--countries {
+        display: none;
+    }
 }
 
 .om-is-hidden {

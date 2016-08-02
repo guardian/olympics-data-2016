@@ -15,11 +15,14 @@ let countryCache = {}
 
 RelativeTime.setNow(Date.now())
 
-lbButton.addEventListener('click', e => {
-    lbButton.innerHTML = (lbButton.innerHTML === 'Hide countries') ? 'All countries' : 'Hide countries'
-    tableEl.classList.toggle('is-expanded');
-    lbButton.classList.toggle('hide-button')
-})
+if ($$('.om-table-row--extra').length > 0) {
+    lbButton.style.display = 'block';
+    lbButton.addEventListener('click', e => {
+        lbButton.innerHTML = (lbButton.innerHTML === 'Hide countries') ? 'All countries' : 'Hide countries'
+        tableEl.classList.toggle('is-expanded');
+        lbButton.classList.toggle('hide-button')
+    })
+};
 
 let dSelect = $('.om-select-discipline')
 let cSelect = $('.om-select-country')
