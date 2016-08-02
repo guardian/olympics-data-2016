@@ -31,10 +31,19 @@ function run(aggregators) {
     var app = express();
 
     app.get('/health', (req, res) => {
-        if (Object.keys(aggregators).every(id => aggregators[id].isHealthy())) {
-            res.send('Healthy');
+        let msg = aggregators.map(agg => {
+            return [
+                agg.id,
+                agg.isHealthy() ? 'healthy' : 'unhealthy',
+                agg.isProcessing() ? 'processing' : 'not processing',
+                'last success was ' + agg.getLastSuccess()
+            ].join(', ');
+        }).join('<br />');
+
+        if (aggregators.every(agg => agg.isHealthy())) {
+            res.send(msg);
         } else {
-            res.status(404).send('Unhealthy');
+            res.status(404).send(msg);
         }
     });
 
@@ -79,10 +88,15 @@ function run(aggregators) {
             } else {
                 res.status(404).send();
             }
-        } else if (type === 'aggregator' && aggregators[id] !== undefined) {
-            aggregators[id].process()
-                .then(() => res.status(204).send())
-                .catch(err => res.status(500).send(err));
+        } else if (type === 'aggregator') {
+            let aggregator = aggregators.find(agg => agg.id === id);
+            if (aggregator) {
+                aggregator.process()
+                    .then(() => res.status(204).send())
+                    .catch(err => res.status(500).send(err));
+            } else {
+                res.status(404).send();
+            }
         } else {
             res.status(404).send();
         }
