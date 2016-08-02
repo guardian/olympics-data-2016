@@ -9,7 +9,7 @@
                 {% endfor %}
             </select>
         </span>
-        <span class="om-filter__line" {% if eventsByDay.length === 0 %}style="display: none">
+        <span class="om-filter__line" {% if eventsByDay.length === 0 %}style="display: none"{% endif %}>
             on
             <select class="om-filter__choice js-date-choice" disabled>
                 {% for eventDay in eventsByDay %}
