@@ -9,10 +9,11 @@
                 {% endfor %}
             </select>
         </span>
-        <span class="om-filter__line">
+        <span class="om-filter__line" {% if eventsByDay.length === 0 %}style="display: none">
             on
             <select class="om-filter__choice js-date-choice" disabled>
-                {% for date in dates %}
+                {% for eventDay in eventsByDay %}
+                    {% set date = eventDay.day.date %}
                     <option value="{{ date }}" {% if date == today %}selected{% endif %}>
                         Day {{ loop.index }} – {{ date|datefmt('ddd D') }}
                     </option>
@@ -23,7 +24,13 @@
 </div>
 <div class="om-container">
     <div class="om-date-schedule js-date-schedule" data-startdate="{{ eventsToday.day.date }}">
-        {% include './days/schedule.html' {'schedule': eventsToday} %}
+        {% if eventsToday %}
+            {% include './days/schedule.html' {'schedule': eventsToday} %}
+        {% else %}
+            <div class="om-section">
+                No results yet
+            </div>
+        {% endif %}
     </div>
     <div class="om-section om-error js-error">
         <h3 class="om-section__title">Error</h3>
