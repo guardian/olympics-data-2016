@@ -82,13 +82,8 @@ function formatScheduleDiscipline(events) {
     };
 }
 
-let first = true;
 function parseScheduledEvent(evt, logger) {
     try {
-        if (first) {
-            first = false;
-            let a = evt.start2.blah;
-        }
         return {
             'description': evt.description,
             'start': evt.start.utc,
