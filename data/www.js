@@ -106,10 +106,11 @@ function run(aggregators) {
     app.use('/cache', express.static(config.pa.cacheDir));
     app.get('/logs/:log', (req, res) => {
         let name = req.params.log;
+        let minDate = moment(req.query.date).subtract(30, 'minutes');
+        let maxDate = moment(req.query.date).add(30, 'minutes');
+
         fs.readdir('logs', (err, logs) => {
             let latestLog = logs.filter(l => l.startsWith(name)).sort((a, b) => a < b ? 1 : -1)[0];
-
-            console.log(latestLog);
 
             fs.readFile('logs/' + latestLog, (err, data) => {
                 if (err) {
@@ -117,8 +118,9 @@ function run(aggregators) {
                 } else {
                     var logs = data.toString().split('\n')
                         .filter(s => s)
-                        .reverse()
                         .map(JSON.parse)
+                        .filter(l => moment(l.timestamp).isBetween(minDate, maxDate))
+                        .reverse()
                     res.send(swig.renderFile('./src/logs.html', {logs}));
                 }
             });

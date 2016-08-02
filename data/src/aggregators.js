@@ -46,7 +46,7 @@ function Aggregator(opts) {
 
             let contents = await Promise.all(deps.map(pa.request));
 
-            combinerData = combiner.process(data, contents);
+            combinerData = combiner.process(data, contents, logger);
             await writeData(combiner.name, {
                 'timestamp': (new Date).toISOString(),
                 'data': combinerData,

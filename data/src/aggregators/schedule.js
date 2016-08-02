@@ -1,12 +1,7 @@
 import _ from 'lodash'
 import moment from 'moment'
-
 import notify from '../notify'
-import log from '../log'
-
 import { forceArray } from '../aggregators.js'
-
-const logger = log('schedule');
 
 const roundDisciplines = {
     'badminton': 'Game Scores',
@@ -87,8 +82,13 @@ function formatScheduleDiscipline(events) {
     };
 }
 
-function parseScheduledEvent(evt) {
+let first = true;
+function parseScheduledEvent(evt, logger) {
     try {
+        if (first) {
+            first = false;
+            let a = evt.start2.blah;
+        }
         return {
             'description': evt.description,
             'start': evt.start.utc,
@@ -137,7 +137,7 @@ function parseEntrant(entrant) {
     };
 }
 
-function parseResult(eventUnit) {
+function parseResult(eventUnit, logger) {
     try {
         let entrants = forceArray(eventUnit.result.entrant)
             .map(parseEntrant)
@@ -290,12 +290,12 @@ export default {
             'dependencies': ({dates}) => {
                 return dates.map(date => `olympics/2016-summer-olympics/schedule/${date}`);
             },
-            'process': ({dates}, dateSchedules) => {
+            'process': ({dates}, dateSchedules, logger) => {
                 let datesEvents = dateSchedules.map(ds => {
                     return forceArray(ds.olympics.scheduledEvent)
                         .filter(evt => evt.discipline && evt.discipline.event && evt.discipline.event.eventUnit)
                         .filter(evt => evt.discipline.event.eventUnit.unitType !== 'Not Applicable')
-                        .map(parseScheduledEvent)
+                        .map(evt => parseScheduledEvent(evt, logger))
                         .filter(evt => !!evt.start);
                 });
 
@@ -316,10 +316,10 @@ export default {
                     .filter(evt => evt.resultAvailable)
                     .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/result`);
             },
-            'process': ({}, results) => {
+            'process': ({}, results, logger) => {
                 return _(results)
                     .map('olympics.eventUnit')
-                    .map(parseResult)
+                    .map(result => parseResult(result, logger))
                     .filter(result => !!result.identifier)
                     .keyBy('identifier')
                     .valueOf();
