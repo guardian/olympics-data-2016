@@ -31,10 +31,14 @@ function run(aggregators) {
     var app = express();
 
     app.get('/health', (req, res) => {
-        if (Object.keys(aggregators).every(id => aggregators[id].isHealthy())) {
+        var unhealthyAggregators = aggregators.filter(agg => !agg.isHealthy());
+        if (unhealthyAggregators.length === 0) {
             res.send('Healthy');
         } else {
-            res.status(404).send('Unhealthy');
+            let msg = unhealthyAggregators.map(agg => {
+                return `${agg.id}, is processing? ${agg.isProcessing()}, last success: ${agg.getLastSuccess()}`;
+            }).join('\n');
+            res.status(404).send(msg);
         }
     });
 
