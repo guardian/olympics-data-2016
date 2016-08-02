@@ -21,7 +21,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 .og-snap {
 	background-color: #f6f6f6;
 	width: 100%;
-	padding: 6px 0px;
+	padding: 3px 0px;
 	overflow: hidden;
     position: relative;
 	border-top: 1px solid $green;
@@ -34,6 +34,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 	.fc-container--story-package & {
 		background-color: #dcdcdc;
 	}
+
 }
 
 .og-snap.og-snap--both {
@@ -45,6 +46,10 @@ $bronzeLight: rgba(243,111,33,0.2);
 
 	@include mq(desktop) {
 		width: 940px;
+	}
+
+	@include mq(tablet) {
+		display: flex;
 	}
 
 	.og-snap__medals {
@@ -67,6 +72,10 @@ $bronzeLight: rgba(243,111,33,0.2);
 		}
 	}
 
+	.og-snap__link {
+		padding: 0 !important;
+	}
+
 	.og-snap__medals-latest {
 		@include mq(mobileLandscape) {
 			width: 50%;
@@ -79,7 +88,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 	.og-snap__medals-table {
 		border-top: 1px dotted #bdbdbd;
 		padding-top: 6px;
-		margin-top: 12px;
+		margin-top: 2px;
 
 		@include mq(mobileLandscape) {
 			margin: 0;
@@ -88,11 +97,12 @@ $bronzeLight: rgba(243,111,33,0.2);
 			width: 50%;
 			float: right;
 			padding-left: 10px;
+			margin-top: 3px;
 		}
 	}
 
 	.og-snap__upcoming {
-		margin-top: 12px;
+		margin-top: 4px;
 		border-top: 1px solid #387e3c;
 		padding-top: 6px;
 
@@ -114,6 +124,10 @@ $bronzeLight: rgba(243,111,33,0.2);
 		width: 100%;
 		padding-left: 5px;
 		padding-right: 5px;
+
+		@include mq(510px, 740px) {
+ 			display: flex;
+ 		}
 	}
 
 	.og-snap__medals-latest {
@@ -127,7 +141,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 	.og-snap__medals-table {
 		border-top: 1px dotted #bdbdbd;
  		padding-top: 4px;
- 		margin-top: 12px;
+ 		margin-top: 2px;
  		padding-left: 0;
 
  		@include mq(510px, 740px) {
@@ -154,10 +168,34 @@ $bronzeLight: rgba(243,111,33,0.2);
 	}
 }
 
+.og-snap__link {
+	@include fs-textSans(3);
+	color: #005689;
+	font-weight: 700;
+	text-decoration: none;
+	display: inline-block;
+	margin-top: 12px;
+
+	@include mq(tablet) {
+		position: absolute;
+		bottom: 0px;
+	}
+
+	&:hover {
+		text-decoration: underline;
+	}
+
+	&.og-snap__link--medals {
+		@include mq(510px, 740px) {
+			position: absolute;
+			bottom: 3px;
+		}	
+	}
+}
+
 .og-snap__title {
 	@include fs-headline(3);
 	font-weight: 500;
-	line-height: 18px; // to make sure it sits flush to the top of the middle border, make sure the line-height = the font-size
 	margin-bottom: 11px;
 
 	.og-snap--both & {
@@ -185,7 +223,13 @@ $bronzeLight: rgba(243,111,33,0.2);
 }
 
 // left side
-
+.og-snap__medals-latest,
+.og-snap__upcoming {
+	@include mq(tablet) {
+		padding-bottom: 24px;
+	}
+	position: relative;
+}
 
 .og-snap__medal-row {
 	@include fs-textSans(3);
@@ -227,7 +271,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 		width: 100%;
 
 		th {
-			padding-bottom: 9px;
+			padding-bottom: 12px;
 		}
 
 		td {
@@ -256,6 +300,11 @@ $bronzeLight: rgba(243,111,33,0.2);
 		}
 	}
 
+	.og-snap--upcoming-only & {
+		padding: 2px 0;
+		border-bottom: 1px dotted #bdbdbd;
+	}
+
 	&:first-of-type {
 		padding-top: 1px;
 	}
@@ -264,9 +313,9 @@ $bronzeLight: rgba(243,111,33,0.2);
 		border-bottom: 0;
 	}
 
-	.og-snap--upcoming-only & {
-		border: 0;
-	}
+	// .og-snap--upcoming-only & {
+	// 	border: 0;
+	// }
 }
 
 .og-snap__upcoming-row__discipline {

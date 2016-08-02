@@ -2,6 +2,8 @@
 @import "mq";
 
 @import "common";
+@import "medals";
+@import "flags";
 
 body {
     background-color: white;
@@ -10,6 +12,13 @@ body {
 .om-section {
     padding: 0;
     margin: 0;
+    max-width: 100%;
+}
+
+.om-section__title {
+    position: relative;
+    left: 0;
+    width: auto;
 }
 
 .om-event__expand {
@@ -22,4 +31,8 @@ body {
     .om-event.om-event--results.is-expanded & {
         background-image: url(../assets/imgs/minus.svg);
     }
+}
+
+.om-flag {
+    background-image: url(../assets/imgs/flags.png);
 }
