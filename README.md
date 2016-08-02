@@ -64,7 +64,6 @@ sudo apt-get install git awscli
 ### Authenticate with AWS
 ```
 aws configure --profile visuals
-
 ```
 Region is us-east-1
 Use your AWS credentials for access key/secret token
