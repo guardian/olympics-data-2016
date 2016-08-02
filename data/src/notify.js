@@ -24,6 +24,8 @@ function process() {
 }
 
 function send(subject, message) {
+    if (!config.argv.notify) return;
+
     if (interval) {
         queue.push({subject, message});
     } else {

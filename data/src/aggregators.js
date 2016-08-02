@@ -53,9 +53,7 @@ function Aggregator(opts) {
         } catch (err) {
             logger.error(`Error processing ${combiner.name} - ${err}, stack trace:`);
             logger.error(err.stack);
-            if (config.argv.notify) {
-                notify.error(err);
-            }
+            notify.error(err);
 
             if (combiner.required) {
                 throw err;
