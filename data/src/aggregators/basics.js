@@ -8,6 +8,7 @@ export default [
         'cacheTime': moment.duration(14, 'days'),
         'combiners': [{
             'name': 'disciplines',
+            'required': true,
             'dependencies': () => ['olympics/2016-summer-olympics/discipline'],
             'process': (a, [disciplines]) => {
                 return disciplines.olympics.discipline.sort((a, b) => a.description < b.description ? -1 : 1);
@@ -19,6 +20,7 @@ export default [
         'cacheTime': moment.duration(14, 'days'),
         'combiners': [{
             'name': 'countries',
+            'required': true,
             'dependencies': () => ['olympics/2016-summer-olympics/country'],
             'process': ({}, [countries]) => {
                 countries.olympics.country.map(function(c) {
@@ -45,6 +47,7 @@ export default [
         'cacheTime': moment.duration(5, 'minutes'),
         'combiners': [{
             'name': 'latestMedals',
+            'required': true,
             'dependencies': () => ['olympics/2016-summer-olympics/medal-cast'],
             'process': ({}, [medalCast]) => {
                 if (!medalCast.olympics.games) return [];

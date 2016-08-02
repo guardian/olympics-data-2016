@@ -53,7 +53,7 @@ function Aggregator(opts) {
                 fallback
             });
         } catch (err) {
-            logger.error(`Error processing ${combiner.name} - ${err}, stack trace:`);
+            logger.error(`Error processing ${combiner.name}`);
             logger.error(err.stack);
             notify.error(err);
 

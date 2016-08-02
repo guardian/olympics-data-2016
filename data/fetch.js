@@ -12,7 +12,7 @@ var argv = parseArgs(process.argv.slice(2), {'default': {
 }});
 
 if (argv.test) {
-    argv.s3 = argv.pa = argv.loop = argv.notify = argv.metric = false;
+    argv.s3 = argv.pa = argv.notify = argv.metric = false;
 }
 
 if (argv.uat) {
