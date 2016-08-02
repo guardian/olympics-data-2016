@@ -118,6 +118,10 @@ a {
 
 .om-date-schedule {
     position: relative;
+
+    @include mq(tablet) {
+        min-height: 800px;
+    }
     &::before {
         content: "";
         position: absolute;
