@@ -145,11 +145,18 @@ async function getAllData() {
     data.resultsToday = data.resultsByDay.find(results => results.day.date === data.today);
 
     let maxMedalCount = _.max(data.medalTable.map(entry => _(entry.medals).values().max()));
+
+    if(!maxMedalCount || maxMedalCount < 10){ maxMedalCount = 10 }
+
     let scale = d3.scaleSqrt()
         .domain([0, maxMedalCount])
         .range([0,8])
+
     swig.setFilter('circleScale', num => num === 0 ? 0 : scale(num));
-    swig.setFilter('maskScale', num => 1 + (num === 0 ? scale(1) : scale(num)));
+    swig.setFilter('maskScale', num => {
+        let val = (num === 0 ? scale(1) : scale(num))
+        return 1 + val
+    });
 
     return data;
 }
