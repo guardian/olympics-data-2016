@@ -44,7 +44,7 @@ function Aggregator(opts) {
             let deps = combiner.dependencies ? combiner.dependencies(data) : [];
             logger.info(`Requesting ${deps.length} resources for ${combiner.name}`);
 
-            let contents = await Promise.all(deps.map(dep => pa.request(dep, !config.argv.pa)));
+            let contents = await Promise.all(deps.map(pa.request));
 
             combinerData = combiner.process(data, contents);
             await writeData(combiner.name, {
