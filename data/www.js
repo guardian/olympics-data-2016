@@ -88,10 +88,15 @@ function run(aggregators) {
             } else {
                 res.status(404).send();
             }
-        } else if (type === 'aggregator' && aggregators[id] !== undefined) {
-            aggregators[id].process()
-                .then(() => res.status(204).send())
-                .catch(err => res.status(500).send(err));
+        } else if (type === 'aggregator') {
+            let aggregator = aggregators.find(agg => agg.id === id);
+            if (aggregator) {
+                aggregator.process()
+                    .then(() => res.status(204).send())
+                    .catch(err => res.status(500).send(err));
+            } else {
+                res.status(404).send();
+            }
         } else {
             res.status(404).send();
         }
