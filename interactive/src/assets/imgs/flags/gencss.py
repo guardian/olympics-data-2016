@@ -1,13 +1,14 @@
 import sys, os.path
 
-width = 30
-height = 20
+width = int(sys.argv[1]) / 2
+height = int(sys.argv[2]) / 2
 
 print """.om-flag {
     background-image: url(./assets/imgs/flags.png);
     background-size: cover;
     width: %dpx;
     height: %dpx;
+    border-radius: 100px;
 }
 """ % (width, height)
 

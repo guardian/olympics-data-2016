@@ -1,8 +1,9 @@
 .om-flag {
     background-image: url(./assets/imgs/flags.png);
     background-size: cover;
-    width: 30px;
+    width: 20px;
     height: 20px;
+    border-radius: 100px;
 }
 
 .om-flag.om-flag--AFG { background-position: 0 -0px }
