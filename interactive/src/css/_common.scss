@@ -119,9 +119,6 @@ a {
 .om-date-schedule {
     position: relative;
 
-    @include mq(tablet) {
-        min-height: 800px;
-    }
     &::before {
         content: "";
         position: absolute;
@@ -135,6 +132,11 @@ a {
     &.is-loading::before {
         z-index: 100;
         background-color: transparentize(white, 0.2);
+    }
+}
+.om-section-schedule {
+    @include mq(tablet) {
+        min-height: 800px !important;
     }
 }
 
