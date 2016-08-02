@@ -75,9 +75,7 @@ function PA(logger, metric) {
         } catch (err) {
             logger.error('Error requesting', endpoint, err);
             logger.error(err.stack);
-            if (config.argv.notify) {
-                notify.error(err);
-            }
+            notify.error(err);
         }
 
         return {'olympics': {}};
