@@ -69,9 +69,9 @@ function PA(logger, metric) {
                     await writeCache(endpoint, resp);
                     return resp;
                 }
+            } else {
+                logger.warn('Empty response for URL', endpoint);
             }
-
-            logger.warn('Empty response for URL', endpoint);
         } catch (err) {
             logger.error('Error requesting', endpoint, err);
             logger.error(err.stack);
