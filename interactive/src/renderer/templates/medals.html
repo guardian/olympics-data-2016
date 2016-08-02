@@ -7,11 +7,13 @@
 <body>
     <div class="om-header om-header--primary">
         <div class="om-header__inner  om-header__background">
-            <a href="https://www.theguardian.com/sport/rio-2016">
+            <a href="https://www.theguardian.com/sport/rio-2016" target="_top">
                 <div class="om-header__logo"></div>
             </a>
             <h1>Medals and results</h1>
-            <div class='om-header__fullcoverage'><a href="https://www.theguardian.com/sport/rio-2016">Full coverage of Rio 2016</a></div>
+            <div class='om-header__fullcoverage'>
+                <a href="https://www.theguardian.com/sport/rio-2016" target="_top">Full coverage of Rio 2016</a>
+            </div>
         </div>
     </div>
 
@@ -58,7 +60,7 @@
         </section>
     </div>
 
-    {% include './_events.html' {'eventsToday': resultsToday, 'eventsByDay': resultsByDay} %}
+    {% include './_events.html' {'eventsToday': resultsToday, 'eventsByDay': resultsByDay, 'eventsType': 'Results'} %}
 
     <script>var isMedalTable = true;</script>
     <script src="./medals.js"></script>
