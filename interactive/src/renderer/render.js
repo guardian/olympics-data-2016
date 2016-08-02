@@ -24,6 +24,18 @@ swig.setFilter('dayfmt', (date, fmt, i) => {
     return str
 });
 
+swig.setFilter('fmtDayOfDays', i => {
+    if(i < 2){
+        return 'pre-opening'
+    }
+    if(i === 2) {
+        return 'Opening day'
+    }
+    else {
+        return `Day ${i-2} of 16`
+    }
+})
+
 swig.setFilter('datefmt', (date, fmt) => moment.utc(date).format(fmt));
 swig.setFilter('dateeq', (date1, date2, type) => moment.utc(date1).isSame(moment.utc(date2), type));
 
@@ -117,7 +129,7 @@ async function getAllData() {
         'country': {},
         'medals': {'gold': 0, 'silver': 0, 'bronze': 0},
         'total': 0,
-        'position': data.medalTable.length + 1
+        'position': -1
     };
 
     // switch at 06:00 UTC

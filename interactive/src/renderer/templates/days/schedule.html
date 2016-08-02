@@ -7,7 +7,7 @@
             </time>
         </h3>
         <p class="om-schedule-date-no">
-            Day {{ schedule.day.dateNo + 1 }} of {{ scheduleByDay.length }}
+        {{ schedule.day.dateNo | fmtDayOfDays }}
         </p>
     </div>
 

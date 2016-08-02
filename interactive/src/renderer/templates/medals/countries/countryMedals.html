@@ -5,7 +5,7 @@
             Currently ranked <span class='om-position-ordinal'></span>, with {{ obj.medals.length }} medal{% if obj.medals.length !== 1 %}s{% endif %}.
     </p>
     <p class='om-country-p om-country-p--unranked om-is-hidden'>
-            {{ obj.country.name }} haven't been awarded any medals yet.
+            {{ obj.country.name }} hasn't been awarded any medals yet.
     </p>
         {% if obj.medals.length > 0 %}
             {% set recent = obj.medals[0] %}
