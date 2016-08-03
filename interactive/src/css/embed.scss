@@ -186,6 +186,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 	}
 }
 
+
 .og-snap.og-snap--upcoming-only {
 	width: 100%;
 
@@ -241,10 +242,21 @@ $bronzeLight: rgba(243,111,33,0.2);
 .facia-snap .og-snap--medals-only {
 	.og-snap__link--stacked {
 		display: block;
+		position: initial !important;
 	}
 
 	.og-snap__link--wide {
 		display: none;
+	}
+
+	.og-snap__medals-table {
+		margin-top: 0 !important;
+	}
+}
+
+.facia-snap .og-snap--upcoming-only {
+	.og-snap__link {
+		line-height: 9px !important;
 	}
 }
 
