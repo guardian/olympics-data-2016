@@ -2,12 +2,12 @@
     <div class="om-section__title">
         <h3 class="om-schedule-date">
             <time datetime="{{ schedule.day.date }}">
-                {{ schedule.day.date|datefmt('dddd') }},
+                {{ schedule.day.date|datefmt('dddd') }} 
                 <span>{{ schedule.day.date|datefmt('D MMM') }}</span>
             </time>
         </h3>
         <p class="om-schedule-date-no">
-            Day {{ schedule.day.dateNo + 1 }} of {{ scheduleByDay.length }}
+        {{ schedule.day.dateNo | fmtDayOfDays }}
         </p>
     </div>
 

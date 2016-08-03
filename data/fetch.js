@@ -3,9 +3,7 @@ import mkdirp from 'mkdirp'
 import colors from 'colors'
 import prompt from 'prompt'
 import aggregators from './src/aggregators'
-
 import { set as setConfig, config } from './src/config'
-
 import www from './www'
 
 var argv = parseArgs(process.argv.slice(2), {'default': {

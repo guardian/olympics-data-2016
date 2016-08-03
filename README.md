@@ -76,7 +76,7 @@ https://developer.github.com/guides/managing-deploy-keys/#deploy-keys
 
 ### Install olympics-data-2016
 
-Get a copy of `config.json` (available here: https://zerobin.gutools.co.uk/?a07a114114d3bef2#DTNqhOvJ9sf1P9pdwZhn1ynPRFdM7CIZ14qJZ97cgrs=)
+Get a copy of `config.json` (available here: https://zerobin.gutools.co.uk/?8cd813b4e2223aca#Ay/PMa7n0lSmgXbcmBhakjTVX0RuFHqyuk1nGVxwErE=)
 
 ```
 git clone git@github.com:guardian/olympics-data-2016.git

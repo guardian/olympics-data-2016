@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import express from 'express'
 import cors from 'cors'
+import swig from 'swig'
 import moment from 'moment'
 import glob from 'glob-fs'
 import denodeify from 'denodeify'
@@ -41,9 +42,9 @@ function run(aggregators) {
         }).join('<br />');
 
         if (aggregators.every(agg => agg.isHealthy())) {
-            res.send('HEALTHY<br />' + msg);
+            res.send('<h1>HEALTHY</h1><br />' + msg);
         } else {
-            res.status(404).send('UNHEALTHY<br />' + msg);
+            res.status(404).send('<h1>UNHEALTHY</h1><br />' + msg);
         }
     });
 
@@ -103,7 +104,29 @@ function run(aggregators) {
     });
 
     app.use('/cache', express.static(config.pa.cacheDir));
-    app.use('/logs', express.static('logs'));
+    app.get('/logs/:log', (req, res) => {
+        let name = req.params.log;
+        let mins = req.query.mins === undefined ? 10 : parseFloat(req.query.mins);
+        let minDate = moment(req.query.date).subtract(mins, 'minutes');
+        let maxDate = moment(req.query.date).add(mins, 'minutes');
+
+        fs.readdir('logs', (err, logs) => {
+            let latestLog = logs.filter(l => l.startsWith(name)).sort((a, b) => a < b ? 1 : -1)[0];
+
+            fs.readFile('logs/' + latestLog, (err, data) => {
+                if (err) {
+                    res.status(404).send();
+                } else {
+                    var logs = data.toString().split('\n')
+                        .filter(s => s)
+                        .map(JSON.parse)
+                        .filter(l => moment(l.timestamp).isBetween(minDate, maxDate))
+                        .reverse()
+                    res.send(swig.renderFile('./src/logs.html', {logs}));
+                }
+            });
+        });
+    });
 
     app.listen(3000, () => logger.info('Listening on port 3000'));
 }
