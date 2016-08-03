@@ -6,10 +6,10 @@ define([], function () {
             var edition;
             var url = '{{ url }}';
 
-            if(guardian.config) {
+            if(guardian.config.page) {
                 edition = guardian.config.page.edition;
             } else {
-                edition = "INT";
+                edition = 'INT';
             }
 
             function _postMessage(message) {

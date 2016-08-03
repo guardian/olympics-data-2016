@@ -48,7 +48,7 @@ function ordinal(num) {
 }
 
 function changeCountry() {
-    let identifier = cSelect.options[cSelect.selectedIndex].value
+    let identifier = cSelect.options[cSelect.selectedIndex].value;
 
     function render(country) {
         countrySection.classList.remove('om-section--hidden');
@@ -96,6 +96,10 @@ function changeCountry() {
     if(identifier === '') {
         countrySection.classList.add('om-section--hidden');
     } else {
+        if(hasStorage()) {
+            localStorage.setItem('selectedCountry', identifier);
+        }
+
         if (countryCache[identifier]) {
             render(countryCache[identifier]);
         } else {
@@ -111,6 +115,18 @@ function getQueryString(field, url) {
     return string ? string[1] : null;
 };
 
+function hasStorage() {
+    try {
+        let mod = new Date;
+        localStorage.setItem(mod, mod.toString());
+        let result = localStorage.getItem(mod) === mod.toString();
+        localStorage.removeItem(mod);
+        return result;
+    } catch(err) {
+        return false;
+    }
+}
+
 cSelect.addEventListener('change', () => {
     changeCountry()
 })
@@ -124,7 +140,10 @@ const editionToCountry = {
     'AU': 'AUS'
 }
 
-if(edition && edition in editionToCountry) {
+if(hasStorage() && localStorage.getItem('selectedCountry')) {
+    cSelect.selectedIndex = [].slice.apply(cSelect.options).map(o => o.value).indexOf(localStorage.getItem('selectedCountry'));
+    changeCountry()
+} else if(edition && edition in editionToCountry) {
     cSelect.selectedIndex = [].slice.apply(cSelect.options).map(o => o.value).indexOf(editionToCountry[edition]);
     changeCountry()
 }
