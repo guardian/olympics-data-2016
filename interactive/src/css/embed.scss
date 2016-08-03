@@ -238,6 +238,16 @@ $bronzeLight: rgba(243,111,33,0.2);
 	}
 }
 
+.facia-card .og-snap--medals-only {
+	.og-snap__link--stacked {
+		display: block;
+	}
+
+	.og-snap__link--wide {
+		display: none;
+	}
+}
+
 .og-snap__title {
 	@include fs-headline(3);
 	font-weight: 500;
