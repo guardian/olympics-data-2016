@@ -18,14 +18,14 @@ $bronzeLight: rgba(243,111,33,0.2);
 
 
 .olym-embed {
-	@include mq($until: 660px) {
+	@include mq($until: 620px) {
 		padding-left: 20px;
-    	padding-right: 20px;
+		padding-right: 20px;
 	}
 
 	@include mq($until: mobileLandscape) {
 		padding-left: 10px;
-    	padding-right: 10px;
+		padding-right: 10px;
 	}
 }
 
@@ -35,7 +35,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 	padding: 3px 0px;
 	overflow: hidden;
     position: relative;
-	border-top: 1px solid $green;
+	border-top: 1px solid #333;
 	// border-bottom: 1px solid #bdbdbd;
 
 	* {
@@ -111,13 +111,13 @@ $bronzeLight: rgba(243,111,33,0.2);
 			width: 50%;
 			float: right;
 			padding-left: 10px;
-			margin-top: 3px;
+			margin-top: 30px;
 		}
 	}
 
 	.og-snap__upcoming {
 		margin-top: 4px;
-		border-top: 1px solid #387e3c;
+		border-top: 1px solid #333;
 		padding-top: 2px;
 
 		@include mq(tablet) {
@@ -167,6 +167,7 @@ $bronzeLight: rgba(243,111,33,0.2);
  			width: 50%;
  			float: right;
  			border: 0;
+
  			padding-top: 0;
  			margin-top: 0;
  			padding-left: 10px;
@@ -215,20 +216,14 @@ $bronzeLight: rgba(243,111,33,0.2);
 .og-snap__title {
 	@include fs-headline(3);
 	font-weight: 500;
-	margin-bottom: 11px;
-
-	.og-snap--both & {
-		@include mq($until: tablet) {
-			margin-bottom: 6px;
-		}
-	}
+	margin-bottom: 6px;
 
 	.og-snap--upcoming-only & {
-		margin-bottom: 6px;
+		margin-bottom: 2px;
 	}
 
 	&.og-snap__title--medals {
-		margin-bottom: 14px;
+		margin-bottom: 9px;
 	}
 }
 
@@ -253,7 +248,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 .og-snap__medal-row {
 	@include fs-textSans(3);
 	color: #333;
-	margin-bottom: 12px;
+	margin-bottom: 6px;
 
 	&:last-of-type {
 		margin-bottom: 0;
@@ -270,7 +265,6 @@ $bronzeLight: rgba(243,111,33,0.2);
 	line-height: 18px;
 	font-weight: 700;
 	color: #000;
-	margin-bottom: 4px;
 }
 
 .og-snap__medals-latest-title--grey {
@@ -352,6 +346,10 @@ $bronzeLight: rgba(243,111,33,0.2);
 			right: 0;
 		}
 	}
+
+	.og-snap--upcoming-only & {
+		padding-bottom: 6px;
+	}
 }
 
 // medals
@@ -373,4 +371,20 @@ $bronzeLight: rgba(243,111,33,0.2);
     &.om-medal--bronze { border-color: $bronze; .fc-container--story-package & { border-color: $bronzeDynamo; } }
     &.om-medal--silver { border-color: $silver; .fc-container--story-package & { border-color: $silverDynamo; } }
     &.om-medal--gold { border-color: $gold; .fc-container--story-package & { border-color: $goldDynamo; } }
+}
+
+.bronze-bg {
+	background-color: $bronzeLight;
+	border-right: 1px solid #767676;
+	min-width: 15px;
+}
+
+.silver-bg {
+	background-color: $silverLight;
+	min-width: 15px;
+}
+
+.gold-bg {
+	background-color: $goldLight;
+	min-width: 15px;
 }

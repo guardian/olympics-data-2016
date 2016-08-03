@@ -1,13 +1,13 @@
 <div class="og-snap og-snap--medals-only"> 
     <div class="og-snap__medals">
         <div class="og-snap__medals-latest">
-            <div class="og-snap__title og-snap__title--medals"><span class="og-snap__title--kicker">Rio</span>Latest Medals</div>
+            <div class="og-snap__title og-snap__title--medals">Latest Medals</div>
             {% for event in latestMedals|slice(2) %}
             <div class="og-snap__medals-latest-title">{{event.discipline}}<span class="og-snap__medals-latest-title--grey">{{event.eventName}}</span></div>
             <div class="og-snap__medal-row">
                 {% for medal in event.medals %}
                 <div class="og-snap__medal">
-                    <div class="om-medal om-medal--{{medal.type}}"></div> {{medal.entrant.country.name}}
+                    <div class="om-medal om-medal--{{medal.type}}"></div> {{medal.entrant.country.identifier}}
                 </div>
                 {% endfor %}
             </div>
@@ -16,31 +16,18 @@
         </div>
         <div class="og-snap__medals-table">
             <table cellspacing="0" border="0">
-                <tr>
-                    <th></th>
-                    <th>
-                        <div class="om-medal om-medal--gold"></div>
-                    </th>
-                    <th>
-                        <div class="om-medal om-medal--silver"></div>
-                    </th>
-                    <th>
-                        <div class="om-medal om-medal--bronze"></div>
-                    </th>
-                    <th>T</th>
-                </tr>
-                {% for row in medalTable|slice(6) %}
+                {% for row in medalTable|slice(5) %}
                 <tr>
                     <td style="text-align: left;">
                         {{row.country.name}}
                     </td>
-                    <td class="og-snap__greyed-rows">
+                    <td class="og-snap__greyed-rows gold-bg">
                         {{row.medals.gold}}
                     </td>
-                    <td class="og-snap__greyed-rows">
+                    <td class="og-snap__greyed-rows silver-bg">
                         {{row.medals.silver}}
                     </td>
-                    <td class="og-snap__greyed-rows">
+                    <td class="og-snap__greyed-rows bronze-bg">
                         {{row.medals.bronze}}
                     </td>
                     <td>

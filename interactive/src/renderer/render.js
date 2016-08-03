@@ -111,7 +111,7 @@ async function getAllData() {
         data[name + 'Fallback'] = contents.fallback;
     });
 
-    data.sixUpcomingEvents = await getUpcomingEventsForSnap();
+    data.fiveUpcomingEvents = await getUpcomingEventsForSnap();
 
     data.emptyMedalTableEntry = {
         'country': {},
@@ -162,7 +162,7 @@ async function getUpcomingEventsForSnap() {
         return event;
     });
 
-    return eventsInTheFuture.slice(0,6);
+    return eventsInTheFuture.slice(0,5);
 }
 
 async function renderTask(task, data) {

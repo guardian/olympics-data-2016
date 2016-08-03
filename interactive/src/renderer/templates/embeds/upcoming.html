@@ -1,10 +1,10 @@
 <div class="og-snap og-snap--upcoming-only">
     <div class="og-snap__upcoming">
-        <div class="og-snap__title"><span class="og-snap__title--kicker">Day {{olympicsDay}}</span>What you should follow</div>
+        <div class="og-snap__title">Schedule</div>
         <div class="og-snap__timezone">
             All times are in UTC<span class="js-tz"></span>
         </div>
-        {% for row in sixUpcomingEvents %}
+        {% for row in fiveUpcomingEvents %}
         <div class="og-snap__upcoming-row">
             <time class="js-og-time" datetime="{{row.timestamp}}">{{row.time}}</time><span class="og-snap__upcoming-row__discipline">{{row.discipline}}</span>{{row.description}}</div>
         {% endfor %}
