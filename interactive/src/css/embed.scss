@@ -179,6 +179,10 @@ $bronzeLight: rgba(243,111,33,0.2);
  			margin-top: 0;
  			padding-left: 10px;
  		}
+
+ 		@include mq(mobileLandscape) {
+ 			margin-top: 30px;
+ 		}
 	}
 }
 
@@ -217,6 +221,20 @@ $bronzeLight: rgba(243,111,33,0.2);
 			position: absolute !important;
 			bottom: 3px;
 		}	
+	}
+
+	&.og-snap__link--wide {
+		display: none;
+		@include mq(mobileLandscape) {
+			display: block;
+		}
+	}
+
+	&.og-snap__link--stacked {
+		display: block;
+		@include mq(mobileLandscape) {
+			display: none;
+		}
 	}
 }
 
