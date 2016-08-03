@@ -19,7 +19,7 @@
 
     <section class="om-filter">
         <div class="om-filter__inner">
-            How is 
+            How are 
             <select class='om-select-country om-filter__choice'>
                 {% for c in countries %}
                     <option value='{{ c.identifier }}' {% if c.identifier === 'GBR' %} selected {% endif %}>{{ c.name }}</option>
