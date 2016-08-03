@@ -345,9 +345,13 @@ $bronzeLight: rgba(243,111,33,0.2);
 			top: 6px;
 			right: 0;
 		}
+
+		@include mq($until: tablet) {
+			padding-bottom: 6px;
+		}
 	}
 
-	.og-snap--upcoming-only & {
+	.og-snap--upcoming-only &, {
 		padding-bottom: 6px;
 	}
 }

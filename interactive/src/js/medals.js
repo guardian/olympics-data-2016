@@ -29,6 +29,7 @@ let dSelect = $('.om-select-discipline')
 let cSelect = $('.om-select-country')
 let recentContainer = $('.om-recent-days')
 let countryContainer = $('.om-country')
+let countrySection = $('.om-country-section')
 
 function ordinal(num) {
     if([11,12,13].indexOf(num % 100) > -1){
@@ -50,6 +51,7 @@ function changeCountry() {
     let identifier = cSelect.options[cSelect.selectedIndex].value
 
     function render(country) {
+        countrySection.classList.remove('om-section--hidden');
         countryCache[identifier] = country
         countryContainer.innerHTML = country
 
@@ -91,17 +93,38 @@ function changeCountry() {
         }
     };
 
-    if (countryCache[identifier]) {
-        render(countryCache[identifier]);
+    if(identifier === '') {
+        countrySection.classList.add('om-section--hidden');
     } else {
-        reqwest(`./medals/countries/countryMedals-${identifier}.html`).then(render);
+        if (countryCache[identifier]) {
+            render(countryCache[identifier]);
+        } else {
+            reqwest(`./medals/countries/countryMedals-${identifier}.html`).then(render);
+        }
     }
 }
+
+function getQueryString(field, url) {
+    var href = url ? url : window.location.href;
+    var reg = new RegExp( '[?&]' + field + '=([^&#]*)', 'i' );
+    var string = reg.exec(href);
+    return string ? string[1] : null;
+};
 
 cSelect.addEventListener('change', () => {
     changeCountry()
 })
 
-// select GBR by default
-cSelect.selectedIndex = [].slice.apply(cSelect.options).map(o => o.value).indexOf('GBR');
-changeCountry()
+// select edition's country by default (if UK/AUS/US)
+let edition = getQueryString('edition');
+
+const editionToCountry = {
+    'UK': 'GBR',
+    'US': 'USA',
+    'AU': 'AUS'
+}
+
+if(edition && edition in editionToCountry) {
+    cSelect.selectedIndex = [].slice.apply(cSelect.options).map(o => o.value).indexOf(editionToCountry[edition]);
+    changeCountry()
+}

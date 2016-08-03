@@ -3,7 +3,14 @@ define([], function () {
         boot: function (el, context, config, mediator) {
             // Extract href of the first link in the content, if any
             var iframe;
+            var edition;
             var url = '{{ url }}';
+
+            if(guardian.config) {
+                edition = guardian.config.page.edition;
+            } else {
+                edition = "INT";
+            }
 
             function _postMessage(message) {
                 iframe.contentWindow.postMessage(JSON.stringify(message), '*');
@@ -13,7 +20,7 @@ define([], function () {
             iframe.style.width = '100%';
             iframe.style.border = 'none';
             iframe.height = '500'; // default height
-            iframe.src = url;
+            iframe.src = url + "?edition=" + edition;
             el.style.margin = '0';
 
             // Listen for requests from the window

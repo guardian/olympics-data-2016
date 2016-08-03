@@ -21,8 +21,9 @@
         <div class="om-filter__inner">
             How are 
             <select class='om-select-country om-filter__choice'>
-                {% for c in countries %}
-                    <option value='{{ c.identifier }}' {% if c.identifier === 'GBR' %} selected {% endif %}>{{ c.name }}</option>
+            <option value='' selected>select a country</option>
+                {% for c in countries %} 
+                    <option value='{{ c.identifier }}'>{{ c.name }}</option>
                     }
                 {% endfor %}
             </select>
@@ -32,9 +33,9 @@
 
     <div class="om-container om-country-container">
 
-        <section class='om-section'>
+        <section class='om-section om-country-section om-section--hidden'>
 
-            <div class='om-country'>
+            <div class='om-country'> 
             </div>
 
         </section>
