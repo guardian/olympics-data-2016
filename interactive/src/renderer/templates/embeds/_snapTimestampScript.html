@@ -1,0 +1,58 @@
+<script type="text/javascript">
+    if(document['querySelector']&&document['querySelectorAll']) {
+    	var base = document.querySelector(".og-snap");
+    	var times = base.querySelectorAll(".js-og-time");
+
+        var edition = (window.guardian && window.guardian.config.page.edition) ? window.guardian.config.page.edition : "INT";
+
+        var timezones = {
+            "UK": {
+                "+01:00": "BST"
+            },
+            "US": {
+                "-07:00": "PDT",
+                "-06:00": "MDT",
+                "-05:00": "CDT",
+                "-04:00": "EDT"
+            },
+            "AU": {
+                "+09:30": "ACST",
+                "+10:00": "AEST"
+            },
+            "INT": {}
+        }
+
+    	function parseISODate(dateStr) {
+    	    var parts = dateStr.split(/[^0-9]/).map(Number);
+    	    var year = parts[0],
+    	        month = parts[1],
+    	        day = parts[2],
+    	        hour = parts[3],
+    	        min = parts[4],
+    	        sec = parts[5];
+    	    var date = new Date(Date.UTC(year, month - 1, day, hour, min, sec));
+    	    return date;
+    	}
+
+    	function pad(n) {
+    	    return (n < 10 ? '0' : '') + n;
+    	}
+
+    	for (var i = 0; i < times.length; i++) {
+    	    var date = parseISODate(times[i].getAttribute('datetime'));
+    	    times[i].textContent = pad(date.getHours()) + ":" + pad(date.getMinutes());
+    	}
+
+    	var tzEl = base.querySelector('.js-tz');
+    	var offset = new Date().getTimezoneOffset();
+    	var tzSign = offset > 0 ? '-' : '+',
+    	    absOffset = Math.abs(offset);
+    	var tzHour = Math.floor(absOffset / 60),
+    	    tzMin = absOffset % 60;
+
+        var offsetString = tzSign + pad(tzHour) + ":" + pad(tzMin);
+        var timezoneString = (timezones[edition][offsetString]) ? timezones[edition][offsetString]: "";
+
+    	tzEl.textContent = (timezoneString) ? timezoneString : "UTC" + offsetString;
+    }
+</script>

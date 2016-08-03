@@ -219,7 +219,13 @@ $bronzeLight: rgba(243,111,33,0.2);
 	margin-bottom: 6px;
 
 	.og-snap--upcoming-only & {
-		margin-bottom: 2px;
+		margin-bottom: 0;
+	}
+
+	.og-snap--both & {
+		@include mq($until: tablet) {
+			margin-bottom: 0;
+		}
 	}
 
 	&.og-snap__title--medals {
