@@ -225,14 +225,14 @@ $bronzeLight: rgba(243,111,33,0.2);
 
 	&.og-snap__link--wide {
 		display: none;
-		@include mq(mobileLandscape) {
+		@include mq(510px) {
 			display: block;
 		}
 	}
 
 	&.og-snap__link--stacked {
 		display: block;
-		@include mq(mobileLandscape) {
+		@include mq(510px) {
 			display: none;
 		}
 	}
