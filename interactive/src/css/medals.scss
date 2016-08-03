@@ -11,6 +11,14 @@
 	}
 }
 
+.om-country {
+	&:after {
+		display: block;
+		content: '';
+		clear: both;
+	}
+}
+
 .om-country-medal-entry {
 	@include fs-textSans(3);
 
