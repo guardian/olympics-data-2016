@@ -5,7 +5,25 @@ function fmt(h, m) {
     return `${pad(h)}:${pad(m)}`;
 }
 
+var timezones = {
+    "UK": {
+        "+01:00": "BST"
+    },
+    "US": {
+        "-07:00": "PDT",
+        "-06:00": "MDT",
+        "-05:00": "CDT",
+        "-04:00": "EDT"
+    },
+    "AU": {
+        "+09:30": "ACST",
+        "+10:00": "AEST"
+    },
+    "INT": {}
+}
+
 export default function formatTime(today, timeEls, tzEl) {
+    let edition = (window.guardian && window.guardian.config.page.edition) ? window.guardian.config.page.edition : "INT";
     let todayDate = parseInt(today.split('-')[2], 10);
 
     if (!tzEl) return;
@@ -23,5 +41,9 @@ export default function formatTime(today, timeEls, tzEl) {
 
     let offset = new Date().getTimezoneOffset();
     let tzSign = offset > 0 ? '-' : '+', absOffset = Math.abs(offset);
-    tzEl.textContent = `your local time (UTC${tzSign}${fmt(Math.floor(absOffset / 60), absOffset % 60)})`;
+
+    let offsetString = tzSign + fmt(Math.floor(absOffset / 60), absOffset % 60);
+    let timezoneString = (timezones[edition][offsetString]) ? timezones[edition][offsetString] : "";
+
+    tzEl.textContent = (timezoneString) ? timezoneString : "UTC" + offsetString;
 }
