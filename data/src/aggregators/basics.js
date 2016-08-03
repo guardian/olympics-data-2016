@@ -35,7 +35,8 @@ export default [
                     if (c.identifier === 'RUS') {c.name = 'Russia'};    
                     if (c.identifier === 'SKN') {c.name = 'St Kitts & Nevis'};    
                     if (c.identifier === 'LCA') {c.name = 'St Lucia'};    
-                    if (c.identifier === 'VIN') {c.name = 'St Vincent & the Grenadines'};  
+                    if (c.identifier === 'VIN') {c.name = 'St Vincent & the Grenadines'};
+                    if (c.identifier === 'IOA') {c.name = 'Individual Olympic Athletes'};  
                     return c;
                 });
                 return countries.olympics.country.sort((a, b) => a.name < b.name ? -1 : 1);
