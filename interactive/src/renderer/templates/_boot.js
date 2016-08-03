@@ -5,6 +5,7 @@ define([], function () {
             var iframe;
             var edition;
             var url = '{{ url }}';
+            var footer = document.getElementsByTagName("footer");
 
             if(guardian.config.page) {
                 edition = guardian.config.page.edition;
@@ -20,8 +21,13 @@ define([], function () {
             iframe.style.width = '100%';
             iframe.style.border = 'none';
             iframe.height = '500'; // default height
-            iframe.src = url + "?edition=" + edition;
+            iframe.src = url + '?edition=' + edition;
             el.style.margin = '0';
+            el.style.lineHeight = '0';
+
+            if(footer) {
+                footer[0].style.display = 'block';
+            }
 
             // Listen for requests from the window
             window.addEventListener('message', function(event) {
