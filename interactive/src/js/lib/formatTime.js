@@ -1,4 +1,5 @@
 import parseISODate from './parseISODate'
+import { getQueryString } from './queryParameters'
 
 function fmt(h, m) {
     let pad = n => (n < 10 ? '0' : '') + n;
@@ -23,7 +24,12 @@ var timezones = {
 }
 
 export default function formatTime(today, timeEls, tzEl) {
-    let edition = (window.guardian && window.guardian.config.page.edition) ? window.guardian.config.page.edition : "INT";
+    var edition = getQueryString('edition');
+
+    if(!edition) {
+        edition = "INT";
+    }
+
     let todayDate = parseInt(today.split('-')[2], 10);
 
     if (!tzEl) return;
