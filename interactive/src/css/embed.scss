@@ -423,15 +423,14 @@ $bronzeLight: rgba(243,111,33,0.2);
     height: 12px;
     border-radius: 10px;
     background: transparent;
-    border: 2px solid #fff;
     margin-right: 2px;
     margin-bottom: -1px;
 }
 
 .om-medal {
-    &.om-medal--bronze { border-color: $bronze; .fc-container--story-package & { border-color: $bronzeDynamo; } }
-    &.om-medal--silver { border-color: $silver; .fc-container--story-package & { border-color: $silverDynamo; } }
-    &.om-medal--gold { border-color: $gold; .fc-container--story-package & { border-color: $goldDynamo; } }
+    &.om-medal--bronze { background-color: $bronze; .fc-container--story-package & { background-color: $bronzeDynamo; } }
+    &.om-medal--silver { background-color: $silver; .fc-container--story-package & { background-color: $silverDynamo; } }
+    &.om-medal--gold { background-color: $gold; .fc-container--story-package & { background-color: $goldDynamo; } }
 }
 
 .bronze-bg {

@@ -23,7 +23,7 @@
     <div class="og-snap__medals-table">
         <table cellspacing="0" border="0">
 
-            {% for row in medalTable|dashIfEmpty|slice(5) %}
+            {% for row in []|dashIfEmpty|slice(5) %}
             <tr>
                 <td style="text-align: left;">
                     {{row.country.name}}

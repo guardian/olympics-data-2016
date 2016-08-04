@@ -39,7 +39,9 @@ swig.setFilter('fmtDayOfDays', i => {
 swig.setFilter('dashIfEmpty', l => {
     if(!l.length || l.length === 0){
         return Array(5).fill({
-            'country' : '-',
+            'country' : {
+                'name': '-'
+            },
             'medals' : {
                 'gold' : '-',
                 'silver' : '-',

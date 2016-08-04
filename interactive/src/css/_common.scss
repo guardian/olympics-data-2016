@@ -193,15 +193,14 @@ a {
     height: 12px;
     border-radius: 10px;
     background: #fff;
-    border: 2px solid #fff;
     margin-right: 4px;
     margin-bottom: -1px;
 }
 
 .om-medal {
-    &.om-medal--bronze { border-color: $bronze; }
-    &.om-medal--silver { border-color: $silver; }
-    &.om-medal--gold { border-color: $gold; }
+    &.om-medal--bronze { background-color: $bronze; }
+    &.om-medal--silver { background-color: $silver; }
+    &.om-medal--gold { background-color: $gold; }
 }
 
 .om-qualified {
