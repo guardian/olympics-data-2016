@@ -24,6 +24,7 @@
 </div>
 <div class="om-container">
     <div class="om-date-schedule js-date-schedule" data-startdate="{{ eventsToday.day.date }}">
+
         {% if eventsToday %}
             {% include './days/schedule.html' {'schedule': eventsToday} %}
         {% else %}

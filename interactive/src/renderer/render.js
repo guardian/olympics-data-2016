@@ -138,11 +138,15 @@ async function getAllData() {
     if (today > _.last(data.dates)) today = _.last(data.dates);
 
     data.today = today;
+    data.yesterday = moment(today).subtract('1', 'days').format('YYYY-MM-DD')
 
     data.olympicsDay = data.dates.indexOf(today) + 1;
 
     data.scheduleToday = data.scheduleByDay.find(schedule => schedule.day.date === data.today);
-    data.resultsToday = data.resultsByDay.find(results => results.day.date === data.today);
+
+    // results from today might not be available -- show yesterday instead
+    let resultsFromLatestDay = data.resultsByDay.find(results => results.day.date === data.today);
+    data.resultsToday = resultsFromLatestDay || data.resultsByDay.find(results => results.day.date === data.yesterday);
 
     let maxMedalCount = _.max(data.medalTable.map(entry => _(entry.medals).values().max()));
 
