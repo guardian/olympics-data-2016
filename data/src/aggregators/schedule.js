@@ -446,24 +446,8 @@ export default {
                 }
         },
         {
-            'name' : 'eventDetails',
-            'dependencies' : ({events}) => {
-                return _(events)
-                    .map(v => `olympics/2016-summer-olympics/event/${v.event.identifier}`)
-                    .uniq()
-                    .valueOf();
-            },
-            'process' : ({}, eventDetails) => {
-                return _(eventDetails)
-                    .map('olympics.event')
-                    .keyBy('identifier')
-                    .mapValues(ed => { return {'gender': ed.gender}; })
-                    .valueOf();
-            }
-        },
-        {
             'name': 'medalsByCountry',
-            'process': ({events, results, countries2, eventDetails = {}}) => {
+            'process': ({events, results, countries2}) => {
                 let medals = _(results)
                     .filter(result => result.medalEvent)
                     .flatMap(result => {
@@ -473,8 +457,7 @@ export default {
                             .map(entrant => {
                                 return {
                                     entrant,
-                                    'event': events[result.identifier],
-                                    'eventDetails': eventDetails[result.identifier.slice(0,-3)]
+                                    'event': events[result.identifier]
                                 };
                             });
                     })
