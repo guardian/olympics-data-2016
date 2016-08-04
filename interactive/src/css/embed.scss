@@ -465,8 +465,12 @@ $bronzeLight: rgba(243,111,33,0.2);
 .silver-bg {
 	&:before {
 		background-color: $silverLight;
+	}
+}
 
-		.fc-container--story-package & {
+.fc-container--story-package {
+	.silver-bg {
+		&:before {
 			background-color: rgba(255,255,255,0.2);
 		}
 	}
