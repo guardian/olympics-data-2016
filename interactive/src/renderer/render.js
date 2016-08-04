@@ -119,6 +119,10 @@ swig.setFilter('slice', (arr, limit) => {
   return arr.slice(0,limit);
 });
 
+swig.setFilter('getCumulative', (eventID, cumulativeResults) => {
+    return (cumulativeResults[eventID]) ? cumulativeResults[eventID] : null;
+});
+
 async function readdir(d) {
     let g = glob();
     let files = await denodeify(g.readdir.bind(g))(d);

@@ -391,6 +391,24 @@ export default {
                 return resultsByDay;
             }
         },
+            {
+            'name': 'cumulativeResults',
+            'dependencies': ({events}) => {
+                return _.values(events)
+                    .filter(evt => evt.status === 'Finished')
+                    .filter(evt => ['Athletics', 'Equestrian', 'Golf', 'Modern Pentathlon', 'Sailing'].indexOf(evt.discipline.description) > -1)
+                    .map(evt => `olympics/2016-summer-olympics/event/${evt.event.identifier}/cumulative-result`);
+            },
+            'process': ({}, cumulativeResults, logger) => {
+                return _(cumulativeResults)
+                    .map('olympics.event')
+                    .filter(event => event)
+                    .map(result => parseResult(result, logger))
+                    .filter(result => !!result.identifier)
+                    .keyBy('identifier')
+                    .valueOf();
+            }
+        },
         {
             'name': 'medalTable',
             'process': ({results}) => {

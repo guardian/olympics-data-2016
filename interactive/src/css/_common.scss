@@ -448,6 +448,16 @@ a {
     .is-expanded & {
         display: block;
     }
+
+    &.om-event__result--grey {
+        background-color: #f6f6f6;
+        padding: 6px 5px;
+        box-sizing: border-box;
+
+        .om-result {
+            margin-bottom: 0 !important;
+        }
+    }
 }
 
 .om-event__expand {
