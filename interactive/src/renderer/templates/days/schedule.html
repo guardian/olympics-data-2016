@@ -25,8 +25,8 @@
             {% endif %}
             <ul class="om-events">
                 {% for event in discipline.events %}
-                    <li class="om-event {% if event.status === 'Finished' %}om-event--finished{% endif %}
-                               {% if event.resultAvailable %}om-event--results{% endif %}">
+                    <li class="om-event {% if event.status === 'Running' %}om-event--awaiting{% endif %} {% if event.status === 'Finished' %}om-event--finished{% endif %}
+                               {% if event.status === 'Finished' %}om-event--results{% endif %}">
                         <div class="om-event__time">
                             <time class="js-time {% if !event.start|dateeq(schedule.day.date, 'day') %}is-next-day{% endif %}"
                                   datetime="{{ event.start }}">{{ event.start|datefmt('HH:mm') }}</time>
@@ -37,7 +37,7 @@
                                 <span class="om-event__name__events">({{ event.group.length }} events)</span>
                             {% endif %}
                         </span>
-                        {% if event.resultAvailable %}
+                        {% if event.status === 'Finished' %}
                             {% for subEvent in event.group  %}
                                 <div class="om-event__result">
                                     {% if event.group.length > 1 %}

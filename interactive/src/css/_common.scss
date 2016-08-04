@@ -460,9 +460,19 @@ a {
 
     display: none;
 
-    .om-event:not(.om-event--finished) & {
+    .om-event:not(.om-event--finished):not(.om-event--awaiting) & {
         background-image: url(assets/imgs/clock.svg);
         display: block;
+    }
+
+    .om-event--awaiting & {
+        width: auto;
+        right: 0px;
+        color: #bdbdbd;
+
+        &::after {
+            content: 'awaiting result';
+        }
     }
 
     .is-expandable & {
