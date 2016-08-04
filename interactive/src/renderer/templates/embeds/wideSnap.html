@@ -2,6 +2,13 @@
     <div class="og-snap__medals">
         <div class="og-snap__medals-latest">
             <div class="og-snap__title og-snap__title--medals">Latest Medals</div>
+
+            {% if !latestMedals.length || latestMedals.length === 0 %}
+                <div class='og-snap__medals-latest-empty'>
+                    No medals have been awarded yet.
+                </div>
+            {% endif %}
+
             {% for event in latestMedals|slice(2) %}
             <div class="og-snap__medals-latest-title">{{event.discipline}}<span class="og-snap__medals-latest-title--grey">{{event.eventName}}</span></div>
             <div class="og-snap__medal-row">
@@ -16,7 +23,8 @@
         </div>
         <div class="og-snap__medals-table">
             <table cellspacing="0" border="0">
-                {% for row in medalTable|slice(5) %}
+
+                {% for row in medalTable|dashIfEmpty|slice(5) %}
                 <tr>
                     <td style="text-align: left;">
                         {{row.country.name}}

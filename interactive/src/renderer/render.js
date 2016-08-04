@@ -36,6 +36,21 @@ swig.setFilter('fmtDayOfDays', i => {
     }
 })
 
+swig.setFilter('dashIfEmpty', l => {
+    if(!l.length || l.length === 0){
+        return Array(5).fill({
+            'country' : '-',
+            'medals' : {
+                'gold' : '-',
+                'silver' : '-',
+                'bronze' : '-'
+            },
+            'total' : '-'
+        })
+    }
+    return l
+})
+
 swig.setFilter('datefmt', (date, fmt) => moment.utc(date).format(fmt));
 swig.setFilter('dateeq', (date1, date2, type) => moment.utc(date1).isSame(moment.utc(date2), type));
 

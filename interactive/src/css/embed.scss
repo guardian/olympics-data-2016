@@ -106,6 +106,10 @@ $bronzeLight: rgba(243,111,33,0.2);
 		}
 	}
 
+	.og-snap__medals-latest-empty {
+		@include fs-textSans(2);
+	}
+
 	.og-snap__medals-table {
 		border-top: 1px dotted #bdbdbd;
 		padding-top: 6px;
