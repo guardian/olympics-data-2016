@@ -73,12 +73,8 @@ function PA(logger, metric) {
             let resp = JSON.parse(_resp);
 
             if (resp.olympics) {
-                let resultRe = re`^olympics/[^/]+/event-unit/[^/]+/result$`;
-
-                if(!(resultRe.test(endpoint) && resp.olympics.eventUnit && resp.olympics.eventUnit.result && resp.olympics.eventUnit.result.type !== "Official")) {
-                    await writeCache(endpoint, resp);
-                    return resp;
-                }
+                await writeCache(endpoint, resp);
+                return resp;
             }
         } else {
             logger.warn('Empty response for URL', endpoint);

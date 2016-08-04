@@ -309,6 +309,7 @@ export default {
             'dependencies': ({events}) => {
                 return _.values(events)
                     .filter(evt => evt.resultAvailable)
+                    .filter(evt => evt.status === 'Finished')
                     .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/result`);
             },
             'process': ({}, results, logger) => {
