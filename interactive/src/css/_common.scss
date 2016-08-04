@@ -478,6 +478,8 @@ a {
         width: auto;
         right: 0px;
         color: #bdbdbd;
+        display: inline !important;
+        position: initial;
 
         &::after {
             content: 'awaiting result';
