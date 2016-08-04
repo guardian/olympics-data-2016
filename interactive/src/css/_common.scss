@@ -479,7 +479,7 @@ a {
         right: 0px;
         color: #bdbdbd;
 
-        @include mq(tablet) {
+        @include mq($until: tablet) {
             display: inline !important;
             position: initial;
         }
