@@ -371,6 +371,7 @@ export default {
             'process': ({events}) => {
                 let resultsByDay = _(events)
                     .filter(evt => evt.resultAvailable)
+                    .filter(evt => evt.status === 'Finished')
                     .groupBy('day.date')
                     .map(dateEvents => {
                         let day = dateEvents[0].day;
