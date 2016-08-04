@@ -222,7 +222,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 	}
 
 	&.og-snap__link--medals {
-		@include mq(510px, 780px) {
+		@include mq(mobileLandscape, 780px) {
 			position: absolute !important;
 			bottom: 3px;
 		}	
@@ -230,14 +230,14 @@ $bronzeLight: rgba(243,111,33,0.2);
 
 	&.og-snap__link--wide {
 		display: none;
-		@include mq(510px) {
+		@include mq(mobileLandscape) {
 			display: block;
 		}
 	}
 
 	&.og-snap__link--stacked {
 		display: block;
-		@include mq(510px) {
+		@include mq(mobileLandscape) {
 			display: none;
 		}
 	}
@@ -433,18 +433,43 @@ $bronzeLight: rgba(243,111,33,0.2);
     &.om-medal--gold { background-color: $gold; .fc-container--story-package & { background-color: $goldDynamo; } }
 }
 
+.bronze-bg,
+.silver-bg,
+.gold-bg {
+	position: relative;
+	width: 20px;
+	
+	span {
+		position: relative;
+		z-index: 2;
+	}	
+
+	&:before {
+		content: '';
+		display: block;
+		position: absolute;
+		left: 50%;
+		left: calc(50% - 9px);
+		border-radius: 12px;
+		height: 18px;
+		width: 18px;
+	}
+}
+
 .bronze-bg {
-	background-color: $bronzeLight;
-	border-right: 1px solid #767676;
-	min-width: 15px;
+	&:before {
+		background-color: $bronzeLight;
+	}
 }
 
 .silver-bg {
-	background-color: $silverLight;
-	min-width: 15px;
+	&:before {
+		background-color: $silverLight;
+	}
 }
 
 .gold-bg {
-	background-color: $goldLight;
-	min-width: 15px;
+	&:before {
+		background-color: $goldLight;
+	}
 }
