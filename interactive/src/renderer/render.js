@@ -186,7 +186,7 @@ async function getAllData() {
 }
 
 async function getUpcomingEventsForSnap() {
-    let data = await rp('https://interactive.guim.co.uk/docsdata/1SMF0vtIILkfSE-TBiIpVKFSV1Tm4K9pB3fwunLdWaUE.json');
+    let data = await rp('https://interactive.guim.co.uk/docsdata-test/1SMF0vtIILkfSE-TBiIpVKFSV1Tm4K9pB3fwunLdWaUE.json');
     let upcomingEvents = JSON.parse(data).sheets.events;
 
     let currentTime = moment();
