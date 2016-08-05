@@ -106,7 +106,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 		}
 
 		@include mq($until: tablet) {
-			position: relative;
+			position: relative !important;
 		}
 	}
 
