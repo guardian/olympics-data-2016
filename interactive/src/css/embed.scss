@@ -421,6 +421,10 @@ $bronzeLight: rgba(243,111,33,0.2);
 	time {
 		display: inline-block;
     	min-width: 40px;
+
+    	@include mq(tablet, desktop) {
+    		display: inline;
+    	}
 	}
 }
 
