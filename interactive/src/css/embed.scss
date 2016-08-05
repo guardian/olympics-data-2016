@@ -249,11 +249,6 @@ $bronzeLight: rgba(243,111,33,0.2);
 }
 
 .facia-snap .og-snap--medals-only {
-	.og-snap__link--stacked {
-		display: block;
-		position: initial !important;
-	}
-
 	.og-snap__link--wide {
 		display: none;
 	}
@@ -263,11 +258,11 @@ $bronzeLight: rgba(243,111,33,0.2);
 	}
 }
 
-.facia-snap .og-snap--upcoming-only {
-	.og-snap__link {
-		line-height: 9px !important;
-	}
-}
+// .facia-snap .og-snap--upcoming-only {
+// 	.og-snap__link {
+// 		line-height: 9px !important;
+// 	}
+// }
 
 .og-snap__title {
 	@include fs-headline(3);
@@ -304,7 +299,6 @@ $bronzeLight: rgba(243,111,33,0.2);
 	@include mq(tablet) {
 		padding-bottom: 24px;
 	}
-	position: relative;
 }
 
 .og-snap__medal-row {
