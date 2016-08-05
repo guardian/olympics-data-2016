@@ -211,6 +211,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 	text-decoration: none;
 	display: inline-block;
 	margin-top: 12px;
+	min-width: 100px;
 
 	@include mq(tablet) {
 		position: absolute !important;
@@ -448,11 +449,9 @@ $bronzeLight: rgba(243,111,33,0.2);
 		content: '';
 		display: block;
 		position: absolute;
-		left: 50%;
-		left: calc(50% - 9px);
 		border-radius: 12px;
-		height: 18px;
-		width: 18px;
+		height: 19px;
+		width: 19px;
 	}
 }
 
