@@ -200,16 +200,17 @@ async function getUpcomingEventsForSnap() {
         return currentTime.diff(parsedDate,'seconds') < 0;
     });
 
-    eventsInTheFuture.map(event => {
+    var fiveEvents = eventsInTheFuture.slice(0,5).map(event => {
         let utcDateTime = moment.utc(event.start);
 
         event.timestamp = utcDateTime.format();
         event.time = utcDateTime.format("HH:mm");
+        event.tomorrowMarker = !(utcDateTime.isSame(new Date(), "day"));
 
         return event;
     });
 
-    return eventsInTheFuture.slice(0,5);
+    return fiveEvents;
 }
 
 async function renderTask(task, data) {

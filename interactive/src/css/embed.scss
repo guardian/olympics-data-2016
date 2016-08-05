@@ -417,14 +417,19 @@ $bronzeLight: rgba(243,111,33,0.2);
 	&:last-of-type {
 		border-bottom: 0;
 	}
+}
 
-	time {
-		display: inline-block;
-    	min-width: 40px;
+.og-snap__upcoming p {
+	@include fs-textSans(3);
+	font-weight: 700;
+	display: none;
+	margin-top: 2px;
+    padding-bottom: 1px;
+    margin-bottom: 1px;
+    border-bottom: 1px dotted #bdbdbd;
 
-    	@include mq(tablet, desktop) {
-    		display: inline;
-    	}
+	&:first-of-type {
+		display: block;
 	}
 }
 
