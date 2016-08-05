@@ -250,14 +250,6 @@ $bronzeLight: rgba(243,111,33,0.2);
 		bottom: 0px;
 	}
 
-	.og-snap--both & {
-		@include mq(510px) {
-			.og-snap__link--wide {
-				position: absolute;
-			}
-		}
-	}
-
 	&:hover {
 		text-decoration: underline;
 	}
@@ -273,6 +265,13 @@ $bronzeLight: rgba(243,111,33,0.2);
 		display: none;
 		@include mq(mobileLandscape) {
 			display: block;
+		}
+
+		.og-snap--both & {
+			@include mq(510px) {
+				position: absolute;
+				bottom: 0;
+			}
 		}
 	}
 
