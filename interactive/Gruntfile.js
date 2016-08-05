@@ -72,7 +72,9 @@ module.exports = function(grunt) {
 
         jspm: {
             options: {
-                sfx: true
+                sfx: true,
+                minify: true,
+                mangle: true
             },
             interactive: {
                 files: [
