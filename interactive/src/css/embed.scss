@@ -192,14 +192,28 @@ $bronzeLight: rgba(243,111,33,0.2);
  		margin-top: 2px;
  		padding-left: 0;
 
- 		@include mq(510px, 780px) {
- 			width: 50%;
- 			float: right;
- 			border: 0;
+ 		.olym-embed & {
+	 		@include mq(510px, 780px) {
+	 			width: 50%;
+	 			float: right;
+	 			border: 0;
 
- 			padding-top: 0;
- 			margin-top: 0;
- 			padding-left: 10px;
+	 			padding-top: 0;
+	 			margin-top: 0;
+	 			padding-left: 10px;
+	 		}
+ 		}
+
+ 		.facia-snap & {
+ 			@include mq(510px, 740px) {
+	 			width: 50%;
+	 			float: right;
+	 			border: 0;
+
+	 			padding-top: 0;
+	 			margin-top: 0;
+	 			padding-left: 10px;
+	 		}
  		}
 
  		@include mq(mobileLandscape) {
