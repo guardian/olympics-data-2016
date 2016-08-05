@@ -104,6 +104,10 @@ $bronzeLight: rgba(243,111,33,0.2);
 		 	border-right: 1px dotted #bdbdbd;
 		 	padding-right: 10px;
 		}
+
+		@include mq(tablet) {
+			position: relative;
+		}
 	}
 
 	.og-snap__medals-latest-empty {
@@ -251,7 +255,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 .facia-snap .og-snap--medals-only {
 	.og-snap__link--stacked {
 		display: block;
-		
+
 		@include mq(510px) {
 			position: absolute !important;
 			left: 5px;
