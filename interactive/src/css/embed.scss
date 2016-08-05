@@ -160,6 +160,10 @@ $bronzeLight: rgba(243,111,33,0.2);
  		}
 	}
 
+	.og-snap__medals-latest-empty {
+		@include fs-textSans(2);
+	}
+
 	.og-snap__medals-latest {
  		@include mq(510px, 780px) {
  			width: 50%;
