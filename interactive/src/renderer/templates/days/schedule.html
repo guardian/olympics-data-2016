@@ -25,7 +25,7 @@
             {% endif %}
             <ul class="om-events">
                 {% for event in discipline.events %}
-                    <li class="om-event {% if event.status === 'Running' %}om-event--awaiting{% endif %} {% if event.status === 'Finished' %}om-event--finished{% endif %}
+                    <li class="om-event {% if event.status === 'Running' || event.status === 'Scheduled Break' %}om-event--awaiting{% endif %} {% if event.status === 'Finished' %}om-event--finished{% endif %}
                                {% if event.status === 'Finished' %}om-event--results{% endif %}">
                         <div class="om-event__time">
                             <time class="js-time {% if !event.start|dateeq(schedule.day.date, 'day') %}is-next-day{% endif %}"
