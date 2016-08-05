@@ -159,7 +159,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 			padding-right: 0;
 		}
 
-		@include mq(510px, 780px) {
+		@include mq(510px, 740px) {
  			display: -webkit-box;  display: -ms-flexbox; display: -webkit-flex; display: flex;
  		}
 	}
@@ -285,7 +285,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 			left: 5px;
 		}
 
-		@include mq(510px, 780px) {
+		@include mq(510px, tablet) {
 			bottom: 4px;
 		}
 	}
