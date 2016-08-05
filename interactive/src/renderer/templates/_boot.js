@@ -3,15 +3,15 @@ define([], function () {
         boot: function (el, context, config, mediator) {
             // Extract href of the first link in the content, if any
             var iframe;
-            var edition;
+            var edition = 'INT';
             var url = '{{ url }}';
             var footer = document.getElementsByTagName("footer");
 
-            if(guardian.config.page) {
-                edition = guardian.config.page.edition;
-            } else {
-                edition = 'INT';
-            }
+            // if(guardian.config.page) {
+            //     edition = guardian.config.page.edition;
+            // } else {
+            //     edition = 'INT';
+            // }
 
             function _postMessage(message) {
                 iframe.contentWindow.postMessage(JSON.stringify(message), '*');
