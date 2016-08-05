@@ -254,13 +254,6 @@ $bronzeLight: rgba(243,111,33,0.2);
 		text-decoration: underline;
 	}
 
-	// &.og-snap__link--medals {
-	// 	@include mq(mobileLandscape, 780px) {
-	// 		position: absolute !important;
-	// 		bottom: 3px;
-	// 	}	
-	// }
-
 	&.og-snap__link--wide {
 		display: none;
 		@include mq(mobileLandscape) {
