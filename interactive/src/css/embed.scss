@@ -169,10 +169,20 @@ $bronzeLight: rgba(243,111,33,0.2);
 	}
 
 	.og-snap__medals-latest {
- 		@include mq(510px, 780px) {
- 			width: 50%;
- 			float: left;
- 			border-right: 1px dotted #bdbdbd;
+		.olym-embed & {
+	 		@include mq(510px, 780px) {
+	 			width: 50%;
+	 			float: left;
+	 			border-right: 1px dotted #bdbdbd;
+	 		}
+ 		}
+
+ 		.facia-snap & {
+ 			@include mq(510px, 740px) {
+	 			width: 50%;
+	 			float: left;
+	 			border-right: 1px dotted #bdbdbd;
+ 			}
  		}
 	}
 
@@ -259,6 +269,10 @@ $bronzeLight: rgba(243,111,33,0.2);
 		@include mq(510px) {
 			position: absolute !important;
 			left: 5px;
+		}
+
+		@include mq(510px, 780px) {
+			bottom: 4px;
 		}
 	}
 
