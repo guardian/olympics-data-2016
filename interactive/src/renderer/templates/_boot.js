@@ -21,7 +21,7 @@ define([], function () {
             iframe.style.width = '100%';
             iframe.style.border = 'none';
             iframe.height = '500'; // default height
-            iframe.src = url + '?edition=' + edition;
+            iframe.src = url //+ '?edition=' + edition;
             el.style.margin = '0';
             el.style.lineHeight = '0';
 
