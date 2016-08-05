@@ -36,6 +36,10 @@ swig.setFilter('fmtDayOfDays', i => {
     }
 })
 
+swig.setFilter('transformStr', s => {
+    return ['', '-ms-', '-webkit-', '-moz-'].map(prefix => `${prefix}transform: scale(${s})`).join(';')
+})
+
 swig.setFilter('dashIfEmpty', l => {
     if(!l.length || l.length === 0){
         return Array(5).fill({
