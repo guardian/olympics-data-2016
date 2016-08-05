@@ -469,25 +469,11 @@ a {
 
     display: none;
 
-    .om-event:not(.om-event--finished):not(.om-event--awaiting):not(.om-event--break) & {
+    .om-event:not(.om-event--finished) & {
         background-image: url(assets/imgs/clock.svg);
         display: block;
     }
 
-    .om-event--awaiting & {
-        width: auto;
-        right: 0px;
-        color: #bdbdbd;
-
-        @include mq($until: tablet) {
-            display: block !important;
-            position: initial;
-        }
-
-        &::after {
-            content: 'in progress';
-        }
-    }
 
     .is-expandable & {
         display: block;
