@@ -26,7 +26,7 @@ var timezones = {
 export default function formatTime(today, timeEls, tzEl) {
     var edition = getQueryString('edition');
 
-    if(!edition) {
+    if(!['UK', 'US', 'AU'].includes(edition)) {
         edition = "INT";
     }
 
