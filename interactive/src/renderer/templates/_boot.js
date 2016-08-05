@@ -7,11 +7,11 @@ define([], function () {
             var url = '{{ url }}';
             var footer = document.getElementsByTagName("footer");
 
-            // if(guardian.config.page) {
-            //     edition = guardian.config.page.edition;
-            // } else {
-            //     edition = 'INT';
-            // }
+            if(guardian && guardian.config && guardian.config.page) {
+                edition = guardian.config.page.edition;
+            } else {
+                edition = 'INT';
+            }
 
             function _postMessage(message) {
                 iframe.contentWindow.postMessage(JSON.stringify(message), '*');
@@ -21,11 +21,11 @@ define([], function () {
             iframe.style.width = '100%';
             iframe.style.border = 'none';
             iframe.height = '500'; // default height
-            iframe.src = url //+ '?edition=' + edition;
+            iframe.src = url + '?edition=' + edition;
             el.style.margin = '0';
             el.style.lineHeight = '0';
 
-            if(footer) {
+            if(footer && footer.length > 0) {
                 footer[0].style.display = 'block';
             }
 
