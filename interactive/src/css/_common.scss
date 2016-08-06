@@ -509,6 +509,8 @@ a {
 }
 
 .om-empty-message {
+
+    @include fs-textSans(3);
     display: none;
     .has-no-events & {
         display: block;
