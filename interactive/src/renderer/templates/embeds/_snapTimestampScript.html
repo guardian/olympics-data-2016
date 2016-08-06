@@ -1,7 +1,6 @@
 <script type="text/javascript">
     if(document['querySelector']&&document['querySelectorAll']) {
-    	var base = document.querySelector(".og-snap");
-    	var times = base.querySelectorAll(".js-og-time");
+    	var times = document.querySelectorAll(".js-og-time");
 
         var edition = (window.guardian && window.guardian.config.page.edition) ? window.guardian.config.page.edition : "INT";
 
@@ -43,7 +42,7 @@
     	    times[i].textContent = pad(date.getHours()) + ":" + pad(date.getMinutes());
     	}
 
-    	var tzEl = base.querySelector('.js-tz');
+    	var tzEl = document.querySelector('.js-tz');
     	var offset = new Date().getTimezoneOffset();
     	var tzSign = offset > 0 ? '-' : '+',
     	    absOffset = Math.abs(offset);
