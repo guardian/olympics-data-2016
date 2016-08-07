@@ -162,6 +162,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 		@include mq(510px, 740px) {
  			display: -webkit-box;  display: -ms-flexbox; display: -webkit-flex; display: flex;
  		}
+
 	}
 
 	.og-snap__medals-latest-empty {
@@ -174,6 +175,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 	 			width: 50%;
 	 			float: left;
 	 			border-right: 1px dotted #bdbdbd;
+	 			margin-bottom: 16px;
 	 		}
  		}
 
@@ -182,8 +184,12 @@ $bronzeLight: rgba(243,111,33,0.2);
 	 			width: 50%;
 	 			float: left;
 	 			border-right: 1px dotted #bdbdbd;
+	 			margin-bottom: 16px;
  			}
  		}
+
+ 		padding-bottom: 8px;
+
 	}
 
 	.og-snap__medals-table {
@@ -219,6 +225,11 @@ $bronzeLight: rgba(243,111,33,0.2);
  		@include mq(mobileLandscape) {
  			margin-top: 30px;
  		}
+
+ 		@include mq($from: tablet) {
+ 			margin-bottom: 24px;
+ 		}
+
 	}
 }
 
