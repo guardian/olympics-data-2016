@@ -18,7 +18,7 @@ module.exports = function(grunt) {
 
         watch: {
             data: {
-                files: ['../data/data-out/**/*'],
+                files: ['../data/data-out/lastUpdated.json'],
                 tasks: ['shell:render'],
             },
             js: {

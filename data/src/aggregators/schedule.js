@@ -523,6 +523,12 @@ export default {
                 return _.merge(medals, noMedals)
             }
         },
+        {
+            'name' : 'lastUpdated',
+            'process' : () => {
+                return {}
+            }
+        }
     ],
     'fallbackCombiners': [
         {
