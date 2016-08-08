@@ -3,10 +3,17 @@
     <div class="og-snap__timezone">
         All times are in <span class="js-tz">UTC</span>
     </div>
-    {% for row in fiveUpcomingEvents %}
-        {% if row.tomorrowMarker %} <p class="og-snap__marker">Tomorrow</p> {% endif %}
+    {% for event in fiveUpcomingEvents %}
+        {% if event.tomorrowMarker %} <p class="og-snap__marker">Tomorrow</p> {% endif %}
         <div class="og-snap__upcoming-row">
-            <time class="js-og-time" datetime="{{row.timestamp}}">{{row.time}}</time><span class="og-snap__upcoming-row__discipline">{{row.discipline.description}}</span>{{row.description}}
+            <time class="js-og-time" datetime="{{event.timestamp}}">{{event.time}}</time><span class="og-snap__upcoming-row__discipline">{{event.discipline.description}}</span>{{event.description}}
+            {% if event.medalEvent %}
+                <span class ="om-medal-event-icon">
+                    <div class="om-medal om-medal--gold"></div>
+                    <div class="om-medal om-medal--silver"></div>
+                    <div class="om-medal om-medal--bronze"></div>
+                </span>
+            {% endif %}
         </div>
     {% endfor %}
     <a href="https://gu.com/p/4p9gp" class="og-snap__link" target="_parent">Full schedule »</a>
