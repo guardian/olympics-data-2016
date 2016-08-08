@@ -493,6 +493,35 @@ $bronzeLight: rgba(243,111,33,0.2);
     &.om-medal--gold { background-color: $gold; .fc-container--story-package & { background-color: $goldDynamo; } }
 }
 
+.om-medal-event-icon {
+	position: relative;
+	margin-left: 2px;
+	width: 14px;
+	height: 14px;
+
+	& .om-medal {
+		position: absolute;
+		border: 1px solid white;
+
+		&.om-medal--gold {
+			top: -4px;
+			left: 4px;
+			z-index: 2;
+		}
+
+		&.om-medal--silver {
+			top: 3px;
+			left: 0px;
+			z-index: 1;
+		}
+
+		&.om-medal--bronze {
+			top: 3px;
+			left: 8px;
+		}
+	}
+}
+
 .bronze-bg,
 .silver-bg,
 .gold-bg {
