@@ -1,6 +1,8 @@
 <script type="text/javascript">
     if(document['querySelector']&&document['querySelectorAll']) {
     	var times = document.querySelectorAll(".js-og-time");
+        var today = new Date();
+        var setNewMarker = false;
 
         var edition = (window.guardian && window.guardian.config.page.edition) ? window.guardian.config.page.edition : "INT";
 
@@ -40,6 +42,12 @@
     	for (var i = 0; i < times.length; i++) {
     	    var date = parseISODate(times[i].getAttribute('datetime'));
     	    times[i].textContent = pad(date.getHours()) + ":" + pad(date.getMinutes());
+
+            if(!setNewMarker && date.setHours(0,0,0,0) !== today.setHours(0,0,0,0)) {
+                var marker = '<p class="og-snap__marker">Tomorrow</p>';
+                times[i].parentNode.insertAdjacentHTML('beforebegin', marker);
+                setNewMarker = true;
+            }
     	}
 
     	var tzEl = document.querySelector('.js-tz');

@@ -4,7 +4,7 @@
         All times are in <span class="js-tz">UTC</span>
     </div>
     {% for event in fiveUpcomingEvents %}
-        {% if event.tomorrowMarker %} <p class="og-snap__marker">Tomorrow</p> {% endif %}
+        {% if event.tomorrowMarker %} <p class="og-snap__marker" datetime="{{event.timestamp}}">Tomorrow</p> {% endif %}
         <div class="og-snap__upcoming-row">
             <time class="js-og-time" datetime="{{event.timestamp}}">{{event.time}}</time><span class="og-snap__upcoming-row__discipline">{{event.discipline.description}}</span>{{event.description}}
             {% if event.medalEvent %}
