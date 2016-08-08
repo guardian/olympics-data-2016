@@ -6,9 +6,8 @@
     {% for row in fiveUpcomingEvents %}
         {% if row.tomorrowMarker %} <p class="og-snap__marker">Tomorrow</p> {% endif %}
         <div class="og-snap__upcoming-row">
-            <time class="js-og-time" datetime="{{row.timestamp}}">{{row.time}}</time><span class="og-snap__upcoming-row__discipline">{{row.discipline}}</span>{{row.description}} 
+            <time class="js-og-time" datetime="{{row.timestamp}}">{{row.time}}</time><span class="og-snap__upcoming-row__discipline">{{row.discipline.description}}</span>{{row.description}}
         </div>
-
     {% endfor %}
     <a href="https://gu.com/p/4p9gp" class="og-snap__link" target="_parent">Full schedule »</a>
 </div>

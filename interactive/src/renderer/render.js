@@ -146,7 +146,7 @@ async function getAllData() {
         data[name + 'Fallback'] = contents.fallback;
     });
 
-    data.fiveUpcomingEvents = await getUpcomingEventsForSnap();
+    data.fiveUpcomingEvents = await getUpcomingEventsForSnap(data);
 
     data.emptyMedalTableEntry = {
         'country': {},
@@ -189,13 +189,27 @@ async function getAllData() {
     return data;
 }
 
-async function getUpcomingEventsForSnap() {
-    let data = await rp('https://interactive.guim.co.uk/docsdata/1SMF0vtIILkfSE-TBiIpVKFSV1Tm4K9pB3fwunLdWaUE.json');
-    let upcomingEvents = JSON.parse(data).sheets.events;
+async function getUpcomingEventsForSnap(data) {
+    let upcomingEvents = data.scheduleByDay;
+
+    let days = upcomingEvents.map(day => {
+        return day;
+    });
+
+    let disciplines = _.flatMap(days, day => {
+        return day.disciplines;
+    });
+
+    let events = _.flatMap(disciplines, discipline => {
+        return discipline.events;
+    });
+
+    let sortedEvents = _.sortBy(events, ['start', 'discipline.description']);
 
     let currentTime = moment();
-    let eventsInTheFuture = upcomingEvents.filter(row => {
-        var parsedDate = moment(row.start);
+
+    let eventsInTheFuture = sortedEvents.filter(event => {
+        var parsedDate = moment(event.start);
 
         return currentTime.diff(parsedDate,'seconds') < 0;
     });
