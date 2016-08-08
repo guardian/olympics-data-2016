@@ -191,40 +191,26 @@ async function getAllData() {
 
 async function getUpcomingEventsForSnap(data) {
     let upcomingEvents = data.scheduleByDay;
-
-    let days = upcomingEvents.map(day => {
-        return day;
-    });
-
-    let disciplines = _.flatMap(days, day => {
-        return day.disciplines;
-    });
-
-    let events = _.flatMap(disciplines, discipline => {
-        return discipline.events;
-    });
-
-    let sortedEvents = _.sortBy(events, ['start', 'discipline.description']);
-
     let currentTime = moment();
 
-    let eventsInTheFuture = sortedEvents.filter(event => {
-        var parsedDate = moment(event.start);
+    let events = _(upcomingEvents).flatMap(day => day.disciplines)
+        .flatMap(discipline => discipline.events)
+        .sortBy(['start', 'discipline.description'])
+        .filter(event => event.status !== 'Postponed')
+        .filter(event => currentTime.diff(moment(event.start),'seconds') < 0)
+        .valueOf()
+        .slice(0,5)
+        .map(event => {
+            let utcDateTime = moment.utc(event.start);
 
-        return currentTime.diff(parsedDate,'seconds') < 0;
-    });
+            event.timestamp = utcDateTime.format();
+            event.time = utcDateTime.format("HH:mm");
+            event.tomorrowMarker = !(utcDateTime.isSame(new Date(), "day"));
 
-    var fiveEvents = eventsInTheFuture.slice(0,5).map(event => {
-        let utcDateTime = moment.utc(event.start);
+            return event;
+        });
 
-        event.timestamp = utcDateTime.format();
-        event.time = utcDateTime.format("HH:mm");
-        event.tomorrowMarker = !(utcDateTime.isSame(new Date(), "day"));
-
-        return event;
-    });
-
-    return fiveEvents;
+    return events;
 }
 
 async function renderTask(task, data) {
