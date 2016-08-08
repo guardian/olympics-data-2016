@@ -27,7 +27,7 @@ const fsReadFile = denodeify(fs.readFile);
 const fsWriteFile = denodeify(fs.writeFile);
 const mkdirpP = denodeify(mkdirp);
 
-const limiter = new Bottleneck(1000 / config.pa.rateLimit, 1000 / config.pa.rateLimit);
+const limiter = new Bottleneck(config.pa.rateLimit, 1000 / config.pa.rateLimit);
 
 function cacheFile(endpoint) {
     return path.join(config.pa.cacheDir, endpoint) + '.json';
@@ -50,26 +50,18 @@ function PA(logger, metric) {
     }
 
     async function requestUrl(endpoint) {
-        await limiter.schedule(() => Promise.resolve());
+        let _resp = await limiter.schedule(() => {
+            logger.info('Requesting URL', endpoint);
+            metric.put('request');
 
-        logger.info('Requesting URL', endpoint);
-        metric.put('request');
-
-        let _resp;
-
-        try {
-            _resp = await rp({
+            return rp({
                 'uri': `${config.pa.baseUrl}/${endpoint}`,
                 'headers': {
                     'Accept': 'application/json',
                     'Apikey': config.pa.apiKey
                 }
             });
-        } catch (err) {
-            logger.error('Error requesting URL', endpoint, err);
-            logger.error(err.stack);
-            notify.error(err);
-        }
+        });
 
         if (_resp && _resp.length > 0) {
             let resp = JSON.parse(_resp);
