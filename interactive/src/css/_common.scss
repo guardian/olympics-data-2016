@@ -469,12 +469,24 @@ a {
 
     display: none;
 
-    .om-event:not(.om-event--finished) & {
+    .om-event:not(.om-event--finished):not(.om-event--postponed) & {
         background-image: url(assets/imgs/clock.svg);
         display: block;
     }
 
-
+    .om-event--postponed & {
+        width: auto;
+        right: 0px;
+        color: #bdbdbd;
+        @include mq($until: tablet) {
+            display: block !important;
+            position: initial;
+        }
+        &::after {
+            content: 'postponed';
+        }
+    }
+     
     .is-expandable & {
         display: block;
     }
@@ -482,10 +494,12 @@ a {
     .om-event.om-event--results & {
         background-image: url(assets/imgs/plus.svg);
     }
+
     .om-event.om-event--results.is-expanded & {
         background-image: url(assets/imgs/minus.svg);
     }
 }
+
 
 .om-event__clicker {
     position: absolute;

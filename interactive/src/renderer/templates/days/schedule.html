@@ -26,7 +26,8 @@
             <ul class="om-events">
                 {% for event in discipline.events %}
                     <li class="om-event {% if event.status === 'Finished' %}om-event--finished{% endif %}
-                               {% if event.status === 'Finished' %}om-event--results{% endif %}">
+                               {% if event.status === 'Finished' %} om-event--results{% endif %}
+                               {% if event.status === 'Postponed' %} om-event--postponed{% endif %}">
                         <div class="om-event__time">
                             <time class="js-time {% if !event.start|dateeq(schedule.day.date, 'day') %}is-next-day{% endif %}"
                                   datetime="{{ event.start }}">{{ event.start|datefmt('HH:mm') }}</time>
