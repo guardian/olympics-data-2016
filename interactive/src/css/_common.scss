@@ -522,3 +522,25 @@ a {
         margin-bottom: 0;
     }
 }
+
+.om-medal-event-icon {
+
+    display: inline-block;
+    margin-left: 4px;
+
+    & .om-medal {
+
+        position: relative;
+        margin-right: -10px;
+        margin-bottom: -2px;
+        border: 1px solid white;
+        box-sizing: content-box;
+
+        &.om-medal--gold {
+            z-index: 2;
+        }
+        &.om-medal--silver {
+            z-index: 1;
+        }
+    }
+}

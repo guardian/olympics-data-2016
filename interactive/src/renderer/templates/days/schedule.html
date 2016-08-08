@@ -37,6 +37,15 @@
                                 <span class="om-event__name__events">({{ event.group.length }} events)</span>
                             {% endif %}
                         </span>
+
+                        {%if event.medalEvent %}
+                            <span class ="om-medal-event-icon">
+                                <div class="om-medal om-medal--gold"></div>
+                                <div class="om-medal om-medal--silver"></div>
+                                <div class="om-medal om-medal--bronze"></div>
+                            </span>
+                        {% endif %}
+
                         {% if event.status === 'Finished' %}
                             {% if event.event.identifier|getCumulative(cumulativeResults) %}
                                 <div class="om-event__result om-event__result--grey">
