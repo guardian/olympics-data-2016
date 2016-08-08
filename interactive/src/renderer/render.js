@@ -190,10 +190,9 @@ async function getAllData() {
 }
 
 async function getUpcomingEventsForSnap(data) {
-    let upcomingEvents = data.scheduleByDay;
     let currentTime = moment();
 
-    let events = _(upcomingEvents).flatMap(day => day.disciplines)
+    let upcomingEvents = _(data.scheduleByDay).flatMap(day => day.disciplines)
         .flatMap(discipline => discipline.events)
         .sortBy(['start', 'discipline.description'])
         .filter(event => event.status !== 'Postponed')
@@ -210,7 +209,7 @@ async function getUpcomingEventsForSnap(data) {
             return event;
         });
 
-    return events;
+    return upcomingEvents;
 }
 
 async function renderTask(task, data) {
