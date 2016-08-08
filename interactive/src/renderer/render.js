@@ -214,7 +214,7 @@ async function getUpcomingEventsForSnap(data) {
         return currentTime.diff(parsedDate,'seconds') < 0;
     });
 
-    var fiveEvents = eventsInTheFuture.slice(0,50).map(event => {
+    var fiveEvents = eventsInTheFuture.slice(0,5).map(event => {
         let utcDateTime = moment.utc(event.start);
 
         event.timestamp = utcDateTime.format();
