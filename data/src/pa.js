@@ -27,7 +27,7 @@ const fsReadFile = denodeify(fs.readFile);
 const fsWriteFile = denodeify(fs.writeFile);
 const mkdirpP = denodeify(mkdirp);
 
-const limiter = new Bottleneck(0, 1000 / config.pa.rateLimit);
+const limiter = new Bottleneck(1000 / config.pa.rateLimit, 1000 / config.pa.rateLimit);
 
 function cacheFile(endpoint) {
     return path.join(config.pa.cacheDir, endpoint) + '.json';
