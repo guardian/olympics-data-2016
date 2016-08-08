@@ -495,6 +495,7 @@ $bronzeLight: rgba(243,111,33,0.2);
 
 .om-medal-event-icon {
 	position: relative;
+	display: inline-block;
 	margin-left: 2px;
 	width: 14px;
 	height: 14px;
@@ -504,19 +505,19 @@ $bronzeLight: rgba(243,111,33,0.2);
 		border: 1px solid white;
 
 		&.om-medal--gold {
-			top: -4px;
+			top: -2px;
 			left: 4px;
 			z-index: 2;
 		}
 
 		&.om-medal--silver {
-			top: 3px;
+			top: 5px;
 			left: 0px;
 			z-index: 1;
 		}
 
 		&.om-medal--bronze {
-			top: 3px;
+			top: 5px;
 			left: 8px;
 		}
 	}
