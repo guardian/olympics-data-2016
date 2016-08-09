@@ -429,7 +429,7 @@ export default {
                     .valueOf();
             }
         },
-        {
+        /*{
             'name': 'medalTable',
             'process': ({results}) => {
                 let medalCountries = _(results)
@@ -462,7 +462,7 @@ export default {
 
                 return medalTable;
             }
-        },
+        },*/
         {
             'name' : 'countries2',
             'dependencies' : () => ['olympics/2016-summer-olympics/country'],
@@ -530,26 +530,5 @@ export default {
             }
         }
     ],
-    'fallbackCombiners': [
-        {
-            'name': 'medalTable',
-            'dependencies': () => ['olympics/2016-summer-olympics/medal-table'],
-            'process': ({}, [medalTable]) => {
-                return forceArray(medalTable.olympics.games.medalTable.tableEntry)
-                    .map(entry => {
-                        let medals = _(['gold', 'silver', 'bronze'])
-                            .map(type => [type, parseInt(entry[type].value)])
-                            .fromPairs()
-                            .valueOf();
-
-                        return {
-                            'country': entry.country,
-                            'medals': medals,
-                            'total': parseInt(entry.total.value),
-                            'position': parseInt(entry.position)
-                        };
-                    });
-            }
-        }
-    ]
+    'fallbackCombiners': []
 };
