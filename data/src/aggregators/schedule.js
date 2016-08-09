@@ -429,40 +429,6 @@ export default {
                     .valueOf();
             }
         },
-        /*{
-            'name': 'medalTable',
-            'process': ({results}) => {
-                let medalCountries = _(results)
-                    .flatMap('entrants')
-                    .filter(entrant => !!entrant.medal)
-                    .groupBy('country.identifier')
-                    .map(countryEntrants => {
-                        let country = countryEntrants[0].country;
-                        let medals = _(['gold', 'silver', 'bronze'])
-                            .map(medal => {
-                                let count = countryEntrants.filter(e => e.medal.toLowerCase() === medal).length;
-                                return [medal, count];
-                            })
-                            .fromPairs()
-                            .valueOf();
-
-                        let total = _(medals).values().sum();
-                        return {country, medals, total};
-                    })
-                    .orderBy(
-                        ['medals.gold', 'medals.silver', 'medals.bronze', 'country.identifier'],
-                        ['desc', 'desc', 'desc', 'asc']
-                    )
-                    .valueOf();
-
-                let medalTable = medalCountries.map(c1 => {
-                    let position = medalCountries.findIndex(c2 => _.isEqual(c1.medals, c2.medals)) + 1;
-                    return {...c1, position};
-                });
-
-                return medalTable;
-            }
-        },*/
         {
             'name' : 'countries2',
             'dependencies' : () => ['olympics/2016-summer-olympics/country'],
