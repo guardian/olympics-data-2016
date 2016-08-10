@@ -89,6 +89,7 @@ function PA(logger, metric) {
                 if (config.argv.pa) {
                     return await requestUrl(endpoint);
                 } else {
+                    logger.warn('No cached response for', endpoint);
                     return {'olympics': {}};
                 }
             } else {

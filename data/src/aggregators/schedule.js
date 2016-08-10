@@ -315,7 +315,7 @@ export default {
             }
         },
         {
-            'name': 'events',
+            'name': 'simpleEvents',
             'required': true,
             'dependencies': ({dates}) => {
                 return dates.map(date => `olympics/2016-summer-olympics/schedule/${date}`);
@@ -323,8 +323,15 @@ export default {
             'process': ({dates}, dateSchedules, logger) => {
                 let datesEvents = dateSchedules.map(ds => {
                     return forceArray(ds.olympics.scheduledEvent)
-                        .filter(evt => evt.discipline && evt.discipline.event && evt.discipline.event.eventUnit)
-                        .filter(evt => evt.discipline.event.eventUnit.unitType !== 'Not Applicable')
+                        .filter(evt => {
+                            return evt.discipline && evt.discipline.event && evt.discipline.event.eventUnit &&
+                                evt.discipline.event.eventUnit.phaseDescription;
+                        })
+                        .filter(evt => {
+                            let unitType = evt.discipline.event.eventUnit.unitType;
+                            let phaseId = evt.discipline.event.eventUnit.phaseDescription.identifier;
+                            return unitType !== 'Not Applicable' || phasesWithoutUnitResults.indexOf(phaseId) > -1
+                        })
                         .map(evt => parseScheduledEvent(evt, logger))
                         .filter(evt => !!evt.start);
                 });
@@ -339,21 +346,80 @@ export default {
             }
         },
         {
+            'name': 'events',
+            'dependencies': () => {
+                return phasesWithoutUnitResults
+                    .map(phaseId => `olympics/2016-summer-olympics/event-phase/${phaseId}`);
+            },
+            'process': ({simpleEvents}, phaseOnlyResults, logger) => {
+                let newEvents = _(phaseOnlyResults)
+                    .flatMap(phaseInfo => {
+                        let phase = phaseInfo.olympics.event.phase;
+                        if (phase.resultAvailable === 'Yes') {
+                            let eventUnits = forceArray(phase.eventUnit);
+                            return eventUnits.map(eventUnit => {
+                                let evt = simpleEvents[eventUnit.identifier];
+                                return {
+                                    ...evt,
+                                   'resultAvailable': true,
+                                   'phaseOnlyResult': true,
+                                   'phaseUnitCount': eventUnits.length
+                                };
+                            });
+                        } else {
+                            return [];
+                        }
+                    })
+                    .keyBy('unit.identifier')
+                    .valueOf();
+
+                return {...simpleEvents, ...newEvents};
+
+            }
+        },
+        {
+            'name': 'phaseResults',
+            'dependencies': ({events}) => {
+                return _(events)
+                    .filter(evt => evt.resultAvailable && evt.phaseOnlyResult)
+                    .map(evt => `olympics/2016-summer-olympics/event-phase/${evt.phase.identifier}/result`)
+                    .uniq()
+                    .valueOf();
+            },
+            'process': ({}, phaseResults, logger) => {
+                return _(phaseResults)
+                    .map(result => parsePhaseResult(result.olympics.event, logger))
+                    .keyBy('identifier')
+                    .valueOf();
+            }
+        },
+        {
             'name': 'results',
             'required': true,
             'dependencies': ({events}) => {
                 return _.values(events)
-                    .filter(evt => evt.resultAvailable)
+                    .filter(evt => evt.resultAvailable && !evt.phaseOnlyResult)
                     .filter(evt => evt.status === 'Finished')
                     .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/result`);
             },
-            'process': ({}, results, logger) => {
-                return _(results)
+            'process': ({events, phaseResults = {}}, results, logger) => {
+                let simpleResults = _(results)
                     .map('olympics.eventUnit')
                     .map(result => parseUnitResult(result, logger))
                     .filter(result => !!result.identifier)
                     .keyBy('identifier')
                     .valueOf();
+
+                let phaseOnlyResults = _(events)
+                    .filter(evt => evt.resultAvailable && evt.phaseOnlyResult)
+                    .map(evt => {
+                        let result = phaseResults[evt.phase.identifier];
+                        return {...result, 'identifier': evt.unit.identifier, 'medalEvent': evt.medalEvent};
+                    })
+                    .keyBy('identifier')
+                    .valueOf();
+
+                return {...simpleResults, ...phaseOnlyResults};
             }
         },
         /*{
@@ -405,8 +471,7 @@ export default {
             'name': 'resultsByDay',
             'process': ({events}) => {
                 let resultsByDay = _(events)
-                    .filter(evt => evt.resultAvailable)
-                    .filter(evt => evt.status === 'Finished')
+                    .filter(evt => evt.resultAvailable && evt.status === 'Finished')
                     .groupBy('day.date')
                     .map(dateEvents => {
                         let day = dateEvents[0].day;
@@ -446,60 +511,14 @@ export default {
             }
         },
         {
-            'name': 'phasesWithResults',
-            'dependencies': ({events}) => {
-                return _(events)
-                    .filter(evt => phasesWithoutUnitResults.indexOf(evt.phase.identifier) > -1)
-                    .map('event.identifier')
-                    .uniq()
-                    .map(eventId => `olympics/2016-summer-olympics/event/${eventId}/phase`)
-                    .valueOf();
-            },
-            'process': ({}, eventPhases) => {
-                return _(eventPhases)
-                    .flatMap(eventPhase => forceArray(eventPhase.olympics.event.phase))
-                    .filter(phase => phase.resultAvailable === 'Yes')
-                    .valueOf();
-            }
-        },
-        {
-            'name': 'phaseResults',
-            'dependencies': ({phasesWithResults}) => {
-                return phasesWithResults
-                    .map(phase => `olympics/2016-summer-olympics/event-phase/${phase.identifier}/result`);
-            },
-            'process': ({events}, phaseResults, logger) => {
-                return _(phaseResults)
-                    .map('olympics.event')
-                    .map(result => {
-                        let phaseResult = parsePhaseResult(result, logger);
-                        let units = getPhaseUnits(events, phaseResult.identifier);
-                        // phases don't indicate if they contain medal events
-                        let medalEvent = units.some(unit => unit.medalEvent);
-                        return {...phaseResult, medalEvent, units};
-                    })
-                    .filter(result => !!result.identifier)
-                    .keyBy('identifier')
-                    .valueOf();
-            }
-        },
-        {
             'name' : 'countries2',
             'dependencies' : () => ['olympics/2016-summer-olympics/country'],
             'process' : ({}, [countries]) => countries.olympics.country.map(getProperCountry)
         },
         {
             'name': 'medalsByCountry',
-            'process': ({events, results, phaseResults, countries2}) => {
-                let phaseUnitResults = _.values(phaseResults)
-                    .filter(phaseResult => phaseResult.medalEvent)
-                    .map(phaseResult => {
-                        return {...phaseResult, 'identifier': phaseResult.units[0].unit.identifier};
-                    });
-
-                let allResults = _.values(results).concat(phaseUnitResults);
-
-                let medals = _(allResults)
+            'process': ({events, results, countries2}) => {
+                let medals = _(results)
                     .flatMap(result => {
                         return result.entrants
                             .filter(entrant => !!entrant.medal)

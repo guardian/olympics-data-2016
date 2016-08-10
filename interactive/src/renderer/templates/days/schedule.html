@@ -55,22 +55,37 @@
                                     {% include '../_result.html' {'result': cumulativeResult} %}
                                 </div>
                             {% endif %}
-                            {% for subEvent in event.group  %}
+                            {% if event.phaseOnlyResult %}
                                 <div class="om-event__result">
-                                    <div class="om-event__sub-name">
-                                        {% if event.group.length > 1 %}
-                                            {{ subEvent.description }}
-                                        {% elif cumulativeResult && subEvent.resultAvailable %}
-                                            Event result:
-                                        {% endif %}
-                                    </div>
-                                    {% if subEvent.resultAvailable %}
-                                        <div class="js-result" data-unit-id="{{ subEvent.unit.identifier }}"></div>
-                                    {% elif !cumulativeResult  %}
+                                    {% if event.phaseUnitCount > 1 %}
+                                        <div class="om-event__sub-name">
+                                            All results for {{ event.phase.value }}:
+                                        </div>
+                                    {% endif %}
+                                    {% if event.resultAvailable %}
+                                        <div class="js-result" data-unit-id="{{ event.unit.identifier }}"></div>
+                                    {% elif !cumulativeResult %}
                                         <div>Results still to come</div>
                                     {% endif %}
                                 </div>
-                            {% endfor %}
+                            {% else %}
+                                {% for subEvent in event.group  %}
+                                    <div class="om-event__result">
+                                        <div class="om-event__sub-name">
+                                            {% if event.group.length > 1 %}
+                                                {{ subEvent.description }}
+                                            {% elif cumulativeResult && subEvent.resultAvailable %}
+                                                Event result:
+                                            {% endif %}
+                                        </div>
+                                        {% if subEvent.resultAvailable %}
+                                            <div class="js-result" data-unit-id="{{ subEvent.unit.identifier }}"></div>
+                                        {% elif !cumulativeResult  %}
+                                            <div>Results still to come</div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
                             <div class="om-event__clicker js-expand-results"></div>
                         {% endif %}
                         <div class="om-event__expand"></div>
