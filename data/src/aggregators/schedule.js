@@ -19,6 +19,10 @@ const roundDisciplines = {
     'water-polo': 'Quarter Scores'
 }
 
+const gymnasticsTypes = [
+    'Floor Breakdown', 'Vault Breakdown', 'Beam Breakdown', 'Uneven Bars Breakdown', 'Pommelhorse Breakdown',
+    'Rings Breakdown', 'Parallel Bars Breakdown', 'Horizontal Bars Breakdown'
+];
 
 const combineBlacklist = [
     'basketball', 'beach-volleyball', 'football', 'handball', 'hockey', 'rugby-sevens',
@@ -134,17 +138,17 @@ function parseEntrant(entrant) {
     };
 }
 
-function parseResult(eventUnit, logger) {
+function parseResult(evt, resultObj, logger) {
     try {
-        let entrants = forceArray(eventUnit.result.entrant)
+        let entrants = forceArray(resultObj.result.entrant)
             .map(parseEntrant)
             .sort((a, b) => a.order - b.order);
 
         let result = {
-            'identifier': eventUnit.identifier,
-            'discipline': eventUnit.disciplineDescription,
-            'medalEvent': eventUnit.medalEvent === 'Yes',
-            'teamEvent': eventUnit.teamEvent === 'Yes',
+            'identifier': resultObj.identifier,
+            'discipline': evt.disciplineDescription,
+            'medalEvent': evt.medalEvent === 'Yes',
+            'teamEvent': evt.teamEvent === 'Yes',
             entrants
         };
 
@@ -164,6 +168,9 @@ function parseResult(eventUnit, logger) {
         return {};
     }
 }
+
+const parsePhaseResult = (evt, logger) => parseResult(evt, evt.phase, logger);
+const parseUnitResult = (evt, logger) => parseResult(evt, evt, logger);
 
 const resultReducers = [
     // Reaction times/wind speed/average speeds
@@ -262,6 +269,20 @@ const resultReducers = [
 
         return {...result, entrants, roundNames, roundType};
     },
+    // Gymnastics breakdowns
+    result => {
+        let entrants = result.entrants.map(entrant => {
+            let gymnastics = gymnasticsTypes
+                .filter(type => !!entrant.resultExtensions[type])
+                .map(type => {
+                    let typeResult = entrant.resultExtensions[type].extension;
+                    return {type, 'position': parseInt(typeResult.position), 'value': parseFloat(typeResult.value)};
+                });
+            return { ...entrant, gymnastics};
+        });
+
+        return {...result, entrants};
+    },
     // Must be last, removes unprocessed API data
     result => {
         let entrants = result.entrants.map(entrant => _.omit(entrant, ['properties', 'resultExtensions']));
@@ -317,7 +338,7 @@ export default {
             'process': ({}, results, logger) => {
                 return _(results)
                     .map('olympics.eventUnit')
-                    .map(result => parseResult(result, logger))
+                    .map(result => parseUnitResult(result, logger))
                     .filter(result => !!result.identifier)
                     .keyBy('identifier')
                     .valueOf();
@@ -406,7 +427,36 @@ export default {
                 return _(cumulativeResults)
                     .map('olympics.event')
                     .filter(event => event)
-                    .map(result => parseResult(result, logger))
+                    .map(result => parseUnitResult(result, logger))
+            }
+        },
+        {
+            'name': 'phasesWithResults',
+            'dependencies': ({events}) => {
+                return _(events)
+                    .filter(evt => ['gymnastics-artistic'].indexOf(evt.discipline.identifier) > -1)
+                    .map('event.identifier')
+                    .uniq()
+                    .map(eventId => `olympics/2016-summer-olympics/event/${eventId}/phase`)
+                    .valueOf();
+            },
+            'process': ({}, eventPhases) => {
+                return _(eventPhases)
+                    .flatMap(eventPhase => forceArray(eventPhase.olympics.event.phase))
+                    .filter(phase => phase.resultAvailable === 'Yes')
+                    .valueOf();
+            }
+        },
+        {
+            'name': 'phaseResults',
+            'dependencies': ({phasesWithResults}) => {
+                return phasesWithResults
+                    .map(phase => `olympics/2016-summer-olympics/event-phase/${phase.identifier}/result`);
+            },
+            'process': ({}, phaseResults, logger) => {
+                return _(phaseResults)
+                    .map('olympics.event')
+                    .map(result => parsePhaseResult(result, logger))
                     .filter(result => !!result.identifier)
                     .keyBy('identifier')
                     .valueOf();
