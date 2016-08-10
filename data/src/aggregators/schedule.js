@@ -28,7 +28,7 @@ const gymnasticsTypes = [
 
 
 const phasesWithoutUnitResults = [
-    'GAM0241', 'GAM0249', 'GAM4001', 'GAM4009', 'GAW0241', 'GAW0249', 'GAW4001', 'GAW4009'
+    'GAM0241', 'GAM0249', 'GAM4001', 'GAM4009', 'GAW0241', 'GAW0249', 'GAW4001', 'GAW4009', 'EQX0031'
 ]
 
 const combineBlacklist = [
