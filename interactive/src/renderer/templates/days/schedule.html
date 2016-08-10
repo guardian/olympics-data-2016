@@ -48,23 +48,25 @@
                         {% endif %}
 
                         {% if event.status === 'Finished' %}
-                            {% if event.event.identifier|getCumulative(cumulativeResults) %}
+                            {% set cumulativeResult = event.event.identifier|getCumulative(cumulativeResults) %}
+                            {% if cumulativeResult %}
                                 <div class="om-event__result om-event__result--grey">
                                     <div class="om-event__sub-name">Cumulative result:</div>
-                                    {% include '../_result.html' {'result': event.event.identifier|getCumulative(cumulativeResults)} %}
+                                    {% include '../_result.html' {'result': cumulativeResult} %}
                                 </div>
                             {% endif %}
                             {% for subEvent in event.group  %}
                                 <div class="om-event__result">
-                                    {% if event.group.length > 1 %}
-                                        <div class="om-event__sub-name">{{ subEvent.description }}</div>
-                                    {% endif %}
-                                    {% if event.group.length === 1 && event.event.identifier|getCumulative(cumulativeResults) %}
-                                        <div class="om-event__sub-name">Event result:</div>
-                                    {% endif %}
+                                    <div class="om-event__sub-name">
+                                        {% if event.group.length > 1 %}
+                                            {{ subEvent.description }}
+                                        {% elif cumulativeResult && subEvent.resultAvailable %}
+                                            Event result:
+                                        {% endif %}
+                                    </div>
                                     {% if subEvent.resultAvailable %}
                                         <div class="js-result" data-unit-id="{{ subEvent.unit.identifier }}"></div>
-                                    {% else %}
+                                    {% elif !cumulativeResult  %}
                                         <div>Results still to come</div>
                                     {% endif %}
                                 </div>
