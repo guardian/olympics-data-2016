@@ -331,9 +331,9 @@ export default {
                             let eventId = evt.discipline.event.identifier;
                             let unitType = evt.discipline.event.eventUnit.unitType;
                             let phaseId = evt.discipline.event.eventUnit.phaseDescription.identifier;
-                            // GAW000 seems to be a non-event, Not Applicable generally seems to be also
-                            // *except* when its part of a phase-only results event
-                            return eventId !== 'GAW000' &&
+                            // GAW000 and GAM000 seem to be a non-events, Not Applicable generally seems to
+                            // be also *except* when its part of a phase-only results event
+                            return eventId !== 'GAW000'  && eventId !== 'GAM000' &&
                                 (unitType !== 'Not Applicable' || phasesWithoutUnitResults.indexOf(phaseId) > -1);
                         })
                         .map(evt => parseScheduledEvent(evt, logger))
