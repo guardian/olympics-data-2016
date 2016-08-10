@@ -85,8 +85,12 @@ function PA(logger, metric) {
 
             return await (!config.argv.pa || moment().isBefore(expiryTime) ? requestCache(endpoint) : requestUrl(endpoint));
         } catch (err) {
-            if (err.code && err.code === 'ENOENT' && config.argv.pa) {
-                return await requestUrl(endpoint);
+            if (err.code && err.code === 'ENOENT') {
+                if (config.argv.pa) {
+                    return await requestUrl(endpoint);
+                } else {
+                    return {'olympics': {}};
+                }
             } else {
                 throw err;
             }
