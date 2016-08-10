@@ -59,7 +59,7 @@
                                 <div class="om-event__result">
                                     {% if event.phaseUnitCount > 1 %}
                                         <div class="om-event__sub-name">
-                                            All results for {{ event.phase.value }}:
+                                            Overall results for {{ event.phase.value|lower }}:
                                         </div>
                                     {% endif %}
                                     {% if event.resultAvailable %}
