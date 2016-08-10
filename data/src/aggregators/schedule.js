@@ -88,6 +88,11 @@ function formatScheduleDiscipline(events) {
     };
 }
 
+// Returns a event unit for a given phaseId
+function getPhaseUnits(events, phaseId) {
+    return _.filter(events, evt => evt.phase.identifier === phaseId);
+}
+
 function parseScheduledEvent(evt, logger) {
     try {
         return {
@@ -453,10 +458,16 @@ export default {
                 return phasesWithResults
                     .map(phase => `olympics/2016-summer-olympics/event-phase/${phase.identifier}/result`);
             },
-            'process': ({}, phaseResults, logger) => {
+            'process': ({events}, phaseResults, logger) => {
                 return _(phaseResults)
                     .map('olympics.event')
-                    .map(result => parsePhaseResult(result, logger))
+                    .map(result => {
+                        let phaseResult = parsePhaseResult(result, logger);
+                        let units = getPhaseUnits(events, phaseResult.identifier);
+                        // phases don't indicate if they contain medal events
+                        let medalEvent = units.some(unit => unit.medalEvent);
+                        return {...phaseResult, medalEvent, units};
+                    })
                     .filter(result => !!result.identifier)
                     .keyBy('identifier')
                     .valueOf();
@@ -465,42 +476,40 @@ export default {
         {
             'name' : 'countries2',
             'dependencies' : () => ['olympics/2016-summer-olympics/country'],
-            'process' : ({}, [countries]) => countries.olympics.country.map(getProperCountry);
+            'process' : ({}, [countries]) => countries.olympics.country.map(getProperCountry)
         },
         {
             'name': 'medalsByCountry',
-            'process': ({events, results, countries2}) => {
-                let medals = _(results)
-                    .filter(result => result.medalEvent)
-                    .flatMap(result => {
+            'process': ({events, results, phaseResults, countries2}) => {
+                let phaseUnitResults = _.values(phaseResults)
+                    .filter(phaseResult => phaseResult.medalEvent)
+                    .map(phaseResult => {
+                        return {...phaseResult, 'identifier': phaseResult.units[0].unit.identifier};
+                    });
 
+                let allResults = _.values(results).concat(phaseUnitResults);
+
+                let medals = _(allResults)
+                    .flatMap(result => {
                         return result.entrants
                             .filter(entrant => !!entrant.medal)
-                            .map(entrant => {
-                                return {
-                                    entrant,
-                                    'event': events[result.identifier]
-                                };
-                            });
+                            .map(entrant => { return {entrant, 'event': events[result.identifier]}; });
                     })
                     .sortBy('event.end')
                     .reverse()
                     .groupBy('entrant.country.identifier')
                     .mapValues((medals, code) => {
                         return {
-                            country: countries2.find(c => c.identifier === code),
+                            country: countries2.find(country => country.identifier === code),
                             medals
                         }
                     })
                     .valueOf();
 
                 let noMedals = _(countries2)
-                    .filter(c => !(medals)[c.identifier])
-                    .map(c => [c.identifier, {
-                        country : c,
-                        medals : []
-                    }])
-                    .fromPairs()
+                    .filter(country => !medals[country.identifier])
+                    .keyBy('identifier')
+                    .mapValues(country => { return {country, medals: []}; })
                     .valueOf()
 
                 return _.merge(medals, noMedals)
