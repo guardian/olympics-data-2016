@@ -10,6 +10,9 @@ print """.om-flag {
     height: %dpx;
     border-radius: 100px;
 }
+
+.om-flag.om-flag--IOA { background: #bdbdbd; }
+.om-flag.om-flag--ROT { background: #bdbdbd; }
 """ % (width, height)
 
 lines = sys.stdin.readlines()

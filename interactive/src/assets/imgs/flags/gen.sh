@@ -1,3 +1,8 @@
+if [ $# -lt 2 ]; then
+    echo "Need width and height"
+    exit 1
+fi
+
 width=$1
 height=$2
 
