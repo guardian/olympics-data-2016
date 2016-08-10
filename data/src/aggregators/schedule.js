@@ -440,6 +440,9 @@ export default {
                     .map('olympics.event')
                     .filter(event => event)
                     .map(result => parseUnitResult(result, logger))
+                    .filter(result => !!result.identifier)
+                    .keyBy('identifier')
+                    .valueOf();
             }
         },
         {
