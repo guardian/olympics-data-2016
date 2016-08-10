@@ -7,11 +7,17 @@ import { set as setConfig, config } from './src/config'
 import www from './www'
 
 var argv = parseArgs(process.argv.slice(2), {'default': {
-    's3': true, 'pa': true, 'loop': true, 'notify': true, 'metric': true, 'test': false, 'uat': true
+    's3': true, 'pa': true, 'loop': true, 'notify': true, 'metric': true,
+    'test': false, 'testish': false,
+    'uat': true
 }});
 
 if (argv.test) {
     argv.s3 = argv.pa = argv.loop = argv.notify = argv.metric = false;
+}
+
+if (argv.testish) {
+    argv.s3 = argv.loop = argv.notifiy = argv.metric = false;
 }
 
 // Write args to config
