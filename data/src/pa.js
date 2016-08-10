@@ -43,7 +43,7 @@ async function writeCache(endpoint, content) {
 function PA(logger, metric) {
 
     async function requestCache(endpoint) {
-        metric.put('cache');
+        if (Math.random() < 0.1) metric.put('cache');
         logger.info('Requesting cache', endpoint);
         let content = await fsReadFile(cacheFile(endpoint));
         return JSON.parse(content);
@@ -52,7 +52,7 @@ function PA(logger, metric) {
     async function requestUrl(endpoint) {
         let _resp = await limiter.schedule(() => {
             logger.info('Requesting URL', endpoint);
-            metric.put('request');
+            if (Math.random() < 0.1) metric.put('request');
 
             return rp({
                 'uri': `${config.pa.baseUrl}/${endpoint}`,
