@@ -19,10 +19,17 @@ const roundDisciplines = {
     'water-polo': 'Quarter Scores'
 }
 
+const cumulativeDisciplines = ['athletics', 'equestrian', 'golf', 'modern-pentathlon', 'sailing'];
+
 const gymnasticsTypes = [
     'Floor Breakdown', 'Vault Breakdown', 'Beam Breakdown', 'Uneven Bars Breakdown', 'Pommelhorse Breakdown',
     'Rings Breakdown', 'Parallel Bars Breakdown', 'Horizontal Bars Breakdown'
 ];
+
+
+const phasesWithoutUnitResults = [
+    'GAM0241', 'GAM0249', 'GAM4001', 'GAM4009', 'GAW0241', 'GAW0249', 'GAW4001', 'GAW4009'
+]
 
 const combineBlacklist = [
     'basketball', 'beach-volleyball', 'football', 'handball', 'hockey', 'rugby-sevens',
@@ -425,7 +432,7 @@ export default {
             'dependencies': ({events}) => {
                 return _.values(events)
                     .filter(evt => evt.status === 'Finished')
-                    .filter(evt => ['Athletics', 'Equestrian', 'Golf', 'Modern Pentathlon', 'Sailing'].indexOf(evt.discipline.description) > -1)
+                    .filter(evt => cumulativeDisciplines.indexOf(evt.discipline.identifier) > -1)
                     .map(evt => `olympics/2016-summer-olympics/event/${evt.event.identifier}/cumulative-result`);
             },
             'process': ({}, cumulativeResults, logger) => {
@@ -439,7 +446,7 @@ export default {
             'name': 'phasesWithResults',
             'dependencies': ({events}) => {
                 return _(events)
-                    .filter(evt => ['gymnastics-artistic'].indexOf(evt.discipline.identifier) > -1)
+                    .filter(evt => phasesWithoutUnitResults.indexOf(evt.phase.identifier) > -1)
                     .map('event.identifier')
                     .uniq()
                     .map(eventId => `olympics/2016-summer-olympics/event/${eventId}/phase`)
