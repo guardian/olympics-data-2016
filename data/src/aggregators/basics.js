@@ -1,6 +1,6 @@
 import moment from 'moment'
 import _ from 'lodash'
-import { forceArray } from '../aggregators'
+import { forceArray, getProperCountry } from '../aggregators'
 
 export default [
     {
@@ -23,23 +23,7 @@ export default [
             'required': true,
             'dependencies': () => ['olympics/2016-summer-olympics/country'],
             'process': ({}, [countries]) => {
-                countries.olympics.country.map(function(c) {
-                    if (c.identifier === 'MKD') {c.name = 'Macedonia'};
-                    if (c.identifier === 'TPE') {c.name = 'Taiwan'};
-                    if (c.identifier === 'CIV') {c.name = 'Ivory Coast'};
-                    if (c.identifier === 'PRK') {c.name = 'North Korea'};
-                    if (c.identifier === 'HKG') {c.name = 'Hong Kong'};
-                    if (c.identifier === 'LAO') {c.name = 'Laos'};    
-                    if (c.identifier === 'KOR') {c.name = 'South Korea'};    
-                    if (c.identifier === 'MDA') {c.name = 'Moldova'};    
-                    if (c.identifier === 'RUS') {c.name = 'Russia'};    
-                    if (c.identifier === 'SKN') {c.name = 'St Kitts & Nevis'};    
-                    if (c.identifier === 'LCA') {c.name = 'St Lucia'};    
-                    if (c.identifier === 'VIN') {c.name = 'St Vincent & the Grenadines'};
-                    if (c.identifier === 'IOA') {c.name = 'Individual Olympic Athletes'};  
-                    return c;
-                });
-                return countries.olympics.country.sort((a, b) => a.name < b.name ? -1 : 1);
+                return countries.olympics.country.map(getProperCountry).sort((a, b) => a.name < b.name ? -1 : 1);
             }
         }]
     },

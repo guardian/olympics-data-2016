@@ -20,6 +20,26 @@ export function forceArray(arr) {
     return arr === undefined ? [] : _.isArray(arr) ? arr : [arr];
 }
 
+const countryNames = {
+    'MKD': 'Macedonia',
+    'TPE': 'Taiwan',
+    'CIV': 'Ivory Coast',
+    'PRK': 'North Korea',
+    'HKG': 'Hong Kong',
+    'LAO': 'Laos',
+    'KOR': 'South Korea',
+    'MDA': 'Moldova',
+    'RUS': 'Russia',
+    'SKN': 'St Kitts & Nevis',
+    'LCA': 'St Lucia',
+    'VIN': 'St Vincent & the Grenadines',
+    'IOA': 'Individual Olympic Athletes',
+};
+
+export function getProperCountry(c) {
+    return {...c, 'name': (countryNames[c.identifier] || c.name)};
+}
+
 function Aggregator(opts) {
     let logger = log(`aggregator:${opts.id}`);
     let paMetric = new Metric({'aggregator': opts.id, 'type': 'PA'})

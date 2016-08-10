@@ -1,7 +1,8 @@
 import _ from 'lodash'
 import moment from 'moment'
 import notify from '../notify'
-import { forceArray } from '../aggregators.js'
+import { forceArray, getProperCountry } from '../aggregators'
+
 
 const roundDisciplines = {
     'badminton': 'Game Scores',
@@ -17,6 +18,7 @@ const roundDisciplines = {
     'volleyball': 'Set Scores',
     'water-polo': 'Quarter Scores'
 }
+
 
 const combineBlacklist = [
     'basketball', 'beach-volleyball', 'football', 'handball', 'hockey', 'rugby-sevens',
@@ -111,25 +113,6 @@ function parseValue(value) {
         'str': value,
         'cmp': value && value.split(':').reduce((t, v) => t * 60 + parseFloat(v), 0)
     };
-}
-
-function getProperCountry(c) {
-
-                    if (c.identifier === 'MKD') {c.name = 'Macedonia'};
-                    if (c.identifier === 'TPE') {c.name = 'Taiwan'};
-                    if (c.identifier === 'CIV') {c.name = 'Ivory Coast'};
-                    if (c.identifier === 'PRK') {c.name = 'North Korea'};
-                    if (c.identifier === 'HKG') {c.name = 'Hong Kong'};
-                    if (c.identifier === 'LAO') {c.name = 'Laos'};    
-                    if (c.identifier === 'KOR') {c.name = 'South Korea'};    
-                    if (c.identifier === 'MDA') {c.name = 'Moldova'};    
-                    if (c.identifier === 'RUS') {c.name = 'Russia'};    
-                    if (c.identifier === 'SKN') {c.name = 'St Kitts & Nevis'};    
-                    if (c.identifier === 'LCA') {c.name = 'St Lucia'};    
-                    if (c.identifier === 'VIN') {c.name = 'St Vincent & the Grenadines'};
-                    if (c.identifier === 'IOA') {c.name = 'Individual Olympic Athletes'};  
-                    return c;
-
 }
 
 function parseEntrant(entrant) {
