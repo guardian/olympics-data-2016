@@ -95,11 +95,6 @@ function formatScheduleDiscipline(events) {
     };
 }
 
-// Returns a event unit for a given phaseId
-function getPhaseUnits(events, phaseId) {
-    return _.filter(events, evt => evt.phase.identifier === phaseId);
-}
-
 function parseScheduledEvent(evt, logger) {
     try {
         return {
