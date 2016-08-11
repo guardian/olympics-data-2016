@@ -406,7 +406,6 @@ export default {
                     .valueOf();
             },
             'process': ({}, phaseResults, logger) => {
-                console.log('here', phaseResults.length);
                 return _(phaseResults)
                     .map(result => parsePhaseResult(logger, result.olympics.event))
                     .keyBy('identifier')
