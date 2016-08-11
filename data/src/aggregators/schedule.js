@@ -414,20 +414,6 @@ export default {
             }
         },
         {
-            'name': 'startLists',
-            'dependencies': ({events}) => {
-                return _.values(events)
-                    .filter(evt => evt.startListAvailable)
-                    .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/start-list`);
-            },
-            'process': ({}, startLists, logger) => {
-                return _(startLists)
-                    .map(startList => parseStartList(logger, startList.olympics.eventUnit))
-                    .keyBy('identifier')
-                    .valueOf();
-            }
-        },
-        {
             'name': 'scheduleByDay',
             'process': ({events}) => {
                 let scheduleByDay = _(events)
@@ -532,17 +518,9 @@ export default {
             }
         },
         {
-            'name': 'startListsByCountry',
-            'process': ({startLists = {}}) => {
-                let startListsByCountry = _(startLists)
-                    .flatMap(startList => {
-                        return startList.entrants.map(entrant => {
-                            return {entrant, 'unitId': startList.identifier};
-                        });
-                    })
-                    .groupBy('entrant.country.identifier')
-                    .valueOf();
-                return startListsByCountry;
+            'name': 'scheduleByCountry',
+            'process': ({events}) => {
+                return [];
             }
         },
         {
