@@ -55,7 +55,7 @@
                             {% if cumulativeResult %}
                                 <div class="om-event__result om-event__result--grey">
                                     <div class="om-event__sub-name">Cumulative result:</div>
-                                    {% include '../_result.html' {'result': cumulativeResult} %}
+                                    <div class="js-result" data-id="{{ event.event.identifier }}"></div>
                                 </div>
                             {% endif %}
                             {% if phaseResult %}
@@ -63,7 +63,7 @@
                                     {% if phases[event.phase.identifier].eventCount > 1 %}
                                         <div class="om-event__sub-name">{{ event.phase.value }} phase result:</div>
                                     {% endif %}
-                                    {% include '../_result.html' {'result': phaseResult} %}
+                                    <div class="js-result" data-id="{{ event.phase.identifier }}"></div>
                                 </div>
                             {% endif %}
                             {% for subEvent in event.group  %}
@@ -76,7 +76,7 @@
                                         {% endif %}
                                     </div>
                                     {% if subEvent.resultAvailable %}
-                                        <div class="js-result" data-unit-id="{{ subEvent.unit.identifier }}"></div>
+                                        <div class="js-result" data-id="{{ subEvent.unit.identifier }}"></div>
                                     {% elif !hasOverallResult  %}
                                         <div>Results still to come</div>
                                     {% endif %}

@@ -89,9 +89,9 @@ function changeDate() {
 
             expandEl.addEventListener('click', () => {
                 $$(parentEl, '.js-result').map(el => {
-                    return {el, 'id': el.getAttribute('data-unit-id')};
-                }).forEach(unit => {
-                    unit.el.innerHTML = results[unit.id];
+                    return {el, 'id': el.getAttribute('data-id')};
+                }).forEach(result => {
+                    result.el.innerHTML = results[result.id];
                 });
                 parentEl.classList.toggle('is-expanded');
             });

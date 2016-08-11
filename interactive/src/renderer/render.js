@@ -285,12 +285,15 @@ async function renderAll() {
         let events = _(schedule.disciplines)
             .flatMap('events')
             .flatMap('group')
-            .filter(evt => !!data.results[evt.unit.identifier])
-            .keyBy('unit.identifier')
-            .mapValues(evt => {
-                return swig.renderFile('./src/renderer/templates/_result.html', {
-                    'result': data.results[evt.unit.identifier]
-                }).replace(/\s+/g, ' ');
+            .flatMap(evt => [
+                data.results[evt.unit.identifier],
+                data.phaseResults[evt.phase.identifier],
+                data.cumulativeResults[evt.event.identifier]
+            ])
+            .filter(r => !!r)
+            .keyBy('identifier')
+            .mapValues(result => {
+                return swig.renderFile('./src/renderer/templates/_result.html', {result}).replace(/\s+/g, ' ');
             })
             .valueOf();
 
