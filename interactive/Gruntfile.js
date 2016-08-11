@@ -116,7 +116,7 @@ module.exports = function(grunt) {
                             'assets/**/*', '!assets/imgs/flags/*'
                         ],
                         dest: '<%= visuals.s3.path %>/' + process.env.USER,
-                        params: { CacheControl: 'max-age=30' }
+                        params: { CacheControl: 'max-age=60' }
                     }
                 ]
             }
