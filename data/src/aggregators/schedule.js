@@ -413,7 +413,7 @@ export default {
                     .valueOf();
             }
         },
-        /*{
+        {
             'name': 'startLists',
             'dependencies': ({events}) => {
                 return _.values(events)
@@ -426,7 +426,7 @@ export default {
                     .keyBy('identifier')
                     .valueOf();
             }
-        },*/
+        },
         {
             'name': 'scheduleByDay',
             'process': ({events}) => {
