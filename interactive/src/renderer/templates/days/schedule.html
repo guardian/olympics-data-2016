@@ -48,7 +48,7 @@
                         {% endif %}
 
                         {% if event.status === 'Finished' %}
-                            {% set cumulativeResult = event.event.identifier|getCumulative(cumulativeResults) %}
+                            {% set cumulativeResult = cumulatiuveResults[event.event.identifier] %}
                             {% if cumulativeResult %}
                                 <div class="om-event__result om-event__result--grey">
                                     <div class="om-event__sub-name">Cumulative result:</div>

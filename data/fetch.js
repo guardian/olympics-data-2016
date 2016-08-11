@@ -17,7 +17,7 @@ if (argv.test) {
 }
 
 if (argv.testish) {
-    argv.s3 = argv.loop = argv.notifiy = argv.metric = false;
+    argv.s3 = argv.loop = argv.notify = argv.metric = false;
 }
 
 // Write args to config

@@ -84,6 +84,25 @@ function combineEvents(evts) {
     return combinedEvents;
 }
 
+function isValidScheduledEvent(evt) {
+    if (!(evt && evt.discipline && evt.discipline.event && evt.discipline.event.eventUnit &&
+        evt.discipline.event.eventUnit.phaseDescription)) return false;
+
+    let disciplineId = evt.discipline.identifier;
+    let eventId = evt.discipline.event.identifier;
+    if (disciplineId === 'gymnastics-artistic') return eventId !== 'GAW000' && eventId !== 'GAM000';
+
+    let phaseId = evt.discipline.event.eventUnit.phaseDescription.identifier;
+    let unitId = evt.discipline.event.eventUnit.identifier;
+    if (phaseId === 'MPW001B') return unitId !== 'MPW001B00';
+    if (phaseId === 'CBM0012') return unitId !== 'CBM001200';
+    if (phaseId === 'CBM0013') return unitId !== 'CBM001300';
+    if (phaseId === 'CBW0012') return unitId !== 'CBW001200';
+
+    let unitType = evt.discipline.event.eventUnit.unitType;
+    return unitType !== 'Not Applicable';
+}
+
 function formatScheduleDiscipline(events) {
     let discipline = events[0].discipline;
     let venues = _(events).map('venue').uniqBy('identifier').valueOf();
@@ -135,7 +154,7 @@ function parseEntrant(entrant) {
         'order': parseInt(entrant.order),
         'type': entrant.type,
         'competitors': forceArray(entrant.participant).map(p => p.competitor),
-        'country': getProperCountry(entrant.country),
+        'country': entrant.country && getProperCountry(entrant.country),
         'value': parseValue(entrant.value),
         properties,
         resultExtensions,
@@ -143,6 +162,22 @@ function parseEntrant(entrant) {
         'record': properties['Record Set'],
         'invalidResultMark': properties['Invalid Result Mark']
     };
+}
+
+function parseStartList(evt, logger) {
+    try {
+        let entrants = forceArray(evt.startList.entrant)
+            .filter(entrant => entrant.code !== 'TBD')
+            .map(parseEntrant)
+            .sort((a, b) => a.order - b.order);
+
+        return {'identifier': evt.identifier, entrants};
+    } catch (err) {
+        logger.error('Failed to parse result', err);
+        logger.error(err.stack);
+        notify.error(err);
+        return {};
+    }
 }
 
 function parseResult(evt, resultObj, logger) {
@@ -318,19 +353,7 @@ export default {
             'process': ({dates}, dateSchedules, logger) => {
                 let datesEvents = dateSchedules.map(ds => {
                     return forceArray(ds.olympics.scheduledEvent)
-                        .filter(evt => {
-                            return evt.discipline && evt.discipline.event && evt.discipline.event.eventUnit &&
-                                evt.discipline.event.eventUnit.phaseDescription;
-                        })
-                        .filter(evt => {
-                            let eventId = evt.discipline.event.identifier;
-                            let unitType = evt.discipline.event.eventUnit.unitType;
-                            let phaseId = evt.discipline.event.eventUnit.phaseDescription.identifier;
-                            // GAW000 and GAM000 seem to be a non-events, Not Applicable generally seems to
-                            // be also *except* when its part of a phase-only results event
-                            return eventId !== 'GAW000'  && eventId !== 'GAM000' &&
-                                (unitType !== 'Not Applicable' || phasesWithoutUnitResults.indexOf(phaseId) > -1);
-                        })
+                        .filter(isValidScheduledEvent)
                         .map(evt => parseScheduledEvent(evt, logger))
                         .filter(evt => !!evt.start);
                 });
@@ -403,9 +426,7 @@ export default {
             },
             'process': ({events, phaseResults = {}}, results, logger) => {
                 let simpleResults = _(results)
-                    .map('olympics.eventUnit')
-                    .map(result => parseUnitResult(result, logger))
-                    .filter(result => !!result.identifier)
+                    .map(result => parseUnitResult(result.olympics.eventUnit, logger))
                     .keyBy('identifier')
                     .valueOf();
 
@@ -428,16 +449,10 @@ export default {
                     .filter(evt => evt.startListAvailable)
                     .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/start-list`);
             },
-            'process': ({}, startLists) => {
+            'process': ({}, startLists, logger) => {
                 return _(startLists)
-                    .map('olympics.eventUnit')
+                    .map(startList => parseStartList(startList.olympics.eventUnit, logger))
                     .keyBy('identifier')
-                    .mapValues(eventUnit => {
-                        return {
-                            'identifier': eventUnit.identifier,
-                            'entrants': forceArray(eventUnit.startList.entrant)
-                        };
-                    })
                     .valueOf();
             }
         },*/
@@ -521,7 +536,9 @@ export default {
                     .flatMap(result => {
                         return result.entrants
                             .filter(entrant => !!entrant.medal)
-                            .map(entrant => { return {entrant, 'event': events[result.identifier]}; });
+                            .map(entrant => {
+                                return {entrant, 'event': events[result.identifier]};
+                            });
                     })
                     .sortBy('event.end')
                     .reverse()
@@ -541,6 +558,20 @@ export default {
                     .valueOf()
 
                 return _.merge(medals, noMedals)
+            }
+        },
+        {
+            'name': 'startListsByCountry',
+            'process': ({startLists = {}}) => {
+                let startListsByCountry = _(startLists)
+                    .flatMap(startList => {
+                        return startList.entrants.map(entrant => {
+                            return {entrant, 'unitId': startList.identifier};
+                        });
+                    })
+                    .groupBy('entrant.country.identifier')
+                    .valueOf();
+                return startListsByCountry;
             }
         },
         {
