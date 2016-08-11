@@ -112,7 +112,7 @@ module.exports = function(grunt) {
                         src: [
                             '**/boot.js', '*.html', '*.css', '*.js', '*.js.map',
                             '*.json', 'days/*.html', 'days/*.json', 'embed/*.html',
-                            'medals/countries/*.html',
+                            'countries/**/*.html',
                             'assets/**/*', '!assets/imgs/flags/*'
                         ],
                         dest: '<%= visuals.s3.path %>/' + process.env.USER,

@@ -104,7 +104,7 @@ function changeCountry() {
         if (countryCache[identifier]) {
             render(countryCache[identifier]);
         } else {
-            reqwest(`./medals/countries/countryMedals-${identifier}.html`).then(render);
+            reqwest(`./countries/medals/countryMedals-${identifier}.html`).then(render);
         }
     }
 }

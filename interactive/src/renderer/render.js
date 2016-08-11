@@ -228,8 +228,14 @@ async function renderTask(task, data) {
 
 let renderTasks = [
     {
-        'srcDir': 'medals/countries',
+        'srcDir': 'countries/medals',
         'arrGetter': data => _.toPairs(data.medalsByCountry),
+        'context': ([code, obj]) => { return {obj}; },
+        'suffix': ([code, obj]) => code
+    },
+    {
+        'srcDir': 'countries/startLists',
+        'arrGetter': data => _.toPairs(data.startListsByCountry),
         'context': ([code, obj]) => { return {obj}; },
         'suffix': ([code, obj]) => code
     },
