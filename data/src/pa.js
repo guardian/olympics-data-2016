@@ -14,9 +14,11 @@ const cacheTimes = [
     {'endpoint': re`^olympics/[^/]+/schedule/[^/]+$`, 'duration': moment.duration(5, 'minutes')},
     {'endpoint': re`^olympics/[^/]+/medal-cast$`, 'duration': moment.duration(5, 'minutes')},
     {'endpoint': re`^olympics/[^/]+/medal-table$`, 'duration': moment.duration(5, 'minutes')},
-    {'endpoint': re`^olympics/[^/]+/event-unit/[^/]+/start-list$`, 'duration' : moment.duration(45, 'minutes')},
+    {'endpoint': re`^olympics/[^/]+/event-unit/[^/]+/start-list$`, 'duration' : moment.duration(1, 'hour')},
     {'endpoint': re`^olympics/[^/]+/event-unit/[^/]+/result$`, 'duration' : moment.duration(30, 'minutes')},
+    {'endpoint': re`^olympics/[^/]+/event-phase/[^/]+/result`, 'duration' : moment.duration(30, 'minutes')},
     {'endpoint': re`^olympics/[^/]+/event/[^/]+/cumulative-result$`, 'duration' : moment.duration(30, 'minutes')},
+    {'endpoint': re`^olympics/[^/]+/event/[^/]+/phase$`, 'duration' : moment.duration(30, 'minutes')},
 
     // default case
     {'endpoint': re`^.*$`, 'duration': moment.duration(6, 'hours')}
