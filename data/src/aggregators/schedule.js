@@ -26,11 +26,6 @@ const gymnasticsTypes = [
     'Rings Breakdown', 'Parallel Bars Breakdown', 'Horizontal Bars Breakdown'
 ];
 
-
-const phasesWithoutUnitResults = [
-    'GAM0241', 'GAM0249', 'GAM4001', 'GAM4009', 'GAW0241', 'GAW0249', 'GAW4001', 'GAW4009', 'EQX0031'
-]
-
 const combineBlacklist = [
     'basketball', 'beach-volleyball', 'football', 'handball', 'hockey', 'rugby-sevens',
     'tennis', 'volleyball', 'water-polo'
@@ -114,27 +109,16 @@ function formatScheduleDiscipline(events) {
     };
 }
 
-function parseScheduledEvent(evt, logger) {
-    try {
-        return {
-            'description': evt.description,
-            'start': evt.start.utc,
-            'end': evt.end && evt.end.utc,
-            'status': evt.status,
-            'venue': evt.venue,
-            'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
-            'phase': evt.discipline.event.eventUnit.phaseDescription,
-            'event': _.pick(evt.discipline.event, ['identifier', 'description']),
-            'discipline': _.pick(evt.discipline, ['identifier', 'description']),
-            'resultAvailable': evt.resultAvailable === 'Yes',
-            'startListAvailable': evt.startListAvailable === 'Yes',
-            'medalEvent': evt.medalEvent === 'Yes'
-        };
-    } catch (err) {
-        logger.error('Failed to parse scheduled event', err);
-        logger.error(err.stack);
-        notify.error(err);
-        return {};
+function wrapError(type, parseFn) {
+    return (logger, ...args) => {
+        try {
+            return parseFn(...args);
+        } catch (err) {
+            logger.error(`Failed to parse ${type}`, err);
+            logger.error(err.stack);
+            notify.error(err);
+            return {};
+        }
     }
 }
 
@@ -164,55 +148,66 @@ function parseEntrant(entrant) {
     };
 }
 
-function parseStartList(evt, logger) {
-    try {
-        let entrants = forceArray(evt.startList.entrant)
-            .filter(entrant => entrant.code !== 'TBD')
-            .map(parseEntrant)
-            .sort((a, b) => a.order - b.order);
+const parseScheduledEvent = wrapError('scheduledEvent', evt => {
+    return {
+        'description': evt.description,
+        'start': evt.start.utc,
+        'end': evt.end && evt.end.utc,
+        'status': evt.status,
+        'venue': evt.venue,
+        'unit': _.pick(evt.discipline.event.eventUnit, ['identifier']),
+        'phase': evt.discipline.event.eventUnit.phaseDescription,
+        'event': _.pick(evt.discipline.event, ['identifier', 'description']),
+        'discipline': _.pick(evt.discipline, ['identifier', 'description']),
+        'resultAvailable': evt.resultAvailable === 'Yes',
+        'startListAvailable': evt.startListAvailable === 'Yes',
+        'medalEvent': evt.medalEvent === 'Yes'
+    };
+});
 
-        return {'identifier': evt.identifier, entrants};
+const parsePhase = wrapError('phase', (phase, eventCount) => {
+    return {
+        'identifier': phase.identifier,
+        'resultAvailable': phase.resultAvailable === 'Yes',
+        eventCount
+    };
+});
+
+const parseStartList = wrapError('startList', evt => {
+    let entrants = forceArray(evt.startList.entrant)
+        .filter(entrant => entrant.code !== 'TBD')
+        .map(parseEntrant)
+        .sort((a, b) => a.order - b.order);
+
+    return {'identifier': evt.identifier, entrants};
+});
+
+const parseResult = wrapError('result', (evt, resultObj) => {
+    let entrants = forceArray(resultObj.result.entrant)
+        .map(parseEntrant)
+        .sort((a, b) => a.order - b.order);
+
+    let result = {
+        'identifier': resultObj.identifier,
+        'discipline': evt.disciplineDescription,
+        'medalEvent': evt.medalEvent === 'Yes',
+        'teamEvent': evt.teamEvent === 'Yes',
+        entrants
+    };
+
+    // Reducers are an optional extra
+    try {
+        return resultReducers.reduce((res, reducer) => reducer(res), result);
     } catch (err) {
-        logger.error('Failed to parse result', err);
+        logger.error('Failed to apply result reducers', err);
         logger.error(err.stack);
         notify.error(err);
-        return {};
+        return result;
     }
-}
+});
 
-function parseResult(evt, resultObj, logger) {
-    try {
-        let entrants = forceArray(resultObj.result.entrant)
-            .map(parseEntrant)
-            .sort((a, b) => a.order - b.order);
-
-        let result = {
-            'identifier': resultObj.identifier,
-            'discipline': evt.disciplineDescription,
-            'medalEvent': evt.medalEvent === 'Yes',
-            'teamEvent': evt.teamEvent === 'Yes',
-            entrants
-        };
-
-        // Reducers are extra
-        try {
-            return resultReducers.reduce((res, reducer) => reducer(res), result);
-        } catch (err) {
-            logger.error('Failed to apply result reducers', err);
-            logger.error(err.stack);
-            notify.error(err);
-            return result;
-        }
-    } catch (err) {
-        logger.error('Failed to parse result', err);
-        logger.error(err.stack);
-        notify.error(err);
-        return {};
-    }
-}
-
-const parsePhaseResult = (evt, logger) => parseResult(evt, evt.phase, logger);
-const parseUnitResult = (evt, logger) => parseResult(evt, evt, logger);
+const parsePhaseResult = (logger, evt) => parseResult(logger, evt, evt.phase);
+const parseUnitResult = (logger, evt) => parseResult(logger, evt, evt);
 
 const resultReducers = [
     // Reaction times/wind speed/average speeds
@@ -345,7 +340,7 @@ export default {
             }
         },
         {
-            'name': 'simpleEvents',
+            'name': 'events',
             'required': true,
             'dependencies': ({dates}) => {
                 return dates.map(date => `olympics/2016-summer-olympics/schedule/${date}`);
@@ -354,7 +349,7 @@ export default {
                 let datesEvents = dateSchedules.map(ds => {
                     return forceArray(ds.olympics.scheduledEvent)
                         .filter(isValidScheduledEvent)
-                        .map(evt => parseScheduledEvent(evt, logger))
+                        .map(evt => parseScheduledEvent(logger, evt))
                         .filter(evt => !!evt.start);
                 });
 
@@ -368,78 +363,54 @@ export default {
             }
         },
         {
-            'name': 'events',
-            'dependencies': () => {
-                return phasesWithoutUnitResults
-                    .map(phaseId => `olympics/2016-summer-olympics/event-phase/${phaseId}`);
+            'name': 'results',
+            'dependencies': ({events}) => {
+                return _.values(events)
+                    .filter(evt => evt.resultAvailable && evt.status === 'Finished')
+                    .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/result`);
             },
-            'process': ({simpleEvents}, phaseOnlyResults, logger) => {
-                let newEvents = _(phaseOnlyResults)
-                    .flatMap(phaseInfo => {
-                        let phase = phaseInfo.olympics.event.phase;
-                        if (phase.resultAvailable === 'Yes') {
-                            let eventUnits = forceArray(phase.eventUnit);
-                            return eventUnits.map(eventUnit => {
-                                let evt = simpleEvents[eventUnit.identifier];
-                                return {
-                                    ...evt,
-                                   'resultAvailable': true,
-                                   'phaseOnlyResult': true,
-                                   'phaseUnitCount': eventUnits.length
-                                };
-                            });
-                        } else {
-                            return [];
-                        }
-                    })
-                    .keyBy('unit.identifier')
+            'process': ({events}, results, logger) => {
+                return _(results)
+                    .map(result => parseUnitResult(logger, result.olympics.eventUnit))
+                    .keyBy('identifier')
                     .valueOf();
-
-                return {...simpleEvents, ...newEvents};
-
+            }
+        },
+        {
+            'name': 'phases',
+            'dependencies': ({events}) => {
+                return _(events)
+                    .map(evt => `olympics/2016-summer-olympics/event/${evt.event.identifier}/phase`)
+                    .uniq()
+                    .valueOf();
+            },
+            'process': ({events}, phasesObj, logger) => {
+                return _(phasesObj)
+                    .flatMap(phaseObj => {
+                        return forceArray(phaseObj.olympics.event.phase).map(phase => {
+                            let eventCount = _.filter(events, evt => evt.phase.identifier === phase.identifier).length;
+                            return parsePhase(logger, phase, eventCount);
+                        });
+                    })
+                    .keyBy('identifier')
+                    .valueOf();
             }
         },
         {
             'name': 'phaseResults',
-            'dependencies': ({events}) => {
-                return _(events)
-                    .filter(evt => evt.resultAvailable && evt.phaseOnlyResult)
-                    .map(evt => `olympics/2016-summer-olympics/event-phase/${evt.phase.identifier}/result`)
+            'dependencies': ({phases}) => {
+                return _(phases)
+                    .filter(phase => phase.resultAvailable)
+                    .map(phase => `olympics/2016-summer-olympics/event-phase/${phase.identifier}/result`)
                     .uniq()
                     .valueOf();
             },
             'process': ({}, phaseResults, logger) => {
+                console.log('here', phaseResults.length);
                 return _(phaseResults)
-                    .map(result => parsePhaseResult(result.olympics.event, logger))
+                    .map(result => parsePhaseResult(logger, result.olympics.event))
                     .keyBy('identifier')
                     .valueOf();
-            }
-        },
-        {
-            'name': 'results',
-            'required': true,
-            'dependencies': ({events}) => {
-                return _.values(events)
-                    .filter(evt => evt.resultAvailable && !evt.phaseOnlyResult)
-                    .filter(evt => evt.status === 'Finished')
-                    .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/result`);
-            },
-            'process': ({events, phaseResults = {}}, results, logger) => {
-                let simpleResults = _(results)
-                    .map(result => parseUnitResult(result.olympics.eventUnit, logger))
-                    .keyBy('identifier')
-                    .valueOf();
-
-                let phaseOnlyResults = _(events)
-                    .filter(evt => evt.resultAvailable && evt.phaseOnlyResult)
-                    .map(evt => {
-                        let result = phaseResults[evt.phase.identifier];
-                        return {...result, 'identifier': evt.unit.identifier, 'medalEvent': evt.medalEvent};
-                    })
-                    .keyBy('identifier')
-                    .valueOf();
-
-                return {...simpleResults, ...phaseOnlyResults};
             }
         },
         /*{
@@ -451,7 +422,7 @@ export default {
             },
             'process': ({}, startLists, logger) => {
                 return _(startLists)
-                    .map(startList => parseStartList(startList.olympics.eventUnit, logger))
+                    .map(startList => parseStartList(logger, startList.olympics.eventUnit))
                     .keyBy('identifier')
                     .valueOf();
             }
@@ -485,7 +456,7 @@ export default {
             'name': 'resultsByDay',
             'process': ({events}) => {
                 let resultsByDay = _(events)
-                    .filter(evt => evt.resultAvailable && evt.status === 'Finished')
+                    .filter(evt => evt.status === 'Finished')
                     .groupBy('day.date')
                     .map(dateEvents => {
                         let day = dateEvents[0].day;
@@ -517,8 +488,8 @@ export default {
             'process': ({}, cumulativeResults, logger) => {
                 return _(cumulativeResults)
                     .map('olympics.event')
-                    .filter(event => event)
-                    .map(result => parseUnitResult(result, logger))
+                    .filter(result => result)
+                    .map(result => parseUnitResult(logger, result))
                     .filter(result => !!result.identifier)
                     .keyBy('identifier')
                     .valueOf();
@@ -531,7 +502,7 @@ export default {
         },
         {
             'name': 'medalsByCountry',
-            'process': ({events, results, countries2}) => {
+            'process': ({events, results = {}, countries2 = []}) => {
                 let medals = _(results)
                     .flatMap(result => {
                         return result.entrants
