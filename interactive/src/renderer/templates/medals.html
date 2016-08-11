@@ -11,7 +11,7 @@
                 <div class="om-header__logo"></div>
             </a>
             <h1>Medals and results</h1>
-            <div class='om-header__fullcoverage'>
+            <div class="om-header__fullcoverage">
                 <a href="http://www.theguardian.com/sport/ng-interactive/2016/aug/05/rio-olympics-2016-full-events-schedule" target="_top">Schedule</a> | <a href="https://www.theguardian.com/sport/rio-2016" target="_top">Full coverage of Rio 2016</a>
             </div>
         </div>
@@ -19,35 +19,29 @@
 
     <section class="om-filter">
         <div class="om-filter__inner">
-            How are 
-            <select class='om-select-country om-filter__choice'>
-            <option value='' selected>select a country</option>
-                {% for c in countries %} 
-                    <option value='{{ c.identifier }}'>{{ c.name }}</option>
-                    }
+            How are
+            <select class="om-select-country om-filter__choice">
+            <option selected>select a country</option>
+                {% for c in countries %}
+                    <option value="{{ c.identifier }}">{{ c.name }}</option>
                 {% endfor %}
             </select>
             doing?
         </div>
+    </section>
+
+    <div class="om-container">
+        <section class="om-section om-country-section om-section--hidden">
+            <div class="om-country"></div>
         </section>
-
-    <div class="om-container om-country-container">
-
-        <section class='om-section om-country-section om-section--hidden'>
-
-            <div class='om-country'> 
-            </div>
-
-        </section>
-
         <section class="om-section">
             <h3 class="om-section__title">Leaderboard</h3>
             {% if !medalTable[0] %}
-                <div class='om-table-empty'>
+                <div class="om-table-empty">
                     No medals have been awarded yet.
                 </div>
             {% endif %}
-            <ol class='om-table js-table'>
+            <ol class="om-table js-table">
                 {% for entry in medalTable %}
                     {% include '_leaderboardEntry.html' { entry } %}
                 {% endfor %}
@@ -57,7 +51,6 @@
             {% if medalTable && medalTable.length > 10 %}
                 <button class="js-leaderboard-button om-expand-button">All countries</button>
             {% endif %}
-
         </section>
     </div>
 
