@@ -137,7 +137,7 @@ function Aggregator(opts) {
 
     let healthThreshold = opts.cacheTime.asSeconds() * 1.5;
     this.isHealthy = () => {
-        return lastSuccess && moment().subtract(healthThreshold, 'seconds').isBefore(lastSuccess);
+        return processing || lastSuccess && moment().subtract(healthThreshold, 'seconds').isBefore(lastSuccess);
     };
 
     this.getLastSuccess = () => lastSuccess ? lastSuccess.format() : 'never';
