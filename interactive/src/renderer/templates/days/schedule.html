@@ -51,6 +51,7 @@
                             {% set cumulativeResult = cumulativeResults[event.event.identifier] %}
                             {% set phaseResult = phaseResults[event.phase.identifier] %}
                             {% set hasOverallResult = cumulativeResult || phaseResult %}
+                            {% set phase = phases[event.phase.identifier] %}
 
                             {% if cumulativeResult %}
                                 <div class="om-event__result om-event__result--grey">
@@ -58,9 +59,9 @@
                                     <div class="js-result" data-id="{{ event.event.identifier }}"></div>
                                 </div>
                             {% endif %}
-                            {% if phaseResult %}
+                            {% if phaseResult && (phase.eventCount > 1 || !event.resultAvailable) %}
                                 <div class="om-event__result">
-                                    {% if phases[event.phase.identifier].eventCount > 1 %}
+                                    {% if phase.eventCount > 1 %}
                                         <div class="om-event__sub-name">{{ event.phase.value }} phase result:</div>
                                     {% endif %}
                                     <div class="js-result" data-id="{{ event.phase.identifier }}"></div>

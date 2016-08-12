@@ -233,9 +233,9 @@ let renderTasks = [
     },
     {
         'srcDir': 'countries/startLists',
-        'arrGetter': data => _.toPairs(data.startListsByCountry),
-        'context': ([code, obj]) => { return {obj}; },
-        'suffix': ([code, obj]) => code
+        'arrGetter': data => _.toPairs(data.startListsByCountry[data.today]),
+        'context': ([code, events]) => { return {code, events}; },
+        'suffix': ([code, events]) => code
     },
     {
         'srcDir' : 'days',

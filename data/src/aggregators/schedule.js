@@ -196,15 +196,7 @@ const parseResult = wrapError('result', (evt, resultObj) => {
         entrants
     };
 
-    // Reducers are an optional extra
-    try {
-        return resultReducers.reduce((res, reducer) => reducer(res), result);
-    } catch (err) {
-        logger.error('Failed to apply result reducers', err);
-        logger.error(err.stack);
-        notify.error(err);
-        return result;
-    }
+    return resultReducers.reduce((res, reducer) => reducer(res), result);
 });
 
 const parsePhaseResult = (logger, evt) => parseResult(logger, evt, evt.phase);
@@ -370,7 +362,7 @@ export default {
                     .filter(evt => evt.resultAvailable && evt.status === 'Finished')
                     .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/result`);
             },
-            'process': ({events}, results, logger) => {
+            'process': ({}, results, logger) => {
                 return _(results)
                     .map(result => parseUnitResult(logger, result.olympics.eventUnit))
                     .keyBy('identifier')
@@ -416,10 +408,13 @@ export default {
                     .filter(evt => evt.startListAvailable)
                     .map(evt => `olympics/2016-summer-olympics/event-unit/${evt.unit.identifier}/start-list`);
             },
-            'process': ({}, startLists, logger) => {
+            'process': ({events}, startLists, logger) => {
                 return _(startLists)
                     .map(startList => parseStartList(logger, startList.olympics.eventUnit))
                     .keyBy('identifier')
+                    .mapValues((startList, unitId) => {
+                        return {...startList, 'event': events[unitId]};
+                    })
                     .valueOf();
             }
         },
@@ -534,23 +529,29 @@ export default {
         },
         {
             'name': 'startListsByCountry',
-            'process': ({startLists = {}}) => {
+            'process': ({startLists = {}, countries2 = []}) => {
                 let startListsByCountry = _(startLists)
                     .flatMap(startList => {
                         return startList.entrants.map(entrant => {
-                            return {entrant, 'unitId': startList.identifier};
+                            return {entrant, 'event': startList.event};
                         });
                     })
-                    .groupBy('entrant.country.identifier')
+                    .groupBy('event.day.date')
+                    .mapValues(dayStartLists => {
+                        return _(dayStartLists)
+                            .groupBy('entrant.country.identifier')
+                            .mapValues((startList, countryCode) => {
+                                return {...startList, 'country': countries2.find(c => c.identifier === countryCode)};
+                            })
+                            .valueOf();
+                    })
                     .valueOf();
                 return startListsByCountry;
             }
         },
         {
             'name' : 'lastUpdated',
-            'process' : () => {
-                return {}
-            }
+            'process' : () => { return {}; }
         }
     ],
     'fallbackCombiners': []
