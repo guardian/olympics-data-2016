@@ -76,7 +76,7 @@ export default [
                             .valueOf();
 
                         return {
-                            'country': entry.country,
+                            'country': getProperCountry(entry.country),
                             'medals': medals,
                             'total': parseInt(entry.total.value),
                             'position': parseInt(entry.position)
