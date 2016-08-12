@@ -165,12 +165,24 @@ const parseScheduledEvent = wrapError('scheduledEvent', evt => {
     };
 });
 
-const parsePhase = wrapError('phase', (phase, eventCount) => {
-    return {
-        'identifier': phase.identifier,
-        'resultAvailable': phase.resultAvailable === 'Yes',
-        eventCount
-    };
+const parsePhases = wrapError('phases', (evt, events) => {
+    return forceArray(evt.phase).map(phase => {
+        let phaseEvents = _.filter(events, evt2 => evt2.phase.identifier === phase.identifier);
+
+        return {
+            'start': _.min(phaseEvents.map(evt2 => evt2.start)),
+            'end': _.max(phaseEvents.map(evt2 => evt2.end)),
+            'phase': {'identifier': phase.identifier, 'value': phase.description},
+            'event': _.pick(evt, ['identifier', 'description']),
+            'discipline': {
+                'identifier': evt.disciplineDescription.identifier,
+                'description': evt.disciplineDescription.value
+            },
+            'resultAvailable': phase.resultAvailable === 'Yes',
+            'medalEvent': phaseEvents.some(evt => evt.medalEvent),
+            'eventCount': phaseEvents.length
+        };
+    });
 });
 
 const parseStartList = wrapError('startList', evt => {
@@ -384,15 +396,11 @@ export default {
                     .uniq()
                     .valueOf();
             },
-            'process': ({events}, phasesObj, logger) => {
-                return _(phasesObj)
-                    .flatMap(phaseObj => {
-                        return forceArray(phaseObj.olympics.event.phase).map(phase => {
-                            let eventCount = _.filter(events, evt => evt.phase.identifier === phase.identifier).length;
-                            return parsePhase(logger, phase, eventCount);
-                        });
-                    })
-                    .keyBy('identifier')
+            'process': ({events}, phaseObjs, logger) => {
+                return _(phaseObjs)
+                    .flatMap(phaseObj => parsePhases(logger, phaseObj.olympics.event, events))
+                    .filter(a => a.phase.identifier)
+                    .keyBy('phase.identifier')
                     .valueOf();
             }
         },
@@ -401,7 +409,7 @@ export default {
             'dependencies': ({phases}) => {
                 return _(phases)
                     .filter(phase => phase.resultAvailable)
-                    .map(phase => `olympics/2016-summer-olympics/event-phase/${phase.identifier}/result`)
+                    .map(phase => `olympics/2016-summer-olympics/event-phase/${phase.phase.identifier}/result`)
                     .uniq()
                     .valueOf();
             },
@@ -499,17 +507,22 @@ export default {
             'dependencies' : () => ['olympics/2016-summer-olympics/country'],
             'process' : ({}, [countries]) => countries.olympics.country.map(getProperCountry)
         },
+        // All very hacky
+        // Some events don't have unit results, some don't have phase results, some have both.
+        // the uniqBy tries to deduplicate those events
         {
             'name': 'medalsByCountry',
-            'process': ({events, results = {}, countries2 = []}) => {
-                let medals = _(results)
+            'process': ({events, phases = {}, results = {}, phaseResults = {}, countries2 = []}) => {
+                let medals = _({...results, ...phaseResults})
                     .flatMap(result => {
                         return result.entrants
                             .filter(entrant => !!entrant.medal)
                             .map(entrant => {
-                                return {entrant, 'event': events[result.identifier]};
+                                let event = events[result.identifier] || phases[result.identifier];
+                                return {entrant, event};
                             });
                     })
+                    .uniqBy(medal => `${medal.event.phase.identifier}-${medal.entrant.order}`)
                     .sortBy('event.end')
                     .reverse()
                     .groupBy('entrant.country.identifier')
@@ -527,7 +540,7 @@ export default {
                     .mapValues(country => { return {country, medals: []}; })
                     .valueOf()
 
-                return _.merge(medals, noMedals)
+                return {...medals, ...noMedals};
             }
         },
         {
