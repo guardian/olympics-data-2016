@@ -2,7 +2,7 @@ import _ from 'lodash'
 import moment from 'moment'
 import notify from '../notify'
 import { forceArray, getProperCountry } from '../aggregators'
-
+import wrapperUnitIds from './wrapperUnitIds.json'
 
 const roundDisciplines = {
     'badminton': 'Game Scores',
@@ -83,19 +83,8 @@ function isValidScheduledEvent(evt) {
     if (!(evt && evt.discipline && evt.discipline.event && evt.discipline.event.eventUnit &&
         evt.discipline.event.eventUnit.phaseDescription)) return false;
 
-    let disciplineId = evt.discipline.identifier;
-    let eventId = evt.discipline.event.identifier;
-    if (disciplineId === 'gymnastics-artistic') return eventId !== 'GAW000' && eventId !== 'GAM000';
-
-    let phaseId = evt.discipline.event.eventUnit.phaseDescription.identifier;
     let unitId = evt.discipline.event.eventUnit.identifier;
-    if (phaseId === 'MPW001B') return unitId !== 'MPW001B00';
-    if (phaseId === 'CBM0012') return unitId !== 'CBM001200';
-    if (phaseId === 'CBM0013') return unitId !== 'CBM001300';
-    if (phaseId === 'CBW0012') return unitId !== 'CBW001200';
-
-    let unitType = evt.discipline.event.eventUnit.unitType;
-    return unitType !== 'Not Applicable';
+    return wrapperUnitIds.indexOf(unitId) === -1;
 }
 
 function formatScheduleDiscipline(events) {
