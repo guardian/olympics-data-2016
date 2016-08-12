@@ -522,7 +522,7 @@ export default {
                                 return {entrant, event};
                             });
                     })
-                    .uniqBy(medal => `${medal.event.phase.identifier}-${medal.entrant.order}`)
+                    .uniqBy(medal => `${medal.event.phase.identifier}-${medal.entrant.competitors[0].identifier}`)
                     .sortBy('event.end')
                     .reverse()
                     .groupBy('entrant.country.identifier')
