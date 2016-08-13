@@ -83,7 +83,7 @@ function PA(logger, metric) {
         try {
             let stat = await fsStat(cacheFile(endpoint));
             let cacheTime = cacheTimes.find(ct => ct.endpoint.test(endpoint)).duration;
-            let randomTime = Math.floor(Math.random() * 300);
+            let randomTime = Math.floor(Math.random() * 900);
             let expiryTime = moment(stat.mtime).add(cacheTime).add(randomTime, 'seconds');
 
             return await (!config.argv.pa || moment().isBefore(expiryTime) ? requestCache(endpoint) : requestUrl(endpoint));
