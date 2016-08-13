@@ -82,8 +82,9 @@ function PA(logger, metric) {
     this.request = async function request(endpoint) {
         try {
             let stat = await fsStat(cacheFile(endpoint));
-            var cacheTime = cacheTimes.find(ct => ct.endpoint.test(endpoint)).duration;
-            var expiryTime = moment(stat.mtime).add(cacheTime);
+            let cacheTime = cacheTimes.find(ct => ct.endpoint.test(endpoint)).duration;
+            let randomTime = Math.floor(Math.random() * 300);
+            let expiryTime = moment(stat.mtime).add(cacheTime).add(randomTime, 'seconds');
 
             return await (!config.argv.pa || moment().isBefore(expiryTime) ? requestCache(endpoint) : requestUrl(endpoint));
         } catch (err) {
