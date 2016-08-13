@@ -401,7 +401,7 @@ export default {
                     .valueOf();
             }
         },
-        {
+        /*{
             'name': 'startLists',
             'dependencies': ({events}) => {
                 return _.values(events)
@@ -417,7 +417,7 @@ export default {
                     })
                     .valueOf();
             }
-        },
+        },*/
         {
             'name': 'scheduleByDay',
             'process': ({events}) => {
