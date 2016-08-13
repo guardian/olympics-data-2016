@@ -97,7 +97,7 @@ swig.setFilter('countryEntrant', medal => {
     } else {
         switch (medal.event.event.identifier[2]) {
             case 'M': return 'Men\'s team';
-            case 'F': return 'Women\'s team';
+            case 'W': return 'Women\'s team';
             default: return 'Mixed team'
         }
     }
