@@ -38,7 +38,7 @@ module.exports = function(grunt) {
                 tasks: ['shell:render']
             },
             server: {
-                files: ['../data/data-out/**/*', 'src/**'],
+                files: ['../data/data-out/lastUpdated.json', 'src/**'],
                 tasks: ['deploy'],
             }
         },
