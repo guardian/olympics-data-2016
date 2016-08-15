@@ -327,6 +327,9 @@ a {
     &:last-child {
         border-bottom: 0;
     }
+    &.om-entrant--qualified {
+        background-color: #e3f8e9;
+    }
 }
 
 .om-entrant__header {

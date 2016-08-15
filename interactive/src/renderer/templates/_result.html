@@ -31,12 +31,10 @@
     </thead>
     <tbody>
         {% for entrant in result.entrants %}
-            <tr class="om-entrant">
+            <tr class="om-entrant {% if entrant.qualified %}om-entrant--qualified{% endif %}">
                 <td>
                     {% if entrant.medal %}
                         <div class="om-medal om-medal--{{ entrant.medal|lower }}"></div>
-                    {% elif entrant.qualified %}
-                        <div class="om-qualified"></div>
                     {% else %}
                         {{ entrant.rank || entrant.order }}.
                     {% endif %}

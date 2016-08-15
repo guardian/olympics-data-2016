@@ -121,6 +121,7 @@ function parseValue(value) {
 function parseEntrant(entrant) {
     let properties = _(forceArray(entrant.property)).keyBy('type').mapValues('value').valueOf();
     let resultExtensions = _.keyBy(forceArray(entrant.resultExtension), 'type');
+    let qualMark = properties['Qualification Mark'];
 
     return {
         'code': entrant.code,
@@ -133,7 +134,8 @@ function parseEntrant(entrant) {
         resultExtensions,
         'medal': properties['Medal Awarded'],
         'record': properties['Record Set'],
-        'invalidResultMark': properties['Invalid Result Mark']
+        'invalidResultMark': properties['Invalid Result Mark'],
+        'qualified': qualMark && qualMark !== 'Eliminated'
     };
 }
 
