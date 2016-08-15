@@ -60,7 +60,7 @@
                                 </div>
                             {% endif %}
                             {% if phaseResult && (phase.eventCount > 1 || !event.resultAvailable) %}
-                                <div class="om-event__result">
+                                <div class="om-event__result om-event__result--grey">
                                     {% if phase.eventCount > 1 %}
                                         <div class="om-event__sub-name">{{ event.phase.value }} phase result:</div>
                                     {% endif %}
