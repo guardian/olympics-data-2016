@@ -19,8 +19,6 @@ const roundDisciplines = {
     'water-polo': 'Quarter Scores'
 }
 
-const cumulativeDisciplines = ['athletics', 'equestrian', 'golf', 'modern-pentathlon', 'sailing'];
-
 const gymnasticsTypes = [
     'Floor Breakdown', 'Vault Breakdown', 'Beam Breakdown', 'Uneven Bars Breakdown', 'Pommelhorse Breakdown',
     'Rings Breakdown', 'Parallel Bars Breakdown', 'Horizontal Bars Breakdown'
@@ -169,6 +167,7 @@ const parsePhases = wrapError('phases', (evt, events) => {
                 'identifier': evt.disciplineDescription.identifier,
                 'description': evt.disciplineDescription.value
             },
+            'cumulativeResultAvailable': evt.cumulativeResultAvailable === 'Yes',
             'resultAvailable': phase.resultAvailable === 'Yes',
             'medalEvent': phaseEvents.some(evt => evt.medalEvent),
             'eventCount': phaseEvents.length
@@ -472,10 +471,16 @@ export default {
         },
             {
             'name': 'cumulativeResults',
-            'dependencies': ({events}) => {
+            'dependencies': ({events, phases}) => {
+                let eventsWithCumulativeResults = _(phases)
+                    .filter('cumulativeResultAvailable')
+                    .map('event.identifier')
+                    .uniq()
+                    .valueOf();
+
                 return _.values(events)
                     .filter(evt => evt.status === 'Finished')
-                    .filter(evt => cumulativeDisciplines.indexOf(evt.discipline.identifier) > -1)
+                    .filter(evt => eventsWithCumulativeResults.indexOf(evt.event.identifier) > -1)
                     .map(evt => `olympics/2016-summer-olympics/event/${evt.event.identifier}/cumulative-result`);
             },
             'process': ({}, cumulativeResults, logger) => {
