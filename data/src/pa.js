@@ -88,16 +88,19 @@ function PA(logger, metric) {
 
             return await (!config.argv.pa || moment().isBefore(expiryTime) ? requestCache(endpoint) : requestUrl(endpoint));
         } catch (err) {
-            if (err.code && err.code === 'ENOENT') {
+            if (err.name === 'StatusCodeError' && err.statusCode >= 500) {
+                logger.warn(`Server error (${err.statusCode}), using cache for ${endpoint}`);
+                try { return await requestCache(endpoint); } catch (err2) {}
+            } else if (err.code && err.code === 'ENOENT') {
                 if (config.argv.pa) {
                     return await requestUrl(endpoint);
                 } else {
                     logger.warn('No cached response for', endpoint);
                     return {'olympics': {}};
                 }
-            } else {
-                throw err;
             }
+
+            throw err;
         }
     };
 }
